@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProAcryl Collection Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg:#0e0f14;--surface:#16181f;--surface2:#1e2130;--border:#2a2d3a;
+    --accent:#c8964a;--accent2:#8fb8d4;--danger:#c0574a;
+    --text:#ddd5c4;--text-muted:#7a7566;--text-dim:#4a4840;
+    --white:#f0ebe0;--green:#6aaa78;--wish:#8fb8d4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,serif;font-size:17px;min-height:100vh;
+    background-image:radial-gradient(ellipse 80% 50% at 20% 10%,rgba(200,150,74,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 90%,rgba(143,184,212,.04) 0%,transparent 60%);}
+  .screen{display:none;min-height:100vh;}
+  .screen.active{display:flex;flex-direction:column;}
+  .center-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2.5rem 2.8rem;width:100%;max-width:520px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 0 1px rgba(200,150,74,.06);animation:fadeUp .4s ease both;}
+  h1{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:var(--white);line-height:1.2;margin-bottom:.4rem;}
+  h2{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:600;color:var(--white);margin-bottom:.4rem;}
+  .subtitle{color:var(--text-muted);font-size:.95rem;font-style:italic;margin-bottom:2rem;line-height:1.5;}
+  .label{display:block;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem;font-family:'Crimson Pro',serif;font-weight:600;}
+  input[type="text"],input[type="password"],input[type="email"]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:7px;
+    color:var(--white);font-family:'Crimson Pro',serif;font-size:1rem;padding:.65rem .9rem;outline:none;transition:border-color .2s;margin-bottom:1.1rem;}
+  textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--white);font-family:'Crimson Pro',serif;
+    font-size:.95rem;padding:.65rem .9rem;outline:none;transition:border-color .2s;resize:vertical;min-height:100px;line-height:1.5;}
+  input:focus,textarea:focus{border-color:var(--accent);}
+  input::placeholder,textarea::placeholder{color:var(--text-dim);}
+  .btn{display:inline-block;padding:.7rem 1.8rem;border-radius:8px;border:none;cursor:pointer;font-family:'Crimson Pro',serif;font-size:1rem;font-weight:600;letter-spacing:.04em;transition:all .15s;}
+  .btn-primary{background:var(--accent);color:#0e0f14;width:100%;padding:.8rem;font-size:1.05rem;margin-top:.5rem;}
+  .btn-primary:hover:not(:disabled){background:#d9a85a;transform:translateY(-1px);}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+  .btn-ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border);font-size:.85rem;}
+  .btn-ghost:hover{border-color:var(--text-muted);color:var(--text);}
+  .btn-sm{padding:.4rem 1rem;font-size:.88rem;}
+  .style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-bottom:1.6rem;}
+  .style-card{background:var(--bg);border:2px solid var(--border);border-radius:10px;padding:1rem .7rem;text-align:center;cursor:pointer;transition:all .2s;}
+  .style-card:hover{border-color:var(--accent);}
+  .style-card.selected{border-color:var(--accent);background:rgba(200,150,74,.08);}
+  .style-card .icon{font-size:1.8rem;display:block;margin-bottom:.5rem;}
+  .style-card .name{font-family:'Playfair Display',serif;font-size:.9rem;font-weight:600;color:var(--white);display:block;margin-bottom:.25rem;}
+  .style-card .desc{font-size:.75rem;color:var(--text-muted);font-style:italic;line-height:1.3;}
+  .style-card.selected .name{color:var(--accent);}
+  .error{color:var(--danger);font-size:.85rem;margin-top:-.7rem;margin-bottom:.8rem;}
+  .link-btn{background:none;border:none;color:var(--accent2);cursor:pointer;font-family:'Crimson Pro',serif;font-size:.9rem;text-decoration:underline;padding:0;}
+  .link-btn:hover{color:var(--accent);}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spinner{width:18px;height:18px;border:2px solid rgba(14,15,20,.3);border-top-color:#0e0f14;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:.5rem;}
+
+  /* Init */
+  #init-screen{align-items:center;justify-content:center;}
+  .init-inner{text-align:center;}
+  .init-inner p{color:var(--text-muted);font-style:italic;margin-top:.8rem;}
+
+  /* Topbar */
+  #app-screen{flex-direction:column;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:.5rem;}
+  .topbar-brand{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--white);display:flex;align-items:center;gap:.6rem;}
+  .topbar-brand span{color:var(--accent);}
+  .topbar-right{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+  .user-badge{font-size:.8rem;color:var(--text-muted);font-style:italic;}
+  .user-badge b{color:var(--accent);font-style:normal;}
+  .progress-pills{display:flex;gap:.5rem;}
+  .progress-pill{background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:.3rem .9rem;font-size:.8rem;font-weight:600;font-family:'Crimson Pro',serif;white-space:nowrap;}
+  .owned-pill{color:var(--green);border-color:rgba(106,170,120,.3);}
+  .wish-pill{color:var(--wish);border-color:rgba(143,184,212,.3);}
+
+  /* App body */
+  .app-body{max-width:1050px;margin:0 auto;padding:2rem 1.5rem 4rem;width:100%;}
+  .app-intro{margin-bottom:1.8rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+  .app-intro h2{font-size:1.9rem;margin-bottom:.25rem;}
+  .style-badge{display:inline-block;background:rgba(200,150,74,.12);border:1px solid rgba(200,150,74,.3);color:var(--accent);border-radius:99px;padding:.2rem .8rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;font-family:'Crimson Pro',serif;margin-bottom:.5rem;}
+  .nudge{background:linear-gradient(135deg,rgba(143,184,212,.08),rgba(200,150,74,.08));border:1px solid rgba(143,184,212,.2);border-radius:10px;padding:1rem 1.2rem;display:flex;align-items:center;gap:.9rem;margin-bottom:1.8rem;font-size:.9rem;color:var(--text-muted);}
+  .nudge-icon{font-size:1.4rem;flex-shrink:0;}
+  .nudge a{color:var(--accent2);text-decoration:underline;cursor:pointer;}
+
+  /* Controls */
+  .controls{display:flex;gap:.8rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center;}
+  .search-wrap{position:relative;flex:1;min-width:200px;}
+  .search-wrap input{margin:0;padding-left:2.2rem;}
+  .search-icon{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:.9rem;pointer-events:none;}
+  .filter-btns{display:flex;gap:.4rem;flex-wrap:wrap;}
+  .filter-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);border-radius:99px;padding:.35rem .9rem;font-size:.78rem;cursor:pointer;font-family:'Crimson Pro',serif;letter-spacing:.05em;text-transform:uppercase;transition:all .15s;}
+  .filter-btn:hover,.filter-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(200,150,74,.08);}
+  .filter-btn.wish-filter.active{border-color:var(--wish);color:var(--wish);background:rgba(143,184,212,.08);}
+
+  /* Paint sections */
+  .line-section{margin-bottom:2.5rem;}
+  .line-header{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--white);margin-bottom:1rem;padding:.65rem 1.1rem;background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;display:flex;align-items:baseline;justify-content:space-between;gap:.6rem;}
+  .line-counts{display:flex;gap:.8rem;}
+  .lc-owned{font-size:.73rem;color:var(--green);font-family:'Crimson Pro',serif;font-style:italic;font-weight:400;}
+  .lc-wish{font-size:.73rem;color:var(--wish);font-family:'Crimson Pro',serif;font-style:italic;font-weight:400;}
+  .group-header{font-size:.78rem;color:var(--text-muted);margin:1.1rem 0 .5rem;padding-bottom:.3rem;border-bottom:1px solid var(--border);display:flex;align-items:baseline;gap:.5rem;text-transform:uppercase;letter-spacing:.1em;font-weight:600;}
+  .group-header .g-count{font-size:.7rem;color:var(--text-dim);font-style:italic;text-transform:none;letter-spacing:0;font-weight:400;}
+
+  /* Paint items */
+  .paint-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:.45rem;}
+  .paint-item{display:flex;align-items:center;gap:.55rem;padding:.45rem .6rem;border-radius:7px;border:1px solid transparent;transition:all .15s;}
+  .paint-item:hover{background:var(--surface2);border-color:var(--border);}
+  .paint-item.owned{background:rgba(106,170,120,.06);border-color:rgba(106,170,120,.2);}
+  .paint-item.wished{background:rgba(143,184,212,.05);border-color:rgba(143,184,212,.2);}
+  .paint-item.saving{opacity:.5;pointer-events:none;}
+  .paint-swatch{width:19px;height:19px;border-radius:50%;flex-shrink:0;border:2px solid rgba(255,255,255,.12);box-shadow:0 1px 4px rgba(0,0,0,.4);}
+  .paint-name{flex:1;font-size:.87rem;color:var(--text);line-height:1.2;}
+  .paint-item.owned .paint-name{color:var(--white);}
+  .paint-item.wished .paint-name{color:var(--accent2);}
+  .paint-code{font-size:.68rem;color:var(--text-dim);font-style:italic;flex-shrink:0;}
+
+  /* Three-column action area */
+  .paint-cols{display:flex;align-items:center;gap:0;flex-shrink:0;}
+  .paint-col{display:flex;flex-direction:column;align-items:center;justify-content:center;width:52px;gap:.2rem;cursor:pointer;padding:.15rem .1rem;border-radius:5px;transition:background .12s;}
+  .paint-col:hover{background:rgba(255,255,255,.04);}
+  .paint-col-label{font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);font-family:'Crimson Pro',serif;line-height:1;user-select:none;}
+  /* Owned box */
+  .col-check{width:16px;height:16px;border-radius:4px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all .15s;}
+  .paint-item.owned .col-check{background:var(--green);border-color:var(--green);}
+  .check-mark{display:none;color:#0e0f14;font-size:9px;font-weight:900;}
+  .paint-item.owned .check-mark{display:block;}
+  .paint-item.owned  .paint-col-label.owned-lbl {color:var(--green);}
+  /* Wish star */
+  .col-star{font-size:.95rem;line-height:1;color:var(--border);transition:all .15s;}
+  .paint-item.wished .col-star{color:var(--wish);filter:drop-shadow(0 0 3px rgba(143,184,212,.5));}
+  .paint-item.wished .paint-col-label.wish-lbl{color:var(--wish);}
+  /* Note icon */
+  .col-note{font-size:.88rem;line-height:1;opacity:.25;transition:opacity .15s;}
+  .has-note .col-note{opacity:.9;}
+  .has-note .paint-col-label.note-lbl{color:var(--accent);}
+  /* Buy column */
+  .col-buy{font-size:.85rem;line-height:1;color:var(--accent);opacity:.4;transition:opacity .15s;}
+  .paint-col:hover .col-buy{opacity:1;}
+  .paint-col.buy-col{text-decoration:none;}
+
+  .empty-state{text-align:center;padding:3rem 1rem;color:var(--text-muted);font-style:italic;}
+
+  /* Modals */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;align-items:center;justify-content:center;padding:1rem;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2rem 2.2rem;width:100%;max-width:440px;animation:fadeUp .25s ease both;}
+  .modal h2{margin-bottom:.3rem;}
+  .modal-sub{font-size:.8rem;color:var(--text-muted);font-style:italic;margin-bottom:1.2rem;}
+  .modal-footer{display:flex;gap:.6rem;margin-top:1rem;justify-content:flex-end;align-items:center;}
+
+  /* Note modal */
+  .note-header{display:flex;align-items:center;gap:.8rem;margin-bottom:1.2rem;}
+  .note-swatch{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.15);flex-shrink:0;}
+  .note-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--white);line-height:1.2;}
+  .note-code{font-size:.75rem;color:var(--text-muted);font-style:italic;}
+  .btn-del{background:transparent;border:none;color:var(--danger);cursor:pointer;font-family:'Crimson Pro',serif;font-size:.85rem;padding:0;margin-right:auto;text-decoration:underline;opacity:.7;}
+  .btn-del:hover{opacity:1;}
+
+  /* Decorative */
+  .paint-drops{display:flex;justify-content:center;gap:.4rem;margin-bottom:.8rem;}
+  .drop{width:12px;height:12px;border-radius:50%;animation:drip 2s ease-in-out infinite;}
+  @keyframes drip{0%,100%{transform:translateY(0);opacity:.7}50%{transform:translateY(4px);opacity:1}}
+
+  /* Toast */
+  .toast{position:fixed;bottom:2rem;right:2rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.7rem 1.2rem;font-size:.85rem;color:var(--text);z-index:200;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;}
+  .toast.show{opacity:1;transform:translateY(0);}
+  .toast.error{border-color:var(--danger);color:var(--danger);}
+</style>
+</head>
+<body>
+
+<!-- INIT -->
+<div class="screen active" id="init-screen">
+  <div class="init-inner" style="margin-top:40vh;">
+    <div class="paint-drops">
+      <div class="drop" style="background:#c8964a;animation-delay:0s"></div>
+      <div class="drop" style="background:#6aaa78;animation-delay:.3s"></div>
+      <div class="drop" style="background:#8fb8d4;animation-delay:.6s"></div>
+      <div class="drop" style="background:#c0574a;animation-delay:.15s"></div>
+      <div class="drop" style="background:#b07ab4;animation-delay:.45s"></div>
+    </div>
+    <p>Loading…</p>
+  </div>
+</div>
+
+<!-- WELCOME -->
+<div class="screen" id="welcome-screen">
+  <div class="center-wrap">
+    <div class="card">
+      <div style="text-align:center;margin-bottom:1.8rem;">
+        <div class="paint-drops">
+          <div class="drop" style="background:#c8964a;animation-delay:0s"></div>
+          <div class="drop" style="background:#6aaa78;animation-delay:.3s"></div>
+          <div class="drop" style="background:#8fb8d4;animation-delay:.6s"></div>
+          <div class="drop" style="background:#c0574a;animation-delay:.15s"></div>
+          <div class="drop" style="background:#b07ab4;animation-delay:.45s"></div>
+        </div>
+        <h1 style="text-align:center;font-size:1.8rem;">ProAcryl Tracker</h1>
+        <p style="font-style:italic;color:var(--text-muted);text-align:center;font-size:.85rem;margin-top:.3rem;">by Monument Hobbies</p>
+      </div>
+      <p class="subtitle" style="text-align:center;margin-bottom:1.8rem;">Track your collection, build your wishlist, and never buy a duplicate again.</p>
+      <button class="btn btn-primary" onclick="showScreen('register-screen')">Create an Account</button>
+      <div style="text-align:center;margin-top:1rem;font-size:.88rem;color:var(--text-muted);">
+        Already have one? <button class="link-btn" onclick="showScreen('login-screen')">Sign in</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div class="screen" id="register-screen">
+  <div class="center-wrap">
+    <div class="card">
+      <h2>Create Account</h2>
+      <p class="subtitle">Your collection will be saved and accessible anywhere.</p>
+      <label class="label">Username</label>
+      <input type="text" id="reg-username" placeholder="e.g. nightshade_painter" autocomplete="off">
+      <div class="error" id="reg-user-error"></div>
+      <label class="label">Email</label>
+      <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="off">
+      <label class="label">Password</label>
+      <input type="password" id="reg-password" placeholder="At least 6 characters">
+      <label class="label">Confirm Password</label>
+      <input type="password" id="reg-confirm" placeholder="Repeat your password">
+      <div class="error" id="reg-pass-error"></div>
+      <button class="btn btn-primary" id="reg-btn" onclick="handleRegister()">Continue →</button>
+      <div style="text-align:center;margin-top:.9rem;font-size:.88rem;color:var(--text-muted);">
+        <button class="link-btn" onclick="showScreen('welcome-screen')">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="screen" id="login-screen">
+  <div class="center-wrap">
+    <div class="card">
+      <h2>Welcome Back</h2>
+      <p class="subtitle">Sign in to pick up where you left off.</p>
+      <label class="label">Email</label>
+      <input type="email" id="login-email" placeholder="you@example.com" autocomplete="off">
+      <label class="label">Password</label>
+      <input type="password" id="login-password" placeholder="Your password">
+      <div class="error" id="login-error"></div>
+      <button class="btn btn-primary" id="login-btn" onclick="handleLogin()">Sign In</button>
+      <div style="text-align:center;margin-top:.9rem;font-size:.88rem;color:var(--text-muted);">
+        <button class="link-btn" onclick="showScreen('welcome-screen')">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STYLE -->
+<div class="screen" id="style-screen">
+  <div class="center-wrap">
+    <div class="card" style="max-width:580px;">
+      <h2>How do you paint?</h2>
+      <p class="subtitle">This helps us personalise your experience.</p>
+      <div class="style-grid">
+        <div class="style-card" data-style="Competition" onclick="selectStyle(this)">
+          <span class="icon">🏆</span><span class="name">Competition</span>
+          <span class="desc">NMM, OSL, and advanced blending for the podium</span>
+        </div>
+        <div class="style-card" data-style="Display" onclick="selectStyle(this)">
+          <span class="icon">🖼️</span><span class="name">Display</span>
+          <span class="desc">Showcase pieces with depth and storytelling</span>
+        </div>
+        <div class="style-card" data-style="Gaming" onclick="selectStyle(this)">
+          <span class="icon">🎲</span><span class="name">Gaming</span>
+          <span class="desc">Efficient, bold, tabletop-ready armies</span>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="style-btn" onclick="handleStyleSelect()">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="screen" id="profile-screen">
+  <div class="center-wrap">
+    <div class="card">
+      <h2>Tell us about yourself</h2>
+      <p class="subtitle">Just a few details so your dashboard feels like yours.</p>
+      <label class="label">Display Name <span style="color:var(--text-muted);font-size:.75em;">(optional)</span></label>
+      <input type="text" id="profile-name" placeholder="e.g. Lady Grimdark">
+      <label class="label">Experience Level</label>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.2rem;">
+        <div class="filter-btn" data-xp="Beginner"     onclick="selectXP(this)">Beginner</div>
+        <div class="filter-btn" data-xp="Intermediate" onclick="selectXP(this)">Intermediate</div>
+        <div class="filter-btn" data-xp="Advanced"     onclick="selectXP(this)">Advanced</div>
+        <div class="filter-btn" data-xp="Veteran"      onclick="selectXP(this)">Veteran</div>
+      </div>
+      <label class="label">Favourite Hobby System <span style="color:var(--text-muted);font-size:.75em;">(optional)</span></label>
+      <input type="text" id="profile-system" placeholder="e.g. Warhammer 40K, Kings of War…">
+      <button class="btn btn-primary" id="profile-btn" onclick="handleProfileSave()">Enter My Collection →</button>
+      <div style="text-align:center;margin-top:.9rem;">
+        <button class="link-btn" onclick="handleProfileSave()" style="font-size:.82rem;">Skip for now</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="screen" id="app-screen">
+  <div class="topbar">
+    <div class="topbar-brand">🎨 <span>ProAcryl</span> Tracker</div>
+    <div class="topbar-right">
+      <div class="progress-pills">
+        <div class="progress-pill owned-pill" id="owned-pill">0 owned</div>
+        <div class="progress-pill wish-pill"  id="wish-pill">0 wishlisted</div>
+      </div>
+      <div class="user-badge">Signed in as <b id="topbar-username"></b></div>
+      <button class="btn btn-ghost btn-sm" onclick="handleLogout()">Log Out</button>
+    </div>
+  </div>
+  <div class="app-body">
+    <div class="app-intro">
+      <div class="style-badge" id="style-badge"></div>
+      <h2 id="app-greeting"></h2>
+      <p class="subtitle" id="app-subtitle" style="margin-bottom:0;"></p>
+    </div>
+    <div class="nudge" id="profile-nudge" style="display:none;">
+      <div class="nudge-icon">✏️</div>
+      <div>Complete your painter profile to personalise your experience. <a onclick="showModal('profile-modal')">Finish setup →</a></div>
+    </div>
+    <div class="controls">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Search by name or code…" oninput="renderPaints()" style="margin:0;">
+      </div>
+      <div class="filter-btns">
+        <button class="filter-btn active"         data-filter="all"     onclick="setFilter(this,'all')">All</button>
+        <button class="filter-btn"                data-filter="owned"   onclick="setFilter(this,'owned')">Owned</button>
+        <button class="filter-btn wish-filter"    data-filter="wished"  onclick="setFilter(this,'wished')">★ Wishlist</button>
+        <button class="filter-btn"                data-filter="missing" onclick="setFilter(this,'missing')">Missing</button>
+      </div>
+    </div>
+    <div id="paint-list"></div>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="profile-modal">
+  <div class="modal">
+    <h2>Your Profile</h2>
+    <label class="label" style="margin-top:.8rem;">Display Name</label>
+    <input type="text" id="modal-name" placeholder="e.g. Lady Grimdark">
+    <label class="label">Experience Level</label>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+      <div class="filter-btn" data-xp="Beginner"     onclick="selectXPModal(this)">Beginner</div>
+      <div class="filter-btn" data-xp="Intermediate" onclick="selectXPModal(this)">Intermediate</div>
+      <div class="filter-btn" data-xp="Advanced"     onclick="selectXPModal(this)">Advanced</div>
+      <div class="filter-btn" data-xp="Veteran"      onclick="selectXPModal(this)">Veteran</div>
+    </div>
+    <label class="label">Favourite System</label>
+    <input type="text" id="modal-system" placeholder="e.g. Warhammer 40K">
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('profile-modal')">Cancel</button>
+      <button class="btn btn-primary" id="modal-save-btn" style="width:auto;" onclick="saveModalProfile()">Save Profile</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTE MODAL -->
+<div class="modal-overlay" id="note-modal">
+  <div class="modal">
+    <div class="note-header">
+      <div class="note-swatch" id="note-modal-swatch"></div>
+      <div>
+        <div class="note-title" id="note-modal-name"></div>
+        <div class="note-code"  id="note-modal-code"></div>
+      </div>
+    </div>
+    <label class="label">Your Notes</label>
+    <textarea id="note-textarea" placeholder="Colours you've mixed with this, techniques that worked, project ideas…"></textarea>
+    <div class="modal-footer">
+      <button class="btn-del" id="note-delete-btn" onclick="deleteNote()" style="display:none;">Delete note</button>
+      <button class="btn btn-ghost" onclick="closeModal('note-modal')">Cancel</button>
+      <button class="btn btn-primary" id="note-save-btn" style="width:auto;" onclick="saveNote()">Save Note</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── Affiliate ────────────────────────────────
+const AFFILIATE_ID = 'YOUR_RFSN_ID'; // ← paste your Refersion ID from the Monumentals portal
+
+const SLUG_MAP = {
+  // Standard Colors
+  "001":"pro-acryl-bold-titanium-white","002":"pro-acryl-coal-black",
+  "003":"pro-acryl-bold-pyrrole-red","004":"pro-acryl-green",
+  "005":"pro-acryl-blue","006":"pro-acryl-golden-yellow",
+  "007":"pro-acryl-orange","008":"pro-acryl-burnt-red",
+  "009":"pro-acryl-mahogany","010":"pro-acryl-purple",
+  "011":"pro-acryl-magenta","012":"pro-acryl-sky-blue",
+  "013":"pro-acryl-faded-ultramarine","014":"pro-acryl-dark-grey-blue",
+  "015":"pro-acryl-bright-warm-grey","016":"pro-acryl-dark-warm-grey",
+  "017":"pro-acryl-golden-brown","018":"pro-acryl-light-umber",
+  "019":"pro-acryl-dark-umber","020":"pro-acryl-camo-green",
+  "021":"pro-acryl-jade","022":"pro-acryl-bright-ivory",
+  "023":"pro-acryl-ivory","024":"pro-acryl-tan-flesh",
+  "034":"pro-acryl-dark-blue","035":"pro-acryl-dark-purple",
+  "036":"pro-acryl-dark-camo-green","037":"pro-acryl-burnt-orange",
+  "038":"pro-acryl-yellow-ochre","039":"pro-acryl-bright-yellow-green",
+  "040":"pro-acryl-black-brown","041":"pro-acryl-olive-flesh",
+  "042":"pro-acryl-shadow-flesh","043":"pro-acryl-pale-pink",
+  "044":"pro-acryl-dark-neutral-grey","045":"pro-acryl-bright-neutral-grey",
+  "054":"pro-acryl-turquoise","055":"pro-acryl-grey-blue",
+  "056":"pro-acryl-blue-black","057":"pro-acryl-black-green",
+  "058":"pro-acryl-bright-pale-green","059":"pro-acryl-burnt-sienna",
+  "060":"pro-acryl-pale-yellow","061":"pro-acryl-khaki",
+  "062":"pro-acryl-dark-golden-brown","063":"pro-acryl-faded-plum",
+  "065":"pro-acryl-yellow-green","066":"pro-acryl-faded-green",
+  "067":"pro-acryl-bright-jade","068":"pro-acryl-dark-flesh",
+  "069":"pro-acryl-burgundy","070":"pro-acryl-plum",
+  "071":"pro-acryl-pink","072":"pro-acryl-warm-yellow",
+  "073":"pro-acryl-warm-flesh","074":"pro-acryl-warm-grey",
+  "075":"pro-acryl-neutral-grey",
+  // Metallics
+  "025":"pro-acryl-silver","026":"pro-acryl-light-bronze",
+  "027":"pro-acryl-copper","028":"pro-acryl-rich-gold",
+  "029":"pro-acryl-white-gold","030":"pro-acryl-dark-silver",
+  "031":"pro-acryl-bright-gold","032":"pro-acryl-bronze",
+  "033":"pro-acryl-metallic-medium",
+  // Transparents
+  "046":"pro-acryl-transparent-blue","047":"pro-acryl-transparent-red",
+  "048":"pro-acryl-transparent-green","049":"pro-acryl-transparent-yellow",
+  "050":"pro-acryl-transparent-orange","051":"pro-acryl-transparent-purple",
+  "052":"pro-acryl-transparent-brown","053":"pro-acryl-transparent-black",
+  "064":"pro-acryl-transparent-white",
+  // Signature Series
+  "S01":"s01-vince-venturella-dark-jade","S02":"s02-vince-venturella-paynes-grey",
+  "S03":"s03-vince-venturella-royal-purple","S04":"s04-vince-venturella-white-blue",
+  "S05":"s05-vince-venturella-beige-red","S06":"s06-vince-venturella-dark-yellow-green",
+  "S07":"s07-ninjon-dark-ivory","S08":"s08-ninjon-dark-warm-flesh",
+  "S09":"s09-ninjon-warm-brown","S10":"s10-ninjon-dark-magenta",
+  "S11":"s11-ninjon-dark-plum","S12":"s12-ninjon-red-grey",
+  "S13":"s13-ben-komets-dark-sea-ben","S14":"s14-ben-komets-petroleum-brown",
+  "S15":"s15-ben-komets-dark-burgundy","S16":"s16-ben-komets-green-oxide",
+  "S17":"s17-ben-komets-advanced-flesh-tone","S18":"s18-ben-komets-heavy-warm-white",
+  "S19":"s19-matt-cexwish-dark-crimson","S20":"s20-matt-cexwish-dark-emerald",
+  "S21":"s21-matt-cexwish-heavy-titanium-white","S22":"s22-matt-cexwish-brown-grey",
+  "S23":"s23-matt-cexwish-bone","S24":"s24-matt-cexwish-dark-bronze",
+  "S25":"s25-flameon-dark-green-brown","S26":"s26-flameon-dark-orange-brown",
+  "S27":"s27-flameon-orange-brown","S28":"s28-flameon-caramel-brown",
+  "S29":"s29-flameon-bright-yellow-ochre","S30":"s30-flameon-bright-pale-yellow",
+  "S31":"s31-rogue-hobbies-orange-red","S32":"s32-rogue-hobbies-dark-hot-pink",
+  "S33":"s33-rogue-hobbies-bright-green","S34":"s34-rogue-hobbies-dark-turquoise",
+  "S35":"s35-rogue-hobbies-ultramarine","S36":"s36-rogue-hobbies-bismuth-yellow",
+  "S37":"s37-adepticon-red-oxide","S38":"s38-adepticon-orange-oxide",
+  "S39":"s39-adepticon-satin-black","S40":"s40-adepticon-drab-brown",
+  "S41":"s41-adepticon-bright-shadow-flesh","S42":"s42-adepticon-magnesium",
+  "S49":"s49-nova-orange",
+  // AMP Colors
+  "AMP002":"amp-colors-002-cool-grey","AMP004":"amp-colors-004-black-red",
+  "AMP005":"amp-colors-005-dark-navy-blue","AMP006":"amp-colors-006-beige-grey",
+  "AMP007":"amp-colors-007-orange-yellow","AMP008":"amp-colors-008-peach-flesh",
+  "AMP009":"amp-colors-009-bright-green-blue","AMP010":"amp-colors-010-steel",
+  "AMP011":"amp-colors-011-magenta-wash","AMP012":"amp-colors-012-petroleum-brown-wash",
+  "AMP013":"amp-colors-013-slate-grey","AMP017":"amp-colors-017-red-orange",
+  "AMP018":"amp-colors-018-burnt-umber","AMP020":"amp-colors-020-green-brown",
+  "AMP021":"amp-colors-021-bright-brown-grey","AMP022":"amp-colors-022-grey-green",
+  "AMP023":"amp-colors-023-brown-grey-wash","AMP024":"amp-colors-024-paynes-grey-wash",
+  // Fluorescents
+  "F01":"f01-fluorescent-red","F02":"f02-fluorescent-orange",
+  "F03":"f03-fluorescent-yellow","F04":"f04-fluorescent-green",
+  "F05":"f05-fluorescent-purple","F06":"f06-fluorescent-pink",
+  // Primers
+  "P-002":"pro-acryl-prime-002-black","P-003":"pro-acryl-prime-003-white",
+  "P-005":"pro-acryl-prime-005-dark-neutral-grey",
+  "P-007":"pro-acryl-prime-007-dark-camo-green",
+  "P-011":"pro-acryl-prime-011-black-brown",
+  // Washes
+  "200":"pro-acryl-black-wash","201":"pro-acryl-brown-wash","202":"pro-acryl-flesh-wash",
+  // Basing Textures
+  "T01":"t01-grey-fine-basing-texture","T02":"t02-grey-coarse-basing-texture",
+  "T03":"t03-red-earth-fine-basing-texture","T04":"t04-golden-earth-fine-basing-texture",
+  "T05":"t05-concrete-extra-fine-basing-texture","T06":"t06-snow-ultra-fine-basing-texture",
+  "T07":"t07-brown-earth-fine-basing-texture","T08":"t08-brown-earth-coarse-basing-texture",
+};
+
+function buyUrl(code) {
+  const slug = SLUG_MAP[code];
+  const base = slug
+    ? `https://monumenthobbies.com/products/${slug}`
+    : `https://monumenthobbies.com/search?q=${encodeURIComponent(PAINT_MAP[code]?.name || code)}`;
+  return AFFILIATE_ID === 'YOUR_RFSN_ID'
+    ? base
+    : `${base}?rfsn=${AFFILIATE_ID}`;
+}
+
+// ─── Supabase ─────────────────────────────────
+const { createClient } = supabase;
+const sb = createClient(
+  'https://nefoybidbeybjaepfgao.supabase.co',
+  'sb_publishable_2GEqVM0FIzy8pid7pPcf0g_KxkE8d63'
+);
+
+// ─── Paint data ───────────────────────────────
+const PAINTS = [
+  // STANDARD COLORS
+  {code:"001",name:"Bold Titanium White", line:"Standard Colors",sub:"Whites",  hex:"#F4F4F2"},
+  {code:"002",name:"Coal Black",          line:"Standard Colors",sub:"Blacks",  hex:"#1e1e22"},
+  {code:"003",name:"Bold Pyrrole Red",    line:"Standard Colors",sub:"Reds",    hex:"#C82020"},
+  {code:"004",name:"Green",               line:"Standard Colors",sub:"Greens",  hex:"#2A7A30"},
+  {code:"005",name:"Blue",                line:"Standard Colors",sub:"Blues",   hex:"#2040A8"},
+  {code:"006",name:"Golden Yellow",       line:"Standard Colors",sub:"Yellows", hex:"#E8A820"},
+  {code:"007",name:"Orange",              line:"Standard Colors",sub:"Oranges", hex:"#E06020"},
+  {code:"008",name:"Burnt Red",           line:"Standard Colors",sub:"Reds",    hex:"#922018"},
+  {code:"009",name:"Mahogany",            line:"Standard Colors",sub:"Browns",  hex:"#6A2A18"},
+  {code:"010",name:"Purple",              line:"Standard Colors",sub:"Purples", hex:"#6A1888"},
+  {code:"011",name:"Magenta",             line:"Standard Colors",sub:"Pinks",   hex:"#C02088"},
+  {code:"012",name:"Sky Blue",            line:"Standard Colors",sub:"Blues",   hex:"#5090C8"},
+  {code:"013",name:"Faded Ultramarine",   line:"Standard Colors",sub:"Blues",   hex:"#5868A0"},
+  {code:"014",name:"Dark Grey Blue",      line:"Standard Colors",sub:"Blues",   hex:"#384860"},
+  {code:"015",name:"Bright Warm Grey",    line:"Standard Colors",sub:"Greys",   hex:"#B8B0A4"},
+  {code:"016",name:"Dark Warm Grey",      line:"Standard Colors",sub:"Greys",   hex:"#706860"},
+  {code:"017",name:"Golden Brown",        line:"Standard Colors",sub:"Browns",  hex:"#A06828"},
+  {code:"018",name:"Light Umber",         line:"Standard Colors",sub:"Browns",  hex:"#8A5830"},
+  {code:"019",name:"Dark Umber",          line:"Standard Colors",sub:"Browns",  hex:"#503020"},
+  {code:"020",name:"Camo Green",          line:"Standard Colors",sub:"Greens",  hex:"#5A6030"},
+  {code:"021",name:"Jade",                line:"Standard Colors",sub:"Greens",  hex:"#2A7860"},
+  {code:"022",name:"Bright Ivory",        line:"Standard Colors",sub:"Whites",  hex:"#EEE8CC"},
+  {code:"023",name:"Ivory",               line:"Standard Colors",sub:"Whites",  hex:"#E0D8B8"},
+  {code:"024",name:"Tan Flesh",           line:"Standard Colors",sub:"Flesh",   hex:"#D4A878"},
+  {code:"034",name:"Dark Blue",           line:"Standard Colors",sub:"Blues",   hex:"#1A2880"},
+  {code:"035",name:"Dark Purple",         line:"Standard Colors",sub:"Purples", hex:"#401060"},
+  {code:"036",name:"Dark Camo Green",     line:"Standard Colors",sub:"Greens",  hex:"#3A4020"},
+  {code:"037",name:"Burnt Orange",        line:"Standard Colors",sub:"Oranges", hex:"#C04818"},
+  {code:"038",name:"Yellow Ochre",        line:"Standard Colors",sub:"Yellows", hex:"#C89030"},
+  {code:"039",name:"Bright Yellow Green", line:"Standard Colors",sub:"Greens",  hex:"#80B020"},
+  {code:"040",name:"Black Brown",         line:"Standard Colors",sub:"Browns",  hex:"#2A1A10"},
+  {code:"041",name:"Olive Flesh",         line:"Standard Colors",sub:"Flesh",   hex:"#B09060"},
+  {code:"042",name:"Shadow Flesh",        line:"Standard Colors",sub:"Flesh",   hex:"#987060"},
+  {code:"043",name:"Pale Pink",           line:"Standard Colors",sub:"Pinks",   hex:"#E8C0C0"},
+  {code:"044",name:"Dark Neutral Grey",   line:"Standard Colors",sub:"Greys",   hex:"#484848"},
+  {code:"045",name:"Bright Neutral Grey", line:"Standard Colors",sub:"Greys",   hex:"#989898"},
+  {code:"054",name:"Turquoise",           line:"Standard Colors",sub:"Blues",   hex:"#20A898"},
+  {code:"055",name:"Grey Blue",           line:"Standard Colors",sub:"Blues",   hex:"#607898"},
+  {code:"056",name:"Blue Black",          line:"Standard Colors",sub:"Blues",   hex:"#181E30"},
+  {code:"057",name:"Black Green",         line:"Standard Colors",sub:"Greens",  hex:"#1A2820"},
+  {code:"058",name:"Bright Pale Green",   line:"Standard Colors",sub:"Greens",  hex:"#98D090"},
+  {code:"059",name:"Burnt Sienna",        line:"Standard Colors",sub:"Browns",  hex:"#9A3E18"},
+  {code:"060",name:"Pale Yellow",         line:"Standard Colors",sub:"Yellows", hex:"#EEE090"},
+  {code:"061",name:"Khaki",               line:"Standard Colors",sub:"Greens",  hex:"#B0A060"},
+  {code:"062",name:"Dark Golden Brown",   line:"Standard Colors",sub:"Browns",  hex:"#7A4A10"},
+  {code:"063",name:"Faded Plum",          line:"Standard Colors",sub:"Purples", hex:"#987080"},
+  {code:"065",name:"Yellow Green",        line:"Standard Colors",sub:"Greens",  hex:"#9ABE40"},
+  {code:"066",name:"Faded Green",         line:"Standard Colors",sub:"Greens",  hex:"#78A070"},
+  {code:"067",name:"Bright Jade",         line:"Standard Colors",sub:"Greens",  hex:"#28A880"},
+  {code:"068",name:"Dark Flesh",          line:"Standard Colors",sub:"Flesh",   hex:"#885040"},
+  {code:"069",name:"Burgundy",            line:"Standard Colors",sub:"Reds",    hex:"#701828"},
+  {code:"070",name:"Plum",                line:"Standard Colors",sub:"Purples", hex:"#602848"},
+  {code:"071",name:"Pink",                line:"Standard Colors",sub:"Pinks",   hex:"#E080A0"},
+  {code:"072",name:"Warm Yellow",         line:"Standard Colors",sub:"Yellows", hex:"#EEC840"},
+  {code:"073",name:"Warm Flesh",          line:"Standard Colors",sub:"Flesh",   hex:"#D09878"},
+  {code:"074",name:"Warm Grey",           line:"Standard Colors",sub:"Greys",   hex:"#A09890"},
+  {code:"075",name:"Neutral Grey",        line:"Standard Colors",sub:"Greys",   hex:"#888888"},
+  // METALLICS
+  {code:"025",name:"Silver",         line:"Metallics",sub:"Metallics",hex:"#C0C0C8"},
+  {code:"026",name:"Light Bronze",   line:"Metallics",sub:"Metallics",hex:"#C0906A"},
+  {code:"027",name:"Copper",         line:"Metallics",sub:"Metallics",hex:"#B07040"},
+  {code:"028",name:"Rich Gold",      line:"Metallics",sub:"Metallics",hex:"#C89820"},
+  {code:"029",name:"White Gold",     line:"Metallics",sub:"Metallics",hex:"#D8D090"},
+  {code:"030",name:"Dark Silver",    line:"Metallics",sub:"Metallics",hex:"#707078"},
+  {code:"031",name:"Bright Gold",    line:"Metallics",sub:"Metallics",hex:"#E0B030"},
+  {code:"032",name:"Bronze",         line:"Metallics",sub:"Metallics",hex:"#9A6028"},
+  {code:"033",name:"Metallic Medium",line:"Metallics",sub:"Metallics",hex:"#909090"},
+  // TRANSPARENTS
+  {code:"046",name:"Transparent Blue",  line:"Transparents",sub:"Transparents",hex:"#2848A0"},
+  {code:"047",name:"Transparent Red",   line:"Transparents",sub:"Transparents",hex:"#C01818"},
+  {code:"048",name:"Transparent Green", line:"Transparents",sub:"Transparents",hex:"#207830"},
+  {code:"049",name:"Transparent Yellow",line:"Transparents",sub:"Transparents",hex:"#D8C020"},
+  {code:"050",name:"Transparent Orange",line:"Transparents",sub:"Transparents",hex:"#D05810"},
+  {code:"051",name:"Transparent Purple",line:"Transparents",sub:"Transparents",hex:"#601888"},
+  {code:"052",name:"Transparent Brown", line:"Transparents",sub:"Transparents",hex:"#603018"},
+  {code:"053",name:"Transparent Black", line:"Transparents",sub:"Transparents",hex:"#101010"},
+  {code:"064",name:"Transparent White", line:"Transparents",sub:"Transparents",hex:"#E8E8F0"},
+  // SIGNATURE SERIES
+  {code:"S01",name:"Dark Jade",           line:"Signature Series",sub:"Set #1 — Vince Venturella",hex:"#1A5A48"},
+  {code:"S02",name:"Payne's Grey",        line:"Signature Series",sub:"Set #1 — Vince Venturella",hex:"#3A4858"},
+  {code:"S03",name:"Royal Purple",        line:"Signature Series",sub:"Set #1 — Vince Venturella",hex:"#501880"},
+  {code:"S04",name:"White Blue",          line:"Signature Series",sub:"Set #1 — Vince Venturella",hex:"#B8D0E8"},
+  {code:"S05",name:"Beige Red",           line:"Signature Series",sub:"Set #1 — Vince Venturella",hex:"#C09080"},
+  {code:"S06",name:"Dark Yellow Green",   line:"Signature Series",sub:"Set #1 — Vince Venturella",hex:"#485820"},
+  {code:"S07",name:"Dark Ivory",          line:"Signature Series",sub:"Set #2 — Ninjon",          hex:"#C8C0A0"},
+  {code:"S08",name:"Dark Warm Flesh",     line:"Signature Series",sub:"Set #2 — Ninjon",          hex:"#906050"},
+  {code:"S09",name:"Warm Brown",          line:"Signature Series",sub:"Set #2 — Ninjon",          hex:"#7A4830"},
+  {code:"S10",name:"Dark Magenta",        line:"Signature Series",sub:"Set #2 — Ninjon",          hex:"#880858"},
+  {code:"S11",name:"Dark Plum",           line:"Signature Series",sub:"Set #2 — Ninjon",          hex:"#380830"},
+  {code:"S12",name:"Red Grey",            line:"Signature Series",sub:"Set #2 — Ninjon",          hex:"#806860"},
+  {code:"S13",name:"Dark Sea Ben",        line:"Signature Series",sub:"Set #3 — Ben Komets",      hex:"#204858"},
+  {code:"S14",name:"Petroleum Brown",     line:"Signature Series",sub:"Set #3 — Ben Komets",      hex:"#403820"},
+  {code:"S15",name:"Dark Burgundy",       line:"Signature Series",sub:"Set #3 — Ben Komets",      hex:"#500818"},
+  {code:"S16",name:"Green Oxide",         line:"Signature Series",sub:"Set #3 — Ben Komets",      hex:"#486028"},
+  {code:"S17",name:"Advanced Flesh Tone", line:"Signature Series",sub:"Set #3 — Ben Komets",      hex:"#C08868"},
+  {code:"S18",name:"Heavy Warm White",    line:"Signature Series",sub:"Set #3 — Ben Komets",      hex:"#F0EAD8"},
+  {code:"S19",name:"Dark Crimson",        line:"Signature Series",sub:"Set #4 — Matt Cexwish",    hex:"#780818"},
+  {code:"S20",name:"Dark Emerald",        line:"Signature Series",sub:"Set #4 — Matt Cexwish",    hex:"#0A5030"},
+  {code:"S21",name:"Heavy Titanium White",line:"Signature Series",sub:"Set #4 — Matt Cexwish",    hex:"#F8F8F6"},
+  {code:"S22",name:"Brown Grey",          line:"Signature Series",sub:"Set #4 — Matt Cexwish",    hex:"#887870"},
+  {code:"S23",name:"Bone",                line:"Signature Series",sub:"Set #4 — Matt Cexwish",    hex:"#D8C898"},
+  {code:"S24",name:"Dark Bronze",         line:"Signature Series",sub:"Set #4 — Matt Cexwish",    hex:"#604020"},
+  {code:"S25",name:"Dark Green Brown",    line:"Signature Series",sub:"Set #5 — Flameon",         hex:"#383818"},
+  {code:"S26",name:"Dark Orange Brown",   line:"Signature Series",sub:"Set #5 — Flameon",         hex:"#703018"},
+  {code:"S27",name:"Orange Brown",        line:"Signature Series",sub:"Set #5 — Flameon",         hex:"#A05020"},
+  {code:"S28",name:"Caramel Brown",       line:"Signature Series",sub:"Set #5 — Flameon",         hex:"#B07830"},
+  {code:"S29",name:"Bright Yellow Ochre", line:"Signature Series",sub:"Set #5 — Flameon",         hex:"#D8A030"},
+  {code:"S30",name:"Bright Pale Yellow",  line:"Signature Series",sub:"Set #5 — Flameon",         hex:"#EEE098"},
+  {code:"S31",name:"Orange Red",          line:"Signature Series",sub:"Set #6 — Rogue Hobbies",   hex:"#D84010"},
+  {code:"S32",name:"Dark Hot Pink",       line:"Signature Series",sub:"Set #6 — Rogue Hobbies",   hex:"#A01060"},
+  {code:"S33",name:"Bright Green",        line:"Signature Series",sub:"Set #6 — Rogue Hobbies",   hex:"#30C040"},
+  {code:"S34",name:"Dark Turquoise",      line:"Signature Series",sub:"Set #6 — Rogue Hobbies",   hex:"#107868"},
+  {code:"S35",name:"Ultramarine",         line:"Signature Series",sub:"Set #6 — Rogue Hobbies",   hex:"#1828A0"},
+  {code:"S36",name:"Bismuth Yellow",      line:"Signature Series",sub:"Set #6 — Rogue Hobbies",   hex:"#E8E040"},
+  {code:"S37",name:"Red Oxide",           line:"Signature Series",sub:"AdeptiCon Spray-Team Set", hex:"#902010"},
+  {code:"S38",name:"Orange Oxide",        line:"Signature Series",sub:"AdeptiCon Spray-Team Set", hex:"#C05010"},
+  {code:"S39",name:"Satin Black",         line:"Signature Series",sub:"AdeptiCon Spray-Team Set", hex:"#141418"},
+  {code:"S40",name:"Drab Brown",          line:"Signature Series",sub:"AdeptiCon Spray-Team Set", hex:"#706040"},
+  {code:"S41",name:"Bright Shadow Flesh", line:"Signature Series",sub:"AdeptiCon Spray-Team Set", hex:"#D4A880"},
+  {code:"S42",name:"Magnesium",           line:"Signature Series",sub:"AdeptiCon Spray-Team Set", hex:"#B0B0B8"},
+  {code:"S49",name:"NOVA Orange",         line:"Signature Series",sub:"AdeptiCon Spray-Team Set", hex:"#F06010"},
+  // AMP COLORS
+  {code:"AMP002",name:"Cool Grey",            line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#909098"},
+  {code:"AMP004",name:"Black Red",            line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#380808"},
+  {code:"AMP005",name:"Dark Navy Blue",       line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#101830"},
+  {code:"AMP006",name:"Beige Grey",           line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#A89E88"},
+  {code:"AMP007",name:"Orange Yellow",        line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#E09820"},
+  {code:"AMP008",name:"Peach Flesh",          line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#E0B090"},
+  {code:"AMP009",name:"Bright Green Blue",    line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#2898A8"},
+  {code:"AMP011",name:"Magenta Wash",         line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#901060"},
+  {code:"AMP012",name:"Petroleum Brown Wash", line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#383020"},
+  {code:"AMP010",name:"Steel",                line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#808898"},
+  {code:"AMP013",name:"Slate Grey",           line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#585E68"},
+  {code:"AMP017",name:"Red Orange",           line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#D04818"},
+  {code:"AMP018",name:"Burnt Umber",          line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#603020"},
+  {code:"AMP020",name:"Green Brown",          line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#505028"},
+  {code:"AMP021",name:"Bright Brown Grey",    line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#A08870"},
+  {code:"AMP022",name:"Grey Green",           line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#708060"},
+  {code:"AMP023",name:"Brown Grey Wash",      line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#504840"},
+  {code:"AMP024",name:"Payne's Grey Wash",    line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#2A3040"},
+  // FLUORESCENTS
+  {code:"F01",name:"Fluorescent Red",    line:"Fluorescents",sub:"Fluorescents",hex:"#FF2020"},
+  {code:"F02",name:"Fluorescent Orange", line:"Fluorescents",sub:"Fluorescents",hex:"#FF6000"},
+  {code:"F03",name:"Fluorescent Yellow", line:"Fluorescents",sub:"Fluorescents",hex:"#FFEE00"},
+  {code:"F04",name:"Fluorescent Green",  line:"Fluorescents",sub:"Fluorescents",hex:"#20EE20"},
+  {code:"F05",name:"Fluorescent Purple", line:"Fluorescents",sub:"Fluorescents",hex:"#B020E0"},
+  {code:"F06",name:"Fluorescent Pink",   line:"Fluorescents",sub:"Fluorescents",hex:"#FF30C0"},
+  // PRIMERS
+  {code:"P-002",name:"Black",             line:"Primers",sub:"Primers",hex:"#141414"},
+  {code:"P-003",name:"White",             line:"Primers",sub:"Primers",hex:"#F6F6F6"},
+  {code:"P-005",name:"Dark Neutral Grey", line:"Primers",sub:"Primers",hex:"#505050"},
+  {code:"P-007",name:"Dark Camo Green",   line:"Primers",sub:"Primers",hex:"#303820"},
+  {code:"P-011",name:"Black Brown",       line:"Primers",sub:"Primers",hex:"#201008"},
+  // WASHES
+  {code:"200",name:"Black Wash",line:"Washes",sub:"Washes",hex:"#181818"},
+  {code:"201",name:"Brown Wash",line:"Washes",sub:"Washes",hex:"#503020"},
+  {code:"202",name:"Flesh Wash",line:"Washes",sub:"Washes",hex:"#905848"},
+  // BASING TEXTURES
+  {code:"T01",name:"Grey Fine",          line:"Basing Textures",sub:"Basing Textures",hex:"#909090"},
+  {code:"T02",name:"Grey Coarse",        line:"Basing Textures",sub:"Basing Textures",hex:"#787878"},
+  {code:"T03",name:"Red Earth Fine",     line:"Basing Textures",sub:"Basing Textures",hex:"#904030"},
+  {code:"T04",name:"Golden Earth Fine",  line:"Basing Textures",sub:"Basing Textures",hex:"#B08040"},
+  {code:"T05",name:"Concrete Extra Fine",line:"Basing Textures",sub:"Basing Textures",hex:"#A0A098"},
+  {code:"T06",name:"Snow Ultra Fine",    line:"Basing Textures",sub:"Basing Textures",hex:"#E8EEF4"},
+  {code:"T07",name:"Brown Earth Fine",   line:"Basing Textures",sub:"Basing Textures",hex:"#7A5030"},
+  {code:"T08",name:"Brown Earth Coarse", line:"Basing Textures",sub:"Basing Textures",hex:"#604020"},
+];
+
+const PAINT_MAP   = Object.fromEntries(PAINTS.map(p => [p.code, p]));
+const LINE_ORDER  = ["Standard Colors","Metallics","Transparents","Signature Series","AMP Colors","Fluorescents","Primers","Washes","Basing Textures"];
+const LINE_ICONS  = {"Standard Colors":"🎨","Metallics":"✨","Transparents":"💧","Signature Series":"⭐","AMP Colors":"🪖","Fluorescents":"💡","Primers":"🧱","Washes":"🌊","Basing Textures":"🌿"};
+const ALWAYS_SUBS = new Set(["Signature Series","AMP Colors"]);
+const COLOUR_SUBS = new Set(["Standard Colors"]);
+
+// ─── State ────────────────────────────────────
+let currentUser    = null;
+let currentProfile = null;
+let ownedPaints    = new Set();
+let wishedPaints   = new Set();
+let paintNotes     = {};        // code → note text
+let activeFilter   = 'all';
+let pendingStyle   = null;
+let pendingXP      = '';
+let noteTargetCode = null;      // which paint the note modal is open for
+
+// ─── UI helpers ───────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function showModal(id) {
+  document.getElementById(id).classList.add('open');
+  if (id === 'profile-modal' && currentProfile) {
+    document.getElementById('modal-name').value   = currentProfile.display_name || '';
+    document.getElementById('modal-system').value = currentProfile.system || '';
+    document.querySelectorAll('#profile-modal [data-xp]').forEach(b =>
+      b.classList.toggle('active', b.dataset.xp === currentProfile.xp));
+  }
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+let toastTimer;
+function showToast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+function setLoading(id, on, label='') {
+  const b = document.getElementById(id);
+  if (!b) return;
+  b.disabled = on;
+  if (on) b.innerHTML = `<span class="spinner"></span>${label}`;
+}
+
+// ─── Session init ─────────────────────────────
+async function init() {
+  const { data:{ session } } = await sb.auth.getSession();
+  if (session) { currentUser = session.user; await loadUserData(); }
+  else showScreen('welcome-screen');
+}
+
+async function loadUserData() {
+  const uid = currentUser.id;
+  const [profRes, ownedRes, wishRes, notesRes] = await Promise.all([
+    sb.from('profiles').select('*').eq('id', uid).single(),
+    sb.from('owned_paints').select('paint_code').eq('user_id', uid),
+    sb.from('wishlist_paints').select('paint_code').eq('user_id', uid),
+    sb.from('paint_notes').select('paint_code,note').eq('user_id', uid),
+  ]);
+  if (!profRes.data) { showScreen('style-screen'); return; }
+  currentProfile = profRes.data;
+  ownedPaints  = new Set((ownedRes.data  || []).map(r => r.paint_code));
+  wishedPaints = new Set((wishRes.data   || []).map(r => r.paint_code));
+  paintNotes   = Object.fromEntries((notesRes.data || []).map(r => [r.paint_code, r.note]));
+  launchApp();
+}
+
+// ─── Auth ─────────────────────────────────────
+async function handleRegister() {
+  const username = document.getElementById('reg-username').value.trim();
+  const email    = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const confirm  = document.getElementById('reg-confirm').value;
+  document.getElementById('reg-user-error').textContent = '';
+  document.getElementById('reg-pass-error').textContent = '';
+  if (!username) { document.getElementById('reg-user-error').textContent = 'Please enter a username.'; return; }
+  if (!email)    { document.getElementById('reg-user-error').textContent = 'Please enter an email.'; return; }
+  if (password.length < 6) { document.getElementById('reg-pass-error').textContent = 'Password must be at least 6 characters.'; return; }
+  if (password !== confirm) { document.getElementById('reg-pass-error').textContent = 'Passwords do not match.'; return; }
+  const { data: existing } = await sb.from('profiles').select('id').eq('username', username).maybeSingle();
+  if (existing) { document.getElementById('reg-user-error').textContent = 'Username already taken.'; return; }
+  setLoading('reg-btn', true, 'Creating account…');
+  const { data, error } = await sb.auth.signUp({ email, password });
+  if (error) { setLoading('reg-btn', false); document.getElementById('reg-pass-error').textContent = error.message; return; }
+  currentUser = data.user;
+  sessionStorage.setItem('pending_username', username);
+  setLoading('reg-btn', false);
+  showScreen('style-screen');
+}
+
+async function handleLogin() {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  document.getElementById('login-error').textContent = '';
+  setLoading('login-btn', true, 'Signing in…');
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) { setLoading('login-btn', false); document.getElementById('login-error').textContent = 'Invalid email or password.'; return; }
+  currentUser = data.user;
+  setLoading('login-btn', false);
+  await loadUserData();
+}
+
+async function handleLogout() {
+  await sb.auth.signOut();
+  currentUser = null; currentProfile = null;
+  ownedPaints = new Set(); wishedPaints = new Set(); paintNotes = {};
+  showScreen('welcome-screen');
+}
+
+// ─── Onboarding ───────────────────────────────
+function selectStyle(el) {
+  document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected'); pendingStyle = el.dataset.style;
+}
+function handleStyleSelect() {
+  if (!pendingStyle) { showToast('Please select a painting style.', true); return; }
+  showScreen('profile-screen');
+}
+function selectXP(el) {
+  document.querySelectorAll('#profile-screen [data-xp]').forEach(b => b.classList.remove('active'));
+  el.classList.add('active'); pendingXP = el.dataset.xp;
+}
+async function handleProfileSave() {
+  const displayName = document.getElementById('profile-name').value.trim();
+  const system      = document.getElementById('profile-system').value.trim();
+  const username    = sessionStorage.getItem('pending_username') || 'painter';
+  const { data:{ session } } = await sb.auth.getSession();
+  if (!session) { showToast('Session expired — please sign in again.', true); showScreen('login-screen'); return; }
+  setLoading('profile-btn', true, 'Saving…');
+  const { data, error } = await sb.from('profiles')
+    .upsert({ id: currentUser.id, username, style: pendingStyle, display_name: displayName, xp: pendingXP, system })
+    .select().single();
+  if (error) { setLoading('profile-btn', false); console.error(error); showToast(error.message, true); return; }
+  currentProfile = data;
+  sessionStorage.removeItem('pending_username');
+  setLoading('profile-btn', false);
+  launchApp();
+}
+
+// ─── Launch ───────────────────────────────────
+function launchApp() {
+  const dn = currentProfile.display_name || currentProfile.username;
+  document.getElementById('app-greeting').textContent    = `Welcome, ${dn}`;
+  document.getElementById('topbar-username').textContent = currentProfile.username;
+  const sm = {
+    Competition:{ badge:'Competition Painter', sub:'Track every pot — your palette is your edge.' },
+    Display:    { badge:'Display Painter',     sub:'Every great piece starts with the right colours.' },
+    Gaming:     { badge:'Gaming Painter',      sub:"Get your army ready. Know what's on your shelf." },
+  };
+  const info = sm[currentProfile.style] || { badge:'Painter', sub:'Your ProAcryl collection.' };
+  document.getElementById('style-badge').textContent  = info.badge;
+  document.getElementById('app-subtitle').textContent = info.sub;
+  document.getElementById('profile-nudge').style.display =
+    (currentProfile.display_name && currentProfile.xp) ? 'none' : 'flex';
+  renderPaints();
+  showScreen('app-screen');
+}
+
+// ─── Owned toggle ─────────────────────────────
+async function toggleOwned(code, event) {
+  event.stopPropagation();
+  const wasOwned = ownedPaints.has(code);
+  wasOwned ? ownedPaints.delete(code) : ownedPaints.add(code);
+  // Marking as owned clears the wishlist — re-wishlist when running low
+  if (!wasOwned && wishedPaints.has(code)) {
+    wishedPaints.delete(code);
+    await sb.from('wishlist_paints').delete().eq('user_id', currentUser.id).eq('paint_code', code);
+  }
+  renderPaints();
+  if (wasOwned) {
+    const { error } = await sb.from('owned_paints').delete().eq('user_id', currentUser.id).eq('paint_code', code);
+    if (error) { ownedPaints.add(code); showToast('Could not save.', true); renderPaints(); }
+  } else {
+    const { error } = await sb.from('owned_paints').insert({ user_id: currentUser.id, paint_code: code });
+    if (error) { ownedPaints.delete(code); showToast('Could not save.', true); renderPaints(); }
+  }
+}
+
+// ─── Wishlist toggle ──────────────────────────
+async function toggleWish(code, event) {
+  event.stopPropagation();
+  const wasWished = wishedPaints.has(code);
+  wasWished ? wishedPaints.delete(code) : wishedPaints.add(code);
+  renderPaints();
+  if (wasWished) {
+    const { error } = await sb.from('wishlist_paints').delete().eq('user_id', currentUser.id).eq('paint_code', code);
+    if (error) { wishedPaints.add(code); showToast('Could not save.', true); renderPaints(); }
+  } else {
+    const { error } = await sb.from('wishlist_paints').upsert({ user_id: currentUser.id, paint_code: code });
+    if (error) { wishedPaints.delete(code); showToast('Could not save.', true); renderPaints(); }
+  }
+}
+
+// ─── Note modal ───────────────────────────────
+function openNoteModal(code, event) {
+  event.stopPropagation();
+  const paint = PAINT_MAP[code];
+  noteTargetCode = code;
+  document.getElementById('note-modal-swatch').style.background = paint.hex;
+  document.getElementById('note-modal-name').textContent = paint.name;
+  document.getElementById('note-modal-code').textContent = code;
+  document.getElementById('note-textarea').value = paintNotes[code] || '';
+  const delBtn = document.getElementById('note-delete-btn');
+  delBtn.style.display = paintNotes[code] ? 'inline' : 'none';
+  showModal('note-modal');
+}
+
+async function saveNote() {
+  const note = document.getElementById('note-textarea').value.trim();
+  const code = noteTargetCode;
+  if (!code) return;
+  setLoading('note-save-btn', true, 'Saving…');
+  if (note) {
+    const { error } = await sb.from('paint_notes')
+      .upsert({ user_id: currentUser.id, paint_code: code, note });
+    if (error) { showToast('Could not save note.', true); setLoading('note-save-btn', false); return; }
+    paintNotes[code] = note;
+  } else {
+    await sb.from('paint_notes').delete().eq('user_id', currentUser.id).eq('paint_code', code);
+    delete paintNotes[code];
+  }
+  setLoading('note-save-btn', false);
+  closeModal('note-modal');
+  renderPaints();
+  showToast(note ? 'Note saved.' : 'Note deleted.');
+}
+
+async function deleteNote() {
+  const code = noteTargetCode;
+  if (!code) return;
+  await sb.from('paint_notes').delete().eq('user_id', currentUser.id).eq('paint_code', code);
+  delete paintNotes[code];
+  closeModal('note-modal');
+  renderPaints();
+  showToast('Note deleted.');
+}
+
+// ─── Render ───────────────────────────────────
+function renderPaints() {
+  const query  = (document.getElementById('search-input').value || '').toLowerCase();
+  const filter = activeFilter;
+
+  const lines = {};
+  PAINTS.forEach(p => {
+    if (!p.name.toLowerCase().includes(query) && !p.code.toLowerCase().includes(query)) return;
+    const isOwned  = ownedPaints.has(p.code);
+    const isWished = wishedPaints.has(p.code);
+    if (filter === 'owned'   && !isOwned)  return;
+    if (filter === 'wished'  && !isWished) return;
+    if (filter === 'missing' && (isOwned || isWished)) return;
+    if (!lines[p.line]) lines[p.line] = {};
+    if (!lines[p.line][p.sub]) lines[p.line][p.sub] = [];
+    lines[p.line][p.sub].push(p);
+  });
+
+  const container = document.getElementById('paint-list');
+  if (!Object.keys(lines).length) {
+    container.innerHTML = '<div class="empty-state">No paints match your search or filter.</div>';
+    updatePills(); return;
+  }
+
+  let html = '';
+  LINE_ORDER.forEach(lineName => {
+    if (!lines[lineName]) return;
+    const subs    = lines[lineName];
+    const all     = Object.values(subs).flat();
+    const ownedN  = all.filter(p => ownedPaints.has(p.code)).length;
+    const wishedN = all.filter(p => wishedPaints.has(p.code)).length;
+    const doSubs  = ALWAYS_SUBS.has(lineName) || (COLOUR_SUBS.has(lineName) && Object.keys(subs).length > 1);
+    const wishHtml = wishedN > 0 ? `<span class="lc-wish">★ ${wishedN} wishlisted</span>` : '';
+
+    html += `<div class="line-section">
+      <div class="line-header">
+        ${LINE_ICONS[lineName]||'🎨'} ${lineName}
+        <div class="line-counts">
+          <span class="lc-owned">${ownedN}/${all.length} owned</span>${wishHtml}
+        </div>
+      </div>`;
+
+    Object.entries(subs).forEach(([subName, paints]) => {
+      if (doSubs) {
+        const os = paints.filter(p => ownedPaints.has(p.code)).length;
+        const ws = paints.filter(p => wishedPaints.has(p.code)).length;
+        const wt = ws > 0 ? ` · <span style="color:var(--wish)">★${ws}</span>` : '';
+        html += `<div class="group-header">${subName}<span class="g-count">${os}/${paints.length}${wt}</span></div>`;
+      }
+      html += '<div class="paint-grid">';
+      paints.forEach(p => {
+        const isOwned  = ownedPaints.has(p.code);
+        const isWished = wishedPaints.has(p.code);
+        const hasNote  = !!paintNotes[p.code];
+        const cls      = [isOwned?'owned':'', isWished?'wished':''].filter(Boolean).join(' ');
+        const noteCls  = hasNote ? 'has-note' : '';
+        const safeCode = p.code.replace(/'/g, "\\'");
+        html += `<div class="paint-item ${cls} ${noteCls}" data-code="${p.code}">
+          <div class="paint-swatch" style="background:${p.hex};"></div>
+          <span class="paint-name">${p.name}</span>
+          <span class="paint-code">${p.code}</span>
+          <div class="paint-cols">
+            <div class="paint-col" onclick="toggleOwned('${safeCode}',event)" title="Mark as owned">
+              <div class="col-check"><span class="check-mark">✓</span></div>
+              <span class="paint-col-label owned-lbl">Owned</span>
+            </div>
+            <div class="paint-col" onclick="toggleWish('${safeCode}',event)" title="${isWished?'Remove from wishlist':'Add to wishlist'}">
+              <div class="col-star">★</div>
+              <span class="paint-col-label wish-lbl">Wishlist</span>
+            </div>
+            <div class="paint-col" onclick="openNoteModal('${safeCode}',event)" title="${hasNote?'Edit note':'Add note'}">
+              <div class="col-note">📝</div>
+              <span class="paint-col-label note-lbl">Notes</span>
+            </div>
+            <a class="paint-col buy-col" href="${buyUrl(p.code)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Buy on Monument Hobbies">
+              <div class="col-buy">🛒</div>
+              <span class="paint-col-label" style="color:var(--accent);opacity:.7;">Buy</span>
+            </a>
+          </div>
+        </div>`;
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+  updatePills();
+}
+
+function updatePills() {
+  document.getElementById('owned-pill').textContent = `${ownedPaints.size} / ${PAINTS.length} owned`;
+  document.getElementById('wish-pill').textContent  = `${wishedPaints.size} wishlisted`;
+}
+
+function setFilter(el, val) {
+  activeFilter = val;
+  document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderPaints();
+}
+
+// ─── Profile modal ────────────────────────────
+let modalXP = '';
+function selectXPModal(el) {
+  document.querySelectorAll('#profile-modal [data-xp]').forEach(b => b.classList.remove('active'));
+  el.classList.add('active'); modalXP = el.dataset.xp;
+}
+async function saveModalProfile() {
+  const displayName = document.getElementById('modal-name').value.trim();
+  const system      = document.getElementById('modal-system').value.trim();
+  const xp          = modalXP || currentProfile.xp;
+  setLoading('modal-save-btn', true, 'Saving…');
+  const { data, error } = await sb.from('profiles')
+    .update({ display_name: displayName, xp, system }).eq('id', currentUser.id).select().single();
+  setLoading('modal-save-btn', false);
+  if (error) { showToast('Could not save profile.', true); return; }
+  currentProfile = data;
+  document.getElementById('app-greeting').textContent = `Welcome, ${displayName || currentProfile.username}`;
+  document.getElementById('profile-nudge').style.display =
+    (data.display_name && data.xp) ? 'none' : 'flex';
+  closeModal('profile-modal');
+  showToast('Profile saved.');
+}
+
+// Close modals on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(o =>
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }));
+
+init();
+</script>
+</body>
+</html>
