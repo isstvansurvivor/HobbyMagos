@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ProAcryl Collection Tracker</title>
+<title>Hobby Materiel Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -62,11 +62,11 @@
   /* Topbar */
   #app-screen{flex-direction:column;}
   .topbar{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:.5rem;}
-  .topbar-brand{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--white);display:flex;align-items:center;gap:.6rem;}
+  .topbar-brand{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--white);display:flex;align-items:center;gap:.6rem;}
   .topbar-brand span{color:var(--accent);}
   .topbar-right{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
   .user-badge{font-size:.8rem;color:var(--text-muted);font-style:italic;}
-  .user-badge b{color:var(--accent);font-style:normal;}
+  .user-badge b{color:var(--white);font-style:normal;}
   .progress-pills{display:flex;gap:.5rem;}
   .progress-pill{background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:.3rem .9rem;font-size:.8rem;font-weight:600;font-family:'Crimson Pro',serif;white-space:nowrap;}
   .owned-pill{color:var(--green);border-color:rgba(106,170,120,.3);}
@@ -99,6 +99,32 @@
   .lc-wish{font-size:.73rem;color:var(--wish);font-family:'Crimson Pro',serif;font-style:italic;font-weight:400;}
   .group-header{font-size:.78rem;color:var(--text-muted);margin:1.1rem 0 .5rem;padding-bottom:.3rem;border-bottom:1px solid var(--border);display:flex;align-items:baseline;gap:.5rem;text-transform:uppercase;letter-spacing:.1em;font-weight:600;}
   .group-header .g-count{font-size:.7rem;color:var(--text-dim);font-style:italic;text-transform:none;letter-spacing:0;font-weight:400;}
+  .brand-header{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--accent);margin:2.5rem 0 1.2rem;padding:.5rem 0 .6rem;border-bottom:2px solid var(--accent);letter-spacing:.04em;}
+  .brand-header .brand-meta{font-size:.75rem;color:var(--text-muted);font-family:'Crimson Pro',serif;font-style:italic;font-weight:400;margin-left:.8rem;vertical-align:middle;letter-spacing:0;}
+  .quick-nav{display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;}
+  .quick-nav-label{font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;font-weight:600;white-space:nowrap;}
+  .nav-select{background:var(--surface2);color:var(--white);border:1px solid var(--border);border-radius:8px;padding:.4rem .85rem .4rem .6rem;font-size:.8rem;font-family:'Crimson Pro',serif;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23a0896a' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .55rem center;padding-right:1.6rem;min-width:200px;}
+  .nav-select:focus{outline:none;border-color:var(--accent);}
+  .nav-select option{background:var(--surface2);color:var(--white);}
+  .nav-select optgroup{background:var(--surface);color:var(--accent);font-style:normal;font-weight:700;}
+  .filter-tag-btn{position:relative;background:var(--surface2);color:var(--text-muted);border:1px solid var(--border);border-radius:20px;padding:.28rem .75rem;font-size:.75rem;cursor:pointer;transition:all .15s;white-space:nowrap;}
+  .filter-tag-btn:hover,.filter-tag-btn.active{background:var(--accent);color:var(--bg);border-color:var(--accent);}
+  .filter-tag-btn .badge{position:absolute;top:-.35rem;right:-.35rem;background:#e05a2b;color:#fff;border-radius:50%;width:1.1rem;height:1.1rem;font-size:.6rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
+  .active-chips{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;min-height:0;}
+  .active-chips:empty{display:none;}
+  .chip{font-size:.7rem;padding:.18rem .55rem .18rem .6rem;border-radius:20px;background:color-mix(in srgb,var(--accent) 20%,transparent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);color:var(--accent);display:flex;align-items:center;gap:.3rem;cursor:pointer;}
+  .chip:hover{background:color-mix(in srgb,var(--accent) 35%,transparent);}
+  .chip-x{opacity:.7;font-size:.8rem;line-height:1;}
+  .filter-modal{max-width:540px;}
+  .filter-group{margin-bottom:1.4rem;}
+  .filter-group-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;font-weight:700;color:var(--text-muted);margin-bottom:.55rem;}
+  .filter-pills{display:flex;flex-wrap:wrap;gap:.4rem;}
+  .fpill{padding:.25rem .65rem;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-muted);font-size:.75rem;cursor:pointer;font-family:'Crimson Pro',serif;transition:all .15s;}
+  .fpill:hover{border-color:var(--accent);color:var(--accent);}
+  .fpill.on{background:var(--accent);color:var(--bg);border-color:var(--accent);}
+  #back-to-top{position:fixed;bottom:2rem;right:2rem;width:2.6rem;height:2.6rem;border-radius:50%;background:var(--accent);color:var(--bg);border:none;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:100;}
+  #back-to-top.visible{opacity:1;pointer-events:auto;}
+  #back-to-top:hover{transform:translateY(-3px);}
 
   /* Paint items */
   .paint-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:.45rem;}
@@ -194,7 +220,7 @@
           <div class="drop" style="background:#c0574a;animation-delay:.15s"></div>
           <div class="drop" style="background:#b07ab4;animation-delay:.45s"></div>
         </div>
-        <h1 style="text-align:center;font-size:1.8rem;">ProAcryl Tracker</h1>
+        <h1 style="text-align:center;font-size:1.8rem;">Hobby Materiel Tracker</h1>
         <p style="font-style:italic;color:var(--text-muted);text-align:center;font-size:.85rem;margin-top:.3rem;">by Monument Hobbies</p>
       </div>
       <p class="subtitle" style="text-align:center;margin-bottom:1.8rem;">Track your collection, build your wishlist, and never buy a duplicate again.</p>
@@ -302,22 +328,17 @@
 <!-- MAIN APP -->
 <div class="screen" id="app-screen">
   <div class="topbar">
-    <div class="topbar-brand">🎨 <span>ProAcryl</span> Tracker</div>
+    <div class="topbar-brand">🎨 <span>Hobby Materiel Tracker</span></div>
     <div class="topbar-right">
       <div class="progress-pills">
         <div class="progress-pill owned-pill" id="owned-pill">0 owned</div>
         <div class="progress-pill wish-pill"  id="wish-pill">0 wishlisted</div>
       </div>
-      <div class="user-badge">Signed in as <b id="topbar-username"></b></div>
+      <div class="user-badge">Welcome <b id="topbar-username"></b></div>
       <button class="btn btn-ghost btn-sm" onclick="handleLogout()">Log Out</button>
     </div>
   </div>
   <div class="app-body">
-    <div class="app-intro">
-      <div class="style-badge" id="style-badge"></div>
-      <h2 id="app-greeting"></h2>
-      <p class="subtitle" id="app-subtitle" style="margin-bottom:0;"></p>
-    </div>
     <div class="nudge" id="profile-nudge" style="display:none;">
       <div class="nudge-icon">✏️</div>
       <div>Complete your painter profile to personalise your experience. <a onclick="showModal('profile-modal')">Finish setup →</a></div>
@@ -332,9 +353,25 @@
         <button class="filter-btn"                data-filter="owned"   onclick="setFilter(this,'owned')">Owned</button>
         <button class="filter-btn wish-filter"    data-filter="wished"  onclick="setFilter(this,'wished')">★ Wishlist</button>
         <button class="filter-btn"                data-filter="missing" onclick="setFilter(this,'missing')">Missing</button>
+        <button class="filter-tag-btn" id="tag-filter-btn" onclick="renderFilterModalBody();showModal('tag-filter-modal')">🔽 Filter<span class="badge" id="tag-filter-badge" style="display:none"></span></button>
       </div>
     </div>
+    <div class="active-chips" id="active-chips"></div>
+    <div class="quick-nav" id="quick-nav"></div>
     <div id="paint-list"></div>
+  </div>
+</div>
+
+<!-- TAG FILTER MODAL -->
+<div class="modal-overlay" id="tag-filter-modal">
+  <div class="modal filter-modal">
+    <h2>Filter Paints</h2>
+    <p class="modal-sub">AND between groups · OR within a group</p>
+    <div id="filter-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="clearTagFilters()">Clear all</button>
+      <button class="btn btn-sm" onclick="hideModal('tag-filter-modal')">Done</button>
+    </div>
   </div>
 </div>
 
@@ -481,13 +518,15 @@ const SLUG_MAP = {
 };
 
 function buyUrl(code) {
-  const slug = SLUG_MAP[code];
-  const base = slug
-    ? `https://monumenthobbies.com/products/${slug}`
-    : `https://monumenthobbies.com/search?q=${encodeURIComponent(PAINT_MAP[code]?.name || code)}`;
+  if (code.startsWith('VMC') || code.startsWith('VGC')) {
+    const num = code.replace(/^[A-Z]+/, '').replace('.','');  // "70.951" → "70951"
+    return `https://acrylicosvallejo.com/en/?s=${num}`;
+  }
+  const name = PAINT_MAP[code]?.name || code;
+  const base = `https://monumenthobbies.com/search?q=${encodeURIComponent(name)}`;
   return AFFILIATE_ID === 'YOUR_RFSN_ID'
     ? base
-    : `${base}?rfsn=${AFFILIATE_ID}`;
+    : `${base}&rfsn=${AFFILIATE_ID}`;
 }
 
 // ─── Supabase ─────────────────────────────────
@@ -666,13 +705,477 @@ const PAINTS = [
   {code:"T06",name:"Snow Ultra Fine",    line:"Basing Textures",sub:"Basing Textures",hex:"#E8EEF4"},
   {code:"T07",name:"Brown Earth Fine",   line:"Basing Textures",sub:"Basing Textures",hex:"#7A5030"},
   {code:"T08",name:"Brown Earth Coarse", line:"Basing Textures",sub:"Basing Textures",hex:"#604020"},
+
+  // ─── VALLEJO METAL COLOR ─────────────────────────────────────────
+  {code:"VMC77.701",name:"Aluminium",line:"Metal Color",sub:"Airbrush",hex:"#a8adb2"},
+  {code:"VMC77.702",name:"Duraluminium",line:"Metal Color",sub:"Airbrush",hex:"#8e9196"},
+  {code:"VMC77.703",name:"Dark Aluminium",line:"Metal Color",sub:"Airbrush",hex:"#6a6c70"},
+  {code:"VMC77.704",name:"Pale Burnt Metal",line:"Metal Color",sub:"Airbrush",hex:"#b8925c"},
+  {code:"VMC77.706",name:"White Aluminium",line:"Metal Color",sub:"Airbrush",hex:"#c8cacc"},
+  {code:"VMC77.707",name:"Chrome",line:"Metal Color",sub:"Airbrush",hex:"#d0d4da"},
+  {code:"VMC77.710",name:"Copper",line:"Metal Color",sub:"Airbrush",hex:"#b87338"},
+  {code:"VMC77.711",name:"Magnesium",line:"Metal Color",sub:"Airbrush",hex:"#939598"},
+  {code:"VMC77.712",name:"Steel",line:"Metal Color",sub:"Airbrush",hex:"#888c90"},
+  {code:"VMC77.713",name:"Jet Exhaust",line:"Metal Color",sub:"Airbrush",hex:"#6a5f58"},
+  {code:"VMC77.716",name:"Semi Matt Aluminium",line:"Metal Color",sub:"Airbrush",hex:"#9fa2a7"},
+  {code:"VMC77.717",name:"Dull Aluminium",line:"Metal Color",sub:"Airbrush",hex:"#8a8c8e"},
+  {code:"VMC77.720",name:"Gunmetal Grey",line:"Metal Color",sub:"Airbrush",hex:"#575b60"},
+  {code:"VMC77.721",name:"Burnt Iron",line:"Metal Color",sub:"Airbrush",hex:"#3e3632"},
+  {code:"VMC77.723",name:"Exhaust Manifold",line:"Metal Color",sub:"Airbrush",hex:"#6b4f48"},
+  {code:"VMC77.724",name:"Silver",line:"Metal Color",sub:"Airbrush",hex:"#b8bcc6"},
+  {code:"VMC77.725",name:"Gold",line:"Metal Color",sub:"Airbrush",hex:"#c8a030"},
+  {code:"VMC77.657",name:"Gloss Metal Varnish",line:"Metal Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC77.660",name:"Gloss Black Primer",line:"Metal Color",sub:"Auxiliaries",hex:"#202020"},
+  // ─── VALLEJO MODEL COLOR ─────────────────────────────────────────
+  {code:"VMC70.951",name:"White",line:"Model Color",sub:"Whites",hex:"#f5f4f2"},
+  {code:"VMC70.919",name:"Cold White",line:"Model Color",sub:"Whites",hex:"#eceae4"},
+  {code:"VMC70.842",name:"Gloss White",line:"Model Color",sub:"Whites",hex:"#f0f0ee"},
+  {code:"VMC70.820",name:"Off-White",line:"Model Color",sub:"Whites",hex:"#e8e0cc"},
+  {code:"VMC70.918",name:"Ivory",line:"Model Color",sub:"Whites",hex:"#ece0b8"},
+  {code:"VMC70.837",name:"Pale Sand",line:"Model Color",sub:"Yellows",hex:"#e0d0a0"},
+  {code:"VMC70.917",name:"Beige",line:"Model Color",sub:"Yellows",hex:"#d0be88"},
+  {code:"VMC70.916",name:"Sand Yellow",line:"Model Color",sub:"Yellows",hex:"#d0b848"},
+  {code:"VMC70.949",name:"Light Yellow",line:"Model Color",sub:"Yellows",hex:"#f0e040"},
+  {code:"VMC70.952",name:"Lemon Yellow",line:"Model Color",sub:"Yellows",hex:"#f8f020"},
+  {code:"VMC70.806",name:"German Yellow",line:"Model Color",sub:"Yellows",hex:"#c8a018"},
+  {code:"VMC70.858",name:"Ice Yellow",line:"Model Color",sub:"Yellows",hex:"#f0e898"},
+  {code:"VMC70.915",name:"Deep Yellow",line:"Model Color",sub:"Yellows",hex:"#f0c000"},
+  {code:"VMC70.953",name:"Flat Yellow",line:"Model Color",sub:"Yellows",hex:"#e8b800"},
+  {code:"VMC70.948",name:"Golden Yellow",line:"Model Color",sub:"Yellows",hex:"#d09818"},
+  {code:"VMC70.928",name:"Light Flesh",line:"Model Color",sub:"Skin/Flesh",hex:"#f4c898"},
+  {code:"VMC70.815",name:"Basic Skin Tone",line:"Model Color",sub:"Skin/Flesh",hex:"#d09870"},
+  {code:"VMC70.955",name:"Flat Flesh",line:"Model Color",sub:"Skin/Flesh",hex:"#f0bc90"},
+  {code:"VMC70.927",name:"Dark Flesh",line:"Model Color",sub:"Skin/Flesh",hex:"#b07050"},
+  {code:"VMC70.845",name:"Sunny Skin Tone",line:"Model Color",sub:"Skin/Flesh",hex:"#d4a870"},
+  {code:"VMC70.860",name:"Medium Fleshtone",line:"Model Color",sub:"Skin/Flesh",hex:"#c88060"},
+  {code:"VMC70.914",name:"Green Ochre",line:"Model Color",sub:"Skin/Flesh",hex:"#a88840"},
+  {code:"VMC70.804",name:"Beige Red",line:"Model Color",sub:"Skin/Flesh",hex:"#c09090"},
+  {code:"VMC70.803",name:"Brown Rose",line:"Model Color",sub:"Skin/Flesh",hex:"#c07878"},
+  {code:"VMC70.911",name:"Light Orange",line:"Model Color",sub:"Oranges",hex:"#f0a030"},
+  {code:"VMC70.805",name:"German Orange",line:"Model Color",sub:"Oranges",hex:"#e07020"},
+  {code:"VMC70.851",name:"Bright Orange",line:"Model Color",sub:"Oranges",hex:"#f06820"},
+  {code:"VMC70.956",name:"Clear Orange",line:"Model Color",sub:"Oranges",hex:"#f07818"},
+  {code:"VMC70.981",name:"Orange Brown",line:"Model Color",sub:"Oranges",hex:"#c85818"},
+  {code:"VMC70.817",name:"Scarlet",line:"Model Color",sub:"Reds",hex:"#cc1010"},
+  {code:"VMC70.910",name:"Orange Red",line:"Model Color",sub:"Reds",hex:"#d82e10"},
+  {code:"VMC70.909",name:"Vermillion",line:"Model Color",sub:"Reds",hex:"#e02810"},
+  {code:"VMC70.947",name:"Dark Vermillion",line:"Model Color",sub:"Reds",hex:"#b82010"},
+  {code:"VMC70.908",name:"Carmine Red",line:"Model Color",sub:"Reds",hex:"#c02828"},
+  {code:"VMC70.957",name:"Flat Red",line:"Model Color",sub:"Reds",hex:"#b81e1e"},
+  {code:"VMC70.946",name:"Dark Red",line:"Model Color",sub:"Reds",hex:"#801818"},
+  {code:"VMC70.926",name:"Red",line:"Model Color",sub:"Reds",hex:"#c01818"},
+  {code:"VMC70.814",name:"Burnt Red",line:"Model Color",sub:"Reds",hex:"#902818"},
+  {code:"VMC70.859",name:"Black Red",line:"Model Color",sub:"Reds",hex:"#481010"},
+  {code:"VMC70.835",name:"Salmon Rose",line:"Model Color",sub:"Pinks",hex:"#e09090"},
+  {code:"VMC70.944",name:"Old Rose",line:"Model Color",sub:"Pinks",hex:"#b06060"},
+  {code:"VMC70.958",name:"Pink",line:"Model Color",sub:"Pinks",hex:"#e080a0"},
+  {code:"VMC70.802",name:"Sunset Red",line:"Model Color",sub:"Pinks",hex:"#d03040"},
+  {code:"VMC70.945",name:"Magenta",line:"Model Color",sub:"Pinks",hex:"#c02060"},
+  {code:"VMC70.812",name:"Violet Red",line:"Model Color",sub:"Pinks",hex:"#901070"},
+  {code:"VMC70.959",name:"Purple",line:"Model Color",sub:"Pinks",hex:"#701880"},
+  {code:"VMC70.960",name:"Violet",line:"Model Color",sub:"Pinks",hex:"#583880"},
+  {code:"VMC70.811",name:"Blue Violet",line:"Model Color",sub:"Pinks",hex:"#403080"},
+  {code:"VMC70.810",name:"Royal Purple",line:"Model Color",sub:"Pinks",hex:"#581868"},
+  {code:"VMC70.965",name:"Prussian Blue",line:"Model Color",sub:"Blues",hex:"#1a3060"},
+  {code:"VMC70.899",name:"Dark Prussian Blue",line:"Model Color",sub:"Blues",hex:"#102040"},
+  {code:"VMC70.807",name:"Oxford Blue",line:"Model Color",sub:"Blues",hex:"#102050"},
+  {code:"VMC70.930",name:"Dark Blue",line:"Model Color",sub:"Blues",hex:"#182048"},
+  {code:"VMC70.809",name:"Royal Blue",line:"Model Color",sub:"Blues",hex:"#1830a0"},
+  {code:"VMC70.839",name:"Ultramarine",line:"Model Color",sub:"Blues",hex:"#1c3890"},
+  {code:"VMC70.925",name:"Blue",line:"Model Color",sub:"Blues",hex:"#1c60c0"},
+  {code:"VMC70.963",name:"Medium Blue",line:"Model Color",sub:"Blues",hex:"#2050b8"},
+  {code:"VMC70.964",name:"Field Blue",line:"Model Color",sub:"Blues",hex:"#486890"},
+  {code:"VMC70.900",name:"French Mirage Blue",line:"Model Color",sub:"Blues",hex:"#405878"},
+  {code:"VMC70.903",name:"Intermediate Blue",line:"Model Color",sub:"Blues",hex:"#304888"},
+  {code:"VMC70.943",name:"Grey Blue",line:"Model Color",sub:"Blues",hex:"#607890"},
+  {code:"VMC70.905",name:"Blue Grey Pale",line:"Model Color",sub:"Blues",hex:"#8898b0"},
+  {code:"VMC70.902",name:"Azure",line:"Model Color",sub:"Blues",hex:"#3090d0"},
+  {code:"VMC70.901",name:"Pastel Blue",line:"Model Color",sub:"Blues",hex:"#8098c0"},
+  {code:"VMC70.906",name:"Pale Blue",line:"Model Color",sub:"Blues",hex:"#a0b8d0"},
+  {code:"VMC70.841",name:"Andrea Blue",line:"Model Color",sub:"Blues",hex:"#1c5888"},
+  {code:"VMC70.844",name:"Deep Sky Blue",line:"Model Color",sub:"Blues",hex:"#1878c8"},
+  {code:"VMC70.961",name:"Sky Blue",line:"Model Color",sub:"Blues",hex:"#60a8d8"},
+  {code:"VMC70.840",name:"Light Turquoise",line:"Model Color",sub:"Blues",hex:"#58c8c0"},
+  {code:"VMC70.966",name:"Turquoise",line:"Model Color",sub:"Blues",hex:"#20b0c0"},
+  {code:"VMC70.808",name:"Blue Green",line:"Model Color",sub:"Greens",hex:"#204870"},
+  {code:"VMC70.838",name:"Emerald",line:"Model Color",sub:"Greens",hex:"#208060"},
+  {code:"VMC70.891",name:"Intermediate Green",line:"Model Color",sub:"Greens",hex:"#486048"},
+  {code:"VMC70.942",name:"Light Green",line:"Model Color",sub:"Greens",hex:"#78b878"},
+  {code:"VMC70.885",name:"Pastel Green",line:"Model Color",sub:"Greens",hex:"#88c898"},
+  {code:"VMC70.827",name:"Lime Green",line:"Model Color",sub:"Greens",hex:"#78c820"},
+  {code:"VMC70.954",name:"Yellow Green",line:"Model Color",sub:"Greens",hex:"#90b840"},
+  {code:"VMC70.881",name:"Yellow Green",line:"Model Color",sub:"Greens",hex:"#a8c030"},
+  {code:"VMC70.857",name:"Golden Olive",line:"Model Color",sub:"Greens",hex:"#908820"},
+  {code:"VMC70.892",name:"Yellow Olive",line:"Model Color",sub:"Greens",hex:"#888040"},
+  {code:"VMC70.969",name:"Park Green Flat",line:"Model Color",sub:"Greens",hex:"#3e5828"},
+  {code:"VMC70.967",name:"Olive Green",line:"Model Color",sub:"Greens",hex:"#507040"},
+  {code:"VMC70.968",name:"Flat Green",line:"Model Color",sub:"Greens",hex:"#406830"},
+  {code:"VMC70.833",name:"German Cam. Bright Green",line:"Model Color",sub:"Greens",hex:"#487830"},
+  {code:"VMC70.971",name:"Green Grey",line:"Model Color",sub:"Greens",hex:"#708870"},
+  {code:"VMC70.886",name:"Green Grey (RLM)",line:"Model Color",sub:"Greens",hex:"#687870"},
+  {code:"VMC70.850",name:"Medium Olive",line:"Model Color",sub:"Greens",hex:"#707840"},
+  {code:"VMC70.972",name:"Light Green Blue",line:"Model Color",sub:"Greens",hex:"#708898"},
+  {code:"VMC70.920",name:"German Uniform WWII",line:"Model Color",sub:"Military",hex:"#5a6240"},
+  {code:"VMC70.923",name:"Japanese Uniform WWII",line:"Model Color",sub:"Military",hex:"#787840"},
+  {code:"VMC70.924",name:"Russian Uniform WWII",line:"Model Color",sub:"Military",hex:"#484820"},
+  {code:"VMC70.821",name:"English Uniform WWII",line:"Model Color",sub:"Military",hex:"#b09448"},
+  {code:"VMC70.830",name:"German Fieldgrey WWII",line:"Model Color",sub:"Military",hex:"#5a6050"},
+  {code:"VMC70.816",name:"Luftwaffe Uniform WWII",line:"Model Color",sub:"Military",hex:"#585e48"},
+  {code:"VMC70.823",name:"Luftwaffe Cam. Green",line:"Model Color",sub:"Military",hex:"#486040"},
+  {code:"VMC70.893",name:"US Dark Green",line:"Model Color",sub:"Military",hex:"#203818"},
+  {code:"VMC70.887",name:"US Olive Drab",line:"Model Color",sub:"Military",hex:"#484824"},
+  {code:"VMC70.895",name:"Gunship Green",line:"Model Color",sub:"Military",hex:"#405050"},
+  {code:"VMC70.884",name:"Cam. Olive Green",line:"Model Color",sub:"Military",hex:"#485038"},
+  {code:"VMC70.896",name:"Ger. Cam. Extra Dark Green",line:"Model Color",sub:"Military",hex:"#202c18"},
+  {code:"VMC70.975",name:"Military Green",line:"Model Color",sub:"Military",hex:"#303820"},
+  {code:"VMC70.890",name:"Refractive Green",line:"Model Color",sub:"Military",hex:"#506040"},
+  {code:"VMC70.897",name:"Bronze Green",line:"Model Color",sub:"Military",hex:"#304828"},
+  {code:"VMC70.826",name:"Ger. Cam. Med. Brown",line:"Model Color",sub:"Military",hex:"#806040"},
+  {code:"VMC70.824",name:"Ger. Cam. Orange Ochre",line:"Model Color",sub:"Military",hex:"#b08840"},
+  {code:"VMC70.825",name:"Ger. Cam. Pale Brown",line:"Model Color",sub:"Military",hex:"#c0a870"},
+  {code:"VMC70.822",name:"Ger. Cam. Black Brown",line:"Model Color",sub:"Military",hex:"#2c2018"},
+  {code:"VMC70.979",name:"German Grey",line:"Model Color",sub:"Military",hex:"#383c38"},
+  {code:"VMC70.913",name:"Yellow Ochre",line:"Model Color",sub:"Browns",hex:"#c09030"},
+  {code:"VMC70.877",name:"Gold Brown",line:"Model Color",sub:"Browns",hex:"#c09030"},
+  {code:"VMC70.856",name:"Ochre Brown",line:"Model Color",sub:"Browns",hex:"#b08028"},
+  {code:"VMC70.912",name:"Tan Yellow",line:"Model Color",sub:"Browns",hex:"#c8a860"},
+  {code:"VMC70.847",name:"Dark Sand",line:"Model Color",sub:"Browns",hex:"#9a8048"},
+  {code:"VMC70.819",name:"Iraqi Sand",line:"Model Color",sub:"Browns",hex:"#b8a870"},
+  {code:"VMC70.986",name:"Deck Tan",line:"Model Color",sub:"Browns",hex:"#c8b070"},
+  {code:"VMC70.976",name:"Buff",line:"Model Color",sub:"Browns",hex:"#c8a850"},
+  {code:"VMC70.977",name:"Desert Yellow",line:"Model Color",sub:"Browns",hex:"#c0a840"},
+  {code:"VMC70.978",name:"Dark Yellow",line:"Model Color",sub:"Browns",hex:"#907830"},
+  {code:"VMC70.843",name:"Cork Brown",line:"Model Color",sub:"Browns",hex:"#8a7040"},
+  {code:"VMC70.875",name:"Beige Brown",line:"Model Color",sub:"Browns",hex:"#9a7850"},
+  {code:"VMC70.876",name:"Brown Sand",line:"Model Color",sub:"Browns",hex:"#a88050"},
+  {code:"VMC70.879",name:"Green Brown",line:"Model Color",sub:"Browns",hex:"#687038"},
+  {code:"VMC70.880",name:"Khaki Grey",line:"Model Color",sub:"Browns",hex:"#808860"},
+  {code:"VMC70.988",name:"Khaki",line:"Model Color",sub:"Browns",hex:"#888050"},
+  {code:"VMC70.882",name:"Middlestone",line:"Model Color",sub:"Browns",hex:"#a89040"},
+  {code:"VMC70.874",name:"Tan Earth",line:"Model Color",sub:"Browns",hex:"#9a7040"},
+  {code:"VMC70.873",name:"US Field Drab",line:"Model Color",sub:"Browns",hex:"#8a7040"},
+  {code:"VMC70.983",name:"Flat Earth",line:"Model Color",sub:"Browns",hex:"#8a6838"},
+  {code:"VMC70.984",name:"Flat Brown",line:"Model Color",sub:"Browns",hex:"#7a5028"},
+  {code:"VMC70.846",name:"Mahogany Brown",line:"Model Color",sub:"Browns",hex:"#703020"},
+  {code:"VMC70.940",name:"Saddle Brown",line:"Model Color",sub:"Browns",hex:"#784028"},
+  {code:"VMC70.982",name:"Cavalry Brown",line:"Model Color",sub:"Browns",hex:"#782c1e"},
+  {code:"VMC70.929",name:"Light Brown",line:"Model Color",sub:"Browns",hex:"#9a6840"},
+  {code:"VMC70.828",name:"Wood Grain",line:"Model Color",sub:"Browns",hex:"#8a6028"},
+  {code:"VMC70.834",name:"Natural Woodgrain",line:"Model Color",sub:"Browns",hex:"#9a7840"},
+  {code:"VMC70.818",name:"Red Leather",line:"Model Color",sub:"Browns",hex:"#802818"},
+  {code:"VMC70.871",name:"Leather Brown",line:"Model Color",sub:"Browns",hex:"#7a5028"},
+  {code:"VMC70.872",name:"Chocolate Brown",line:"Model Color",sub:"Browns",hex:"#4a2818"},
+  {code:"VMC70.941",name:"Burnt Umber",line:"Model Color",sub:"Browns",hex:"#4a2818"},
+  {code:"VMC70.985",name:"Hull Red",line:"Model Color",sub:"Browns",hex:"#5a1c10"},
+  {code:"VMC70.939",name:"Smoke",line:"Model Color",sub:"Browns",hex:"#505050"},
+  {code:"VMC70.907",name:"Pale Grey Blue",line:"Model Color",sub:"Greys",hex:"#a8b0c0"},
+  {code:"VMC70.989",name:"Sky Grey",line:"Model Color",sub:"Greys",hex:"#b0b8c0"},
+  {code:"VMC70.990",name:"Light Grey",line:"Model Color",sub:"Greys",hex:"#a8b0b0"},
+  {code:"VMC70.993",name:"White Grey",line:"Model Color",sub:"Greys",hex:"#c8c8c8"},
+  {code:"VMC70.883",name:"Silvergrey",line:"Model Color",sub:"Greys",hex:"#909898"},
+  {code:"VMC70.987",name:"Medium Grey",line:"Model Color",sub:"Greys",hex:"#888888"},
+  {code:"VMC70.992",name:"Neutral Grey",line:"Model Color",sub:"Greys",hex:"#787878"},
+  {code:"VMC70.991",name:"Dark Sea Grey",line:"Model Color",sub:"Greys",hex:"#606868"},
+  {code:"VMC70.994",name:"Dark Grey",line:"Model Color",sub:"Greys",hex:"#505050"},
+  {code:"VMC70.995",name:"German Grey",line:"Model Color",sub:"Greys",hex:"#383838"},
+  {code:"VMC70.836",name:"London Grey",line:"Model Color",sub:"Greys",hex:"#909898"},
+  {code:"VMC70.870",name:"Medium Sea Grey",line:"Model Color",sub:"Greys",hex:"#808890"},
+  {code:"VMC70.904",name:"Dark Blue Grey",line:"Model Color",sub:"Greys",hex:"#485068"},
+  {code:"VMC70.869",name:"Basalt Grey",line:"Model Color",sub:"Greys",hex:"#545858"},
+  {code:"VMC70.867",name:"Dark Blue Grey",line:"Model Color",sub:"Greys",hex:"#404858"},
+  {code:"VMC70.868",name:"Dark Sea Green",line:"Model Color",sub:"Greys",hex:"#404840"},
+  {code:"VMC70.866",name:"Grey Green",line:"Model Color",sub:"Greys",hex:"#606858"},
+  {code:"VMC70.888",name:"Olive Grey",line:"Model Color",sub:"Greys",hex:"#606050"},
+  {code:"VMC70.889",name:"Olive Brown",line:"Model Color",sub:"Greys",hex:"#6a5830"},
+  {code:"VMC70.973",name:"Light Sea Grey",line:"Model Color",sub:"Greys",hex:"#909898"},
+  {code:"VMC70.980",name:"Black Green",line:"Model Color",sub:"Greys",hex:"#161c10"},
+  {code:"VMC70.950",name:"Black",line:"Model Color",sub:"Blacks",hex:"#0e0e0e"},
+  {code:"VMC70.861",name:"Glossy Black",line:"Model Color",sub:"Blacks",hex:"#101010"},
+  {code:"VMC70.862",name:"Black Grey",line:"Model Color",sub:"Blacks",hex:"#282830"},
+  {code:"VMC70.997",name:"Silver",line:"Model Color",sub:"Metallics",hex:"#b8bcc4"},
+  {code:"VMC70.996",name:"Gold",line:"Model Color",sub:"Metallics",hex:"#c8a030"},
+  {code:"VMC70.998",name:"Bronze",line:"Model Color",sub:"Metallics",hex:"#8a6028"},
+  {code:"VMC70.999",name:"Copper",line:"Model Color",sub:"Metallics",hex:"#b07038"},
+  {code:"VMC70.863",name:"Gunmetal Grey",line:"Model Color",sub:"Metallics",hex:"#505458"},
+  {code:"VMC70.864",name:"Natural Steel",line:"Model Color",sub:"Metallics",hex:"#909498"},
+  {code:"VMC70.865",name:"Oily Steel",line:"Model Color",sub:"Metallics",hex:"#585c60"},
+  {code:"VMC70.878",name:"Old Gold",line:"Model Color",sub:"Metallics",hex:"#b89030"},
+  {code:"VMC70.801",name:"Brass",line:"Model Color",sub:"Metallics",hex:"#a88028"},
+  {code:"VMC70.793",name:"Rich Gold (alcohol)",line:"Model Color",sub:"Metallics",hex:"#b08020"},
+  {code:"VMC70.792",name:"Old Gold (alcohol)",line:"Model Color",sub:"Metallics",hex:"#907820"},
+  {code:"VMC70.791",name:"Gold (alcohol)",line:"Model Color",sub:"Metallics",hex:"#c09020"},
+  {code:"VMC70.790",name:"Silver (alcohol)",line:"Model Color",sub:"Metallics",hex:"#b0b4bc"},
+  {code:"VMC70.795",name:"Green Gold",line:"Model Color",sub:"Metallics",hex:"#909040"},
+  {code:"VMC70.796",name:"White Gold",line:"Model Color",sub:"Metallics",hex:"#c8c4a0"},
+  {code:"VMC70.797",name:"Copper (alcohol)",line:"Model Color",sub:"Metallics",hex:"#b07038"},
+  {code:"VMC70.794",name:"Red Gold",line:"Model Color",sub:"Metallics",hex:"#b86030"},
+  {code:"VMC70.934",name:"Transparent Red",line:"Model Color",sub:"Transparents",hex:"#d03030"},
+  {code:"VMC70.935",name:"Transparent Orange",line:"Model Color",sub:"Transparents",hex:"#d07020"},
+  {code:"VMC70.936",name:"Transparent Yellow",line:"Model Color",sub:"Transparents",hex:"#d0c020"},
+  {code:"VMC70.937",name:"Transparent Green",line:"Model Color",sub:"Transparents",hex:"#308040"},
+  {code:"VMC70.938",name:"Transparent Blue",line:"Model Color",sub:"Transparents",hex:"#1050a0"},
+  {code:"VMC70.832",name:"Verdigris Glaze",line:"Model Color",sub:"Glazes",hex:"#488870"},
+  {code:"VMC70.831",name:"Tan Glaze",line:"Model Color",sub:"Glazes",hex:"#a08040"},
+  {code:"VMC70.853",name:"White Glaze",line:"Model Color",sub:"Glazes",hex:"#e0e0e0"},
+  {code:"VMC70.854",name:"Brown Glaze",line:"Model Color",sub:"Glazes",hex:"#603020"},
+  {code:"VMC70.855",name:"Black Glaze",line:"Model Color",sub:"Glazes",hex:"#1e1e1e"},
+  {code:"VMC70.730",name:"Fluorescent Yellow",line:"Model Color",sub:"Fluorescents",hex:"#f8f000"},
+  {code:"VMC70.733",name:"Fluorescent Orange",line:"Model Color",sub:"Fluorescents",hex:"#f86000"},
+  {code:"VMC70.735",name:"Fluorescent Magenta",line:"Model Color",sub:"Fluorescents",hex:"#f82090"},
+  {code:"VMC70.736",name:"Fluorescent Blue",line:"Model Color",sub:"Fluorescents",hex:"#2020f8"},
+  {code:"VMC70.737",name:"Fluorescent Green",line:"Model Color",sub:"Fluorescents",hex:"#10e020"},
+  {code:"VMC70.540",name:"Matt Medium",line:"Model Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC70.470",name:"Gloss Medium",line:"Model Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC70.521",name:"Metal Medium",line:"Model Color",sub:"Auxiliaries",hex:"#b8bcc4"},
+  {code:"VMC70.520",name:"Matt Varnish",line:"Model Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC70.510",name:"Gloss Varnish",line:"Model Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC70.522",name:"Satin Varnish",line:"Model Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC70.596",name:"Glaze Medium",line:"Model Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC70.597",name:"Retarder Medium",line:"Model Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC70.598",name:"Crackle Medium",line:"Model Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC70.523",name:"Liquid Mask",line:"Model Color",sub:"Auxiliaries",hex:"#e0e0e0"},
+  {code:"VMC70.400",name:"Plastic Putty",line:"Model Color",sub:"Auxiliaries",hex:"#e0e8e0"},
+  {code:"VMC70.524",name:"Thinner",line:"Model Color",sub:"Auxiliaries",hex:"#e8f0f8"},
+  // ─── VALLEJO GAME COLOR ──────────────────────────────────────────
+  {code:"VGC72.001",name:"Dead White",line:"Game Color",sub:"Standard",hex:"#f5f4f0"},
+  {code:"VGC72.101",name:"Off-White",line:"Game Color",sub:"Standard",hex:"#e8e0cc"},
+  {code:"VGC72.098",name:"Elfic Flesh",line:"Game Color",sub:"Standard",hex:"#f0d8b8"},
+  {code:"VGC72.034",name:"Bone White",line:"Game Color",sub:"Standard",hex:"#d8c898"},
+  {code:"VGC72.003",name:"Pale Flesh",line:"Game Color",sub:"Standard",hex:"#f4c898"},
+  {code:"VGC72.100",name:"Rosy Flesh",line:"Game Color",sub:"Standard",hex:"#e29080"},
+  {code:"VGC72.107",name:"Anthea Skin",line:"Game Color",sub:"Standard",hex:"#d4a07a"},
+  {code:"VGC72.108",name:"Succubus Skin",line:"Game Color",sub:"Standard",hex:"#c07070"},
+  {code:"VGC72.099",name:"Skin Tone",line:"Game Color",sub:"Standard",hex:"#d09470"},
+  {code:"VGC72.004",name:"Elf Skin Tone",line:"Game Color",sub:"Standard",hex:"#e8b088"},
+  {code:"VGC72.071",name:"Barbarian Skin",line:"Game Color",sub:"Standard",hex:"#cc8e68"},
+  {code:"VGC72.109",name:"Toxic Yellow",line:"Game Color",sub:"Standard",hex:"#c8e018"},
+  {code:"VGC72.005",name:"Moon Yellow",line:"Game Color",sub:"Standard",hex:"#f5e050"},
+  {code:"VGC72.006",name:"Sun Yellow",line:"Game Color",sub:"Standard",hex:"#f0c828"},
+  {code:"VGC72.007",name:"Gold Yellow",line:"Game Color",sub:"Standard",hex:"#d0a018"},
+  {code:"VGC72.038",name:"Scrofulous Brown",line:"Game Color",sub:"Standard",hex:"#a87838"},
+  {code:"VGC72.110",name:"Sunset Orange",line:"Game Color",sub:"Standard",hex:"#f08030"},
+  {code:"VGC72.008",name:"Orange Fire",line:"Game Color",sub:"Standard",hex:"#f07020"},
+  {code:"VGC72.009",name:"Hot Orange",line:"Game Color",sub:"Standard",hex:"#e05820"},
+  {code:"VGC72.106",name:"Scarlet Blood",line:"Game Color",sub:"Standard",hex:"#c01818"},
+  {code:"VGC72.010",name:"Bloody Red",line:"Game Color",sub:"Standard",hex:"#b82020"},
+  {code:"VGC72.012",name:"Scarlet Red",line:"Game Color",sub:"Standard",hex:"#d02828"},
+  {code:"VGC72.011",name:"Gory Red",line:"Game Color",sub:"Standard",hex:"#a01e1e"},
+  {code:"VGC72.111",name:"Nocturnal Red",line:"Game Color",sub:"Standard",hex:"#780018"},
+  {code:"VGC72.112",name:"Evil Red",line:"Game Color",sub:"Standard",hex:"#b01828"},
+  {code:"VGC72.013",name:"Squid Pink",line:"Game Color",sub:"Standard",hex:"#e06080"},
+  {code:"VGC72.014",name:"Warlord Purple",line:"Game Color",sub:"Standard",hex:"#7a2878"},
+  {code:"VGC72.113",name:"Deep Magenta",line:"Game Color",sub:"Standard",hex:"#a81858"},
+  {code:"VGC72.114",name:"Lustful Purple",line:"Game Color",sub:"Standard",hex:"#701890"},
+  {code:"VGC72.076",name:"Alien Purple",line:"Game Color",sub:"Standard",hex:"#6a2e90"},
+  {code:"VGC72.015",name:"Hexed Lichen",line:"Game Color",sub:"Standard",hex:"#504870"},
+  {code:"VGC72.016",name:"Royal Purple",line:"Game Color",sub:"Standard",hex:"#602e90"},
+  {code:"VGC72.116",name:"Midnight Purple",line:"Game Color",sub:"Standard",hex:"#301848"},
+  {code:"VGC72.117",name:"Elfic Blue",line:"Game Color",sub:"Standard",hex:"#4878c0"},
+  {code:"VGC72.022",name:"Ultramarine Blue",line:"Game Color",sub:"Standard",hex:"#2848a0"},
+  {code:"VGC72.019",name:"Night Blue",line:"Game Color",sub:"Standard",hex:"#1a1a3a"},
+  {code:"VGC72.118",name:"Sunrise Blue",line:"Game Color",sub:"Standard",hex:"#6090d0"},
+  {code:"VGC72.023",name:"Electric Blue",line:"Game Color",sub:"Standard",hex:"#3878d0"},
+  {code:"VGC72.021",name:"Magic Blue",line:"Game Color",sub:"Standard",hex:"#3060b8"},
+  {code:"VGC72.020",name:"Imperial Blue",line:"Game Color",sub:"Standard",hex:"#1e4080"},
+  {code:"VGC72.096",name:"Verdigris",line:"Game Color",sub:"Standard",hex:"#489060"},
+  {code:"VGC72.119",name:"Aquamarine",line:"Game Color",sub:"Standard",hex:"#30c0a0"},
+  {code:"VGC72.024",name:"Turquoise",line:"Game Color",sub:"Standard",hex:"#20a0b0"},
+  {code:"VGC72.120",name:"Abyssal Turquoise",line:"Game Color",sub:"Standard",hex:"#186880"},
+  {code:"VGC72.121",name:"Ghost Green",line:"Game Color",sub:"Standard",hex:"#90d090"},
+  {code:"VGC72.025",name:"Foul Green",line:"Game Color",sub:"Standard",hex:"#508050"},
+  {code:"VGC72.026",name:"Jade Green",line:"Game Color",sub:"Standard",hex:"#2e8060"},
+  {code:"VGC72.027",name:"Scurvy Green",line:"Game Color",sub:"Standard",hex:"#406030"},
+  {code:"VGC72.122",name:"Bile Green",line:"Game Color",sub:"Standard",hex:"#a0b840"},
+  {code:"VGC72.032",name:"Scorpy Green",line:"Game Color",sub:"Standard",hex:"#60b060"},
+  {code:"VGC72.030",name:"Goblin Green",line:"Game Color",sub:"Standard",hex:"#409040"},
+  {code:"VGC72.029",name:"Sick Green",line:"Game Color",sub:"Standard",hex:"#789050"},
+  {code:"VGC72.123",name:"Angel Green",line:"Game Color",sub:"Standard",hex:"#70c880"},
+  {code:"VGC72.028",name:"Dark Green",line:"Game Color",sub:"Standard",hex:"#184820"},
+  {code:"VGC72.035",name:"Dead Flesh",line:"Game Color",sub:"Standard",hex:"#c8b878"},
+  {code:"VGC72.031",name:"Camouflage Green",line:"Game Color",sub:"Standard",hex:"#608050"},
+  {code:"VGC72.145",name:"Dirty Grey",line:"Game Color",sub:"Standard",hex:"#888888"},
+  {code:"VGC72.067",name:"Cayman Green",line:"Game Color",sub:"Standard",hex:"#507040"},
+  {code:"VGC72.061",name:"Khaki",line:"Game Color",sub:"Standard",hex:"#9a8840"},
+  {code:"VGC72.063",name:"Desert Yellow",line:"Game Color",sub:"Standard",hex:"#c8b050"},
+  {code:"VGC72.062",name:"Earth",line:"Game Color",sub:"Standard",hex:"#8a6030"},
+  {code:"VGC72.036",name:"Bronze Brown",line:"Game Color",sub:"Standard",hex:"#7a5020"},
+  {code:"VGC72.039",name:"Plague Brown",line:"Game Color",sub:"Standard",hex:"#9a8050"},
+  {code:"VGC72.040",name:"Leather Brown",line:"Game Color",sub:"Standard",hex:"#9a6840"},
+  {code:"VGC72.043",name:"Beasty Brown",line:"Game Color",sub:"Standard",hex:"#8a5828"},
+  {code:"VGC72.042",name:"Parasite Brown",line:"Game Color",sub:"Standard",hex:"#6a4820"},
+  {code:"VGC72.115",name:"Marron Mugre",line:"Game Color",sub:"Standard",hex:"#7a5838"},
+  {code:"VGC72.124",name:"Gorgon Brown",line:"Game Color",sub:"Standard",hex:"#888060"},
+  {code:"VGC72.066",name:"Tan",line:"Game Color",sub:"Standard",hex:"#c8a870"},
+  {code:"VGC72.044",name:"Dark Fleshtone",line:"Game Color",sub:"Standard",hex:"#a06040"},
+  {code:"VGC72.045",name:"Charred Brown",line:"Game Color",sub:"Standard",hex:"#4a2818"},
+  {code:"VGC72.047",name:"Wolf Grey",line:"Game Color",sub:"Standard",hex:"#808888"},
+  {code:"VGC72.095",name:"Glacier Blue",line:"Game Color",sub:"Standard",hex:"#a8c8e0"},
+  {code:"VGC72.102",name:"Steel Grey",line:"Game Color",sub:"Standard",hex:"#707880"},
+  {code:"VGC72.048",name:"Sombre Grey",line:"Game Color",sub:"Standard",hex:"#686870"},
+  {code:"VGC72.148",name:"Warm Grey",line:"Game Color",sub:"Standard",hex:"#908880"},
+  {code:"VGC72.049",name:"Stonewall Grey",line:"Game Color",sub:"Standard",hex:"#a0a090"},
+  {code:"VGC72.050",name:"Neutral Grey",line:"Game Color",sub:"Standard",hex:"#808080"},
+  {code:"VGC72.155",name:"Charcoal",line:"Game Color",sub:"Standard",hex:"#484848"},
+  {code:"VGC72.051",name:"Black",line:"Game Color",sub:"Standard",hex:"#101010"},
+  {code:"VGC72.052",name:"Silver",line:"Game Color",sub:"Metallic",hex:"#b8bcc6"},
+  {code:"VGC72.053",name:"Chainmail Silver",line:"Game Color",sub:"Metallic",hex:"#909498"},
+  {code:"VGC72.054",name:"Dark Gunmetal",line:"Game Color",sub:"Metallic",hex:"#505458"},
+  {code:"VGC72.055",name:"Polished Gold",line:"Game Color",sub:"Metallic",hex:"#d0a830"},
+  {code:"VGC72.056",name:"Glorious Gold",line:"Game Color",sub:"Metallic",hex:"#b89020"},
+  {code:"VGC72.057",name:"Bright Bronze",line:"Game Color",sub:"Metallic",hex:"#a07830"},
+  {code:"VGC72.058",name:"Brassy Brass",line:"Game Color",sub:"Metallic",hex:"#b89040"},
+  {code:"VGC72.059",name:"Hammered Copper",line:"Game Color",sub:"Metallic",hex:"#b07038"},
+  {code:"VGC72.060",name:"Tinny Tin",line:"Game Color",sub:"Metallic",hex:"#707878"},
+  {code:"VGC72.082",name:"White Ink",line:"Game Color",sub:"Ink",hex:"#f0f0ec"},
+  {code:"VGC72.093",name:"Skin Ink",line:"Game Color",sub:"Ink",hex:"#e8a870"},
+  {code:"VGC72.085",name:"Yellow Ink",line:"Game Color",sub:"Ink",hex:"#e0c000"},
+  {code:"VGC72.086",name:"Red Ink",line:"Game Color",sub:"Ink",hex:"#c81818"},
+  {code:"VGC72.083",name:"Magenta Ink",line:"Game Color",sub:"Ink",hex:"#c82878"},
+  {code:"VGC72.087",name:"Violet Ink",line:"Game Color",sub:"Ink",hex:"#582888"},
+  {code:"VGC72.088",name:"Blue Ink",line:"Game Color",sub:"Ink",hex:"#1e50c0"},
+  {code:"VGC72.084",name:"Dark Turquoise Ink",line:"Game Color",sub:"Ink",hex:"#107080"},
+  {code:"VGC72.089",name:"Green Ink",line:"Game Color",sub:"Ink",hex:"#1e8040"},
+  {code:"VGC72.090",name:"Black Green Ink",line:"Game Color",sub:"Ink",hex:"#1a3018"},
+  {code:"VGC72.091",name:"Sepia Ink",line:"Game Color",sub:"Ink",hex:"#6a4818"},
+  {code:"VGC72.094",name:"Black Ink",line:"Game Color",sub:"Ink",hex:"#101010"},
+  {code:"VGC72.103",name:"Fluorescent Yellow",line:"Game Color",sub:"Fluorescent",hex:"#f0f010"},
+  {code:"VGC72.156",name:"Fluorescent Orange",line:"Game Color",sub:"Fluorescent",hex:"#f06000"},
+  {code:"VGC72.157",name:"Fluorescent Red",line:"Game Color",sub:"Fluorescent",hex:"#f01820"},
+  {code:"VGC72.158",name:"Fluorescent Magenta",line:"Game Color",sub:"Fluorescent",hex:"#f020a0"},
+  {code:"VGC72.159",name:"Fluorescent Violet",line:"Game Color",sub:"Fluorescent",hex:"#9010e0"},
+  {code:"VGC72.160",name:"Fluorescent Blue",line:"Game Color",sub:"Fluorescent",hex:"#1020f8"},
+  {code:"VGC72.104",name:"Fluorescent Green",line:"Game Color",sub:"Fluorescent",hex:"#10e020"},
+  {code:"VGC72.161",name:"Fluorescent Cold Green",line:"Game Color",sub:"Fluorescent",hex:"#10f0a0"},
+  {code:"VGC73.208",name:"Yellow Wash",line:"Game Color",sub:"Wash",hex:"#d0b818"},
+  {code:"VGC73.204",name:"Flesh Wash",line:"Game Color",sub:"Wash",hex:"#c89060"},
+  {code:"VGC73.206",name:"Red Wash",line:"Game Color",sub:"Wash",hex:"#b02020"},
+  {code:"VGC73.209",name:"Violet Wash",line:"Game Color",sub:"Wash",hex:"#6030a0"},
+  {code:"VGC73.207",name:"Blue Wash",line:"Game Color",sub:"Wash",hex:"#203090"},
+  {code:"VGC73.203",name:"Umber Wash",line:"Game Color",sub:"Wash",hex:"#5a3818"},
+  {code:"VGC73.200",name:"Sepia Wash",line:"Game Color",sub:"Wash",hex:"#7a5020"},
+  {code:"VGC73.201",name:"Black Wash",line:"Game Color",sub:"Wash",hex:"#101010"},
+  {code:"VGC72.600",name:"Vomit",line:"Game Color",sub:"Special FX",hex:"#b0a018"},
+  {code:"VGC72.601",name:"Fresh Blood",line:"Game Color",sub:"Special FX",hex:"#c01818"},
+  {code:"VGC72.602",name:"Thick Blood",line:"Game Color",sub:"Special FX",hex:"#8a1010"},
+  {code:"VGC72.603",name:"Demon Blood",line:"Game Color",sub:"Special FX",hex:"#580808"},
+  {code:"VGC72.604",name:"Frost",line:"Game Color",sub:"Special FX",hex:"#a0d0e8"},
+  {code:"VGC72.605",name:"Green Rust",line:"Game Color",sub:"Special FX",hex:"#608048"},
+  {code:"VGC72.606",name:"Bile",line:"Game Color",sub:"Special FX",hex:"#90a020"},
+  {code:"VGC72.607",name:"Acid",line:"Game Color",sub:"Special FX",hex:"#a0c818"},
+  {code:"VGC72.608",name:"Corrosion",line:"Game Color",sub:"Special FX",hex:"#786040"},
+  {code:"VGC72.609",name:"Rust",line:"Game Color",sub:"Special FX",hex:"#a05018"},
+  {code:"VGC72.610",name:"Galvanic Corrosion",line:"Game Color",sub:"Special FX",hex:"#588090"},
+  {code:"VGC72.611",name:"Moss and Lichen",line:"Game Color",sub:"Special FX",hex:"#607040"},
+  {code:"VGC72.401",name:"Templar White",line:"Game Color",sub:"Xpress",hex:"#e8e8e4"},
+  {code:"VGC72.402",name:"Dwarf Skin",line:"Game Color",sub:"Xpress",hex:"#c89068"},
+  {code:"VGC72.403",name:"Imperial Yellow",line:"Game Color",sub:"Xpress",hex:"#d0a010"},
+  {code:"VGC72.404",name:"Nuclear Yellow",line:"Game Color",sub:"Xpress",hex:"#f0e020"},
+  {code:"VGC72.405",name:"Martian Orange",line:"Game Color",sub:"Xpress",hex:"#e06818"},
+  {code:"VGC72.406",name:"Plasma Red",line:"Game Color",sub:"Xpress",hex:"#c01818"},
+  {code:"VGC72.407",name:"Velvet Red",line:"Game Color",sub:"Xpress",hex:"#901828"},
+  {code:"VGC72.408",name:"Cardinal Purple",line:"Game Color",sub:"Xpress",hex:"#8018a0"},
+  {code:"VGC72.409",name:"Deep Purple",line:"Game Color",sub:"Xpress",hex:"#380878"},
+  {code:"VGC72.410",name:"Gloomy Violet",line:"Game Color",sub:"Xpress",hex:"#582090"},
+  {code:"VGC72.411",name:"Mystic Blue",line:"Game Color",sub:"Xpress",hex:"#3060c0"},
+  {code:"VGC72.412",name:"Storm Blue",line:"Game Color",sub:"Xpress",hex:"#283880"},
+  {code:"VGC72.413",name:"Omega Blue",line:"Game Color",sub:"Xpress",hex:"#1848a8"},
+  {code:"VGC72.414",name:"Caribbean Turquoise",line:"Game Color",sub:"Xpress",hex:"#1890a8"},
+  {code:"VGC72.415",name:"Orc Skin",line:"Game Color",sub:"Xpress",hex:"#609050"},
+  {code:"VGC72.416",name:"Troll Green",line:"Game Color",sub:"Xpress",hex:"#308050"},
+  {code:"VGC72.417",name:"Snake Green",line:"Game Color",sub:"Xpress",hex:"#50a040"},
+  {code:"VGC72.418",name:"Lizard Green",line:"Game Color",sub:"Xpress",hex:"#80c050"},
+  {code:"VGC72.419",name:"Plague Green",line:"Game Color",sub:"Xpress",hex:"#506028"},
+  {code:"VGC72.420",name:"Wasteland Brown",line:"Game Color",sub:"Xpress",hex:"#9a7848"},
+  {code:"VGC72.421",name:"Copper Brown",line:"Game Color",sub:"Xpress",hex:"#9a6030"},
+  {code:"VGC72.422",name:"Space Grey",line:"Game Color",sub:"Xpress",hex:"#707888"},
+  {code:"VGC72.423",name:"Black Lotus",line:"Game Color",sub:"Xpress",hex:"#181818"},
+  {code:"VGC72.448",name:"Xpress Medium",line:"Game Color",sub:"Xpress",hex:"#e8e8e8"},
+  {code:"VGC72.650",name:"Gloss Poly. Varnish",line:"Game Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VGC72.651",name:"Matt Poly. Varnish",line:"Game Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VGC72.652",name:"Satin Poly. Varnish",line:"Game Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VGC72.653",name:"Ultra Matt Varnish",line:"Game Color",sub:"Auxiliaries",hex:"#e8e8e8"},
 ];
 
+// Note: VMC = Vallejo Metal/Model Color, VGC = Vallejo Game Color
+
 const PAINT_MAP   = Object.fromEntries(PAINTS.map(p => [p.code, p]));
-const LINE_ORDER  = ["Standard Colors","Metallics","Transparents","Signature Series","AMP Colors","Fluorescents","Primers","Washes","Basing Textures"];
-const LINE_ICONS  = {"Standard Colors":"🎨","Metallics":"✨","Transparents":"💧","Signature Series":"⭐","AMP Colors":"🪖","Fluorescents":"💡","Primers":"🧱","Washes":"🌊","Basing Textures":"🌿"};
-const ALWAYS_SUBS = new Set(["Signature Series","AMP Colors"]);
+const LINE_ORDER  = ["Standard Colors","Metallics","Transparents","Signature Series","AMP Colors","Fluorescents","Primers","Washes","Basing Textures","Metal Color","Model Color","Game Color"];
+const LINE_ICONS  = {"Standard Colors":"🎨","Metallics":"✨","Transparents":"💧","Signature Series":"⭐","AMP Colors":"🪖","Fluorescents":"💡","Primers":"🧱","Washes":"🌊","Basing Textures":"🌿","Metal Color":"🔩","Model Color":"🖌️","Game Color":"⚔️"};
+const ALWAYS_SUBS = new Set(["Signature Series","AMP Colors","Metal Color","Model Color","Game Color"]);
 const COLOUR_SUBS = new Set(["Standard Colors"]);
+const BRAND_ORDER = ["Monument Hobbies","Vallejo"];
+const BRAND_LINES = {
+  "Monument Hobbies": ["Standard Colors","Metallics","Transparents","Signature Series","AMP Colors","Fluorescents","Primers","Washes","Basing Textures"],
+  "Vallejo":          ["Metal Color","Model Color","Game Color"]
+};
+const BRAND_ICONS = {"Monument Hobbies":"🏔️","Vallejo":"🦅"};
+
+// ─── Tag derivation ───────────────────────────────────────────────────────
+const _SUB_FAM = {
+  'Whites':'White','Blacks':'Black','Reds':'Red','Blues':'Blue','Greens':'Green',
+  'Yellows':'Yellow','Oranges':'Orange','Browns':'Brown','Greys':'Grey',
+  'Skin/Flesh':'Skin/Flesh','Metallics':'Metallic','Metallic':'Metallic',
+  'Pinks':'Pink','Transparents':'Transparent','Fluorescents':'Fluorescent',
+  'Fluorescent':'Fluorescent','Glazes':'Glaze','Military':'Brown',
+  'Wash':'Wash','Ink':'Ink','Special FX':'Special FX','Xpress':'Xpress',
+  'Airbrush':'Metallic',
+};
+const _NAME_FAMS = [
+  [/\bwhit|ivory|bone\s*white|off.white|pale\s*sand/i,           'White'],
+  [/\bblack\b(?!\s*(green|red|brown|grey))/i,                    'Black'],
+  [/grey|gray(?!.*brown)|silver\s*grey|basalt|neutral grey|dark sea grey/i, 'Grey'],
+  [/\bred\b|blood|scarlet|gory|carmine|vermil|dark red|burnt red|flat red|rojo|hull red/i, 'Red'],
+  [/pink|rose|magenta|squid|sunset red|salmon/i,                    'Pink'],
+  [/purple|violet|warlord|hexed|lichen|lustful|midnight purple|alien purple/i, 'Purple'],
+  [/\borange\b|hot orange|orange fire|bright orange|clear orange|german orange/i, 'Orange'],
+  [/yellow|lemon|sun\b|moon\b|toxic yel|gold.*yel|sand yel|ice yel|deep yel|flat yel|golden yel/i, 'Yellow'],
+  [/green|jade|goblin|bile|scurvy|foul green|scorpy|angel green|ghost green|lime|emerald|verdigris|aquam/i, 'Green'],
+  [/\bblue\b|azure|ultramarine|prussian|royal blue|magic blue|electric blue|imperial blue|andrea blue|sky blue|deep sky|oxford|cobalt|turquoise|abyssal|elfic blue|sunrise blue|night blue/i, 'Blue'],
+  [/brown|earth|leather|wood|\btan\b|khaki|sand|ochre|beige|cork|saddle|mahogany|umber|cavalry|chocolate|scrofulous|marron|gorgon|parasite|plague brown|beasty|wasteland/i, 'Brown'],
+  [/skin|flesh|pale flesh|rosy flesh|anthea|succubus|barbarian|elfic flesh|elf skin|dark flesh|basic skin|medium flesh|sunny skin|dwarf skin|orc skin/i, 'Skin/Flesh'],
+  [/\bgold\b|\bsilver\b|\bcopper\b|\bbrass\b|\bbronze\b|gunmetal|\bsteel\b|\biron\b|tinny|duralum|alumin|chrome|magnesium|exhaust|burnt iron|chainmail|polished gold|glorious|brassy|hammered/i, 'Metallic'],
+  [/transparent|smoke\b|woodgrain|natural wood/i,                  'Transparent'],
+  [/fluorescent|fluo/i,                                             'Fluorescent'],
+  [/\bwash\b/i,                                                   'Wash'],
+  [/\bink\b/i,                                                    'Ink'],
+];
+function _deriveManufacturer(p){
+  return (p.code.startsWith('VMC')||p.code.startsWith('VGC'))?'Vallejo':'Monument Hobbies';
+}
+function _deriveColorFamily(p){
+  if(_SUB_FAM[p.sub]) return _SUB_FAM[p.sub];
+  const s=(p.name+' '+p.sub).toLowerCase();
+  for(const[re,fam]of _NAME_FAMS){if(re.test(s))return fam;}
+  return 'Other';
+}
+function _deriveType(p){
+  const l=p.line,s=p.sub;
+  if(s==='Auxiliaries'||s==='Auxiliary')return 'Auxiliary';
+  if(s==='Wash'||l==='Washes')          return 'Wash';
+  if(s==='Ink')                          return 'Ink';
+  if(s==='Special FX')                  return 'Special FX';
+  if(s==='Xpress')                       return 'Xpress';
+  if(s==='Glazes'||s==='Glaze')          return 'Glaze';
+  if(l==='Fluorescents'||s==='Fluorescent'||s==='Fluorescents') return 'Fluorescent';
+  if(l==='Primers')                      return 'Primer';
+  if(l==='Basing Textures')             return 'Texture';
+  if(l==='Transparents'||s==='Transparents'||s==='Transparent') return 'Transparent';
+  if(l==='Metallics'||s==='Metallics'||s==='Metallic'||l==='Metal Color'||s==='Airbrush') return 'Metallic';
+  return 'Standard';
+}
+const PAINT_TAGS={};
+PAINTS.forEach(p=>{
+  PAINT_TAGS[p.code]={
+    manufacturer:_deriveManufacturer(p),
+    colorFamily: _deriveColorFamily(p),
+    type:        _deriveType(p),
+  };
+});
+const TAG_GROUPS=[
+  {key:'manufacturer', label:'Brand',        values:['Monument Hobbies','Vallejo']},
+  {key:'colorFamily',  label:'Colour',       values:['White','Black','Grey','Red','Pink','Purple','Orange','Yellow','Green','Blue','Brown','Skin/Flesh','Metallic','Transparent','Fluorescent','Wash','Ink','Other']},
+  {key:'type',         label:'Type',         values:['Standard','Metallic','Transparent','Wash','Ink','Fluorescent','Glaze','Primer','Texture','Special FX','Xpress','Auxiliary']},
+];
 
 // ─── State ────────────────────────────────────
 let currentUser    = null;
@@ -681,6 +1184,7 @@ let ownedPaints    = new Set();
 let wishedPaints   = new Set();
 let paintNotes     = {};        // code → note text
 let activeFilter   = 'all';
+let activeTagFilters = {manufacturer:new Set(), colorFamily:new Set(), type:new Set()};
 let pendingStyle   = null;
 let pendingXP      = '';
 let noteTargetCode = null;      // which paint the note modal is open for
@@ -814,16 +1318,7 @@ async function handleProfileSave() {
 // ─── Launch ───────────────────────────────────
 function launchApp() {
   const dn = currentProfile.display_name || currentProfile.username;
-  document.getElementById('app-greeting').textContent    = `Welcome, ${dn}`;
   document.getElementById('topbar-username').textContent = currentProfile.username;
-  const sm = {
-    Competition:{ badge:'Competition Painter', sub:'Track every pot — your palette is your edge.' },
-    Display:    { badge:'Display Painter',     sub:'Every great piece starts with the right colours.' },
-    Gaming:     { badge:'Gaming Painter',      sub:"Get your army ready. Know what's on your shelf." },
-  };
-  const info = sm[currentProfile.style] || { badge:'Painter', sub:'Your ProAcryl collection.' };
-  document.getElementById('style-badge').textContent  = info.badge;
-  document.getElementById('app-subtitle').textContent = info.sub;
   document.getElementById('profile-nudge').style.display =
     (currentProfile.display_name && currentProfile.xp) ? 'none' : 'flex';
   renderPaints();
@@ -916,12 +1411,18 @@ function renderPaints() {
 
   const lines = {};
   PAINTS.forEach(p => {
-    if (!p.name.toLowerCase().includes(query) && !p.code.toLowerCase().includes(query)) return;
+    const _tags = PAINT_TAGS[p.code];
+    const _tagStr = _tags ? `${_tags.manufacturer} ${_tags.colorFamily} ${_tags.type}`.toLowerCase() : '';
+    if (!p.name.toLowerCase().includes(query) && !p.code.toLowerCase().includes(query) && !_tagStr.includes(query)) return;
     const isOwned  = ownedPaints.has(p.code);
     const isWished = wishedPaints.has(p.code);
     if (filter === 'owned'   && !isOwned)  return;
     if (filter === 'wished'  && !isWished) return;
     if (filter === 'missing' && (isOwned || isWished)) return;
+    const _t = PAINT_TAGS[p.code];
+    if (activeTagFilters.manufacturer.size && !activeTagFilters.manufacturer.has(_t.manufacturer)) return;
+    if (activeTagFilters.colorFamily.size  && !activeTagFilters.colorFamily.has(_t.colorFamily))  return;
+    if (activeTagFilters.type.size         && !activeTagFilters.type.has(_t.type))                return;
     if (!lines[p.line]) lines[p.line] = {};
     if (!lines[p.line][p.sub]) lines[p.line][p.sub] = [];
     lines[p.line][p.sub].push(p);
@@ -934,8 +1435,18 @@ function renderPaints() {
   }
 
   let html = '';
+  let lastBrand = null;
   LINE_ORDER.forEach(lineName => {
     if (!lines[lineName]) return;
+    const brand = Object.keys(BRAND_LINES).find(b => BRAND_LINES[b].includes(lineName)) || 'Other';
+    if (brand !== lastBrand) {
+      const brandLines = BRAND_LINES[brand] || [lineName];
+      const brandAll   = brandLines.flatMap(l => lines[l] ? Object.values(lines[l]).flat() : []);
+      const bOwned     = brandAll.filter(p => ownedPaints.has(p.code)).length;
+      const bTotal     = brandAll.length;
+      html += `<div class="brand-header" id="brand-${brand.replace(/\s+/g,'-').toLowerCase()}">${BRAND_ICONS[brand]||'🎨'} ${brand}<span class="brand-meta">${bOwned}/${bTotal} owned</span></div>`;
+      lastBrand = brand;
+    }
     const subs    = lines[lineName];
     const all     = Object.values(subs).flat();
     const ownedN  = all.filter(p => ownedPaints.has(p.code)).length;
@@ -983,7 +1494,7 @@ function renderPaints() {
               <div class="col-note">📝</div>
               <span class="paint-col-label note-lbl">Notes</span>
             </div>
-            <a class="paint-col buy-col" href="${buyUrl(p.code)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Buy on Monument Hobbies">
+            <a class="paint-col buy-col" href="${buyUrl(p.code)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${(p.code.startsWith('VMC')||p.code.startsWith('VGC'))?'Find on Vallejo website':'Buy on Monument Hobbies'}">
               <div class="col-buy">🛒</div>
               <span class="paint-col-label" style="color:var(--accent);opacity:.7;">Buy</span>
             </a>
@@ -997,6 +1508,7 @@ function renderPaints() {
 
   container.innerHTML = html;
   updatePills();
+  renderNav();
 }
 
 function updatePills() {
@@ -1027,7 +1539,6 @@ async function saveModalProfile() {
   setLoading('modal-save-btn', false);
   if (error) { showToast('Could not save profile.', true); return; }
   currentProfile = data;
-  document.getElementById('app-greeting').textContent = `Welcome, ${displayName || currentProfile.username}`;
   document.getElementById('profile-nudge').style.display =
     (data.display_name && data.xp) ? 'none' : 'flex';
   closeModal('profile-modal');
@@ -1039,6 +1550,123 @@ document.querySelectorAll('.modal-overlay').forEach(o =>
   o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }));
 
 init();
+function renderNav() {
+  const nav = document.getElementById('quick-nav');
+  if (!nav) return;
+
+  // Build list of visible lines from rendered DOM
+  const visibleLines = new Set();
+  document.querySelectorAll('.line-header').forEach(h => {
+    LINE_ORDER.forEach(l => { if (h.textContent.includes(l)) visibleLines.add(l); });
+  });
+
+  if (!visibleLines.size) { nav.style.display='none'; return; }
+  nav.style.display='flex';
+
+  let opts = '<option value="">Jump to section…</option>';
+  BRAND_ORDER.forEach(brand => {
+    const lines = (BRAND_LINES[brand] || []).filter(l => visibleLines.has(l));
+    if (!lines.length) return;
+    opts += `<optgroup label="${BRAND_ICONS[brand]||''} ${brand}">`;
+    lines.forEach(l => { opts += `<option value="${l}">${l}</option>`; });
+    opts += '</optgroup>';
+  });
+
+  nav.innerHTML = `<span class="quick-nav-label">Jump to</span><select class="nav-select" onchange="navTo(this.value);this.value=''">${opts}</select>`;
+}
+
+function navTo(lineName) {
+  const headers = document.querySelectorAll('.line-header');
+  for (const h of headers) {
+    if (h.textContent.includes(lineName)) {
+      h.closest('.line-section').scrollIntoView({behavior:'smooth', block:'start'});
+      return;
+    }
+  }
+  // fallback: scroll to brand header
+  const brandHeader = document.querySelector('.brand-header');
+  if (brandHeader) brandHeader.scrollIntoView({behavior:'smooth'});
+}
+
+
+// ─── Tag filter UI ────────────────────────────────────────────────────────
+function openTagFilterModal(){
+  renderFilterModalBody();
+  showModal('tag-filter-modal');
+}
+function renderFilterModalBody(){
+  const el=document.getElementById('filter-modal-body');
+  if(!el)return;
+  let h='';
+  TAG_GROUPS.forEach(({key,label,values})=>{
+    h+=`<div class="filter-group"><div class="filter-group-label">${label}</div><div class="filter-pills">`;
+    values.forEach(v=>{
+      const on=activeTagFilters[key].has(v)?'on':'';
+      h+=`<button class="fpill ${on}" onclick="toggleTagFilter('${key}','${v}',this)">${v}</button>`;
+    });
+    h+='</div></div>';
+  });
+  el.innerHTML=h;
+}
+function toggleTagFilter(key,val,btn){
+  const s=activeTagFilters[key];
+  s.has(val)?s.delete(val):s.add(val);
+  btn.classList.toggle('on',s.has(val));
+  updateTagFilterUI();
+  renderPaints();
+}
+function clearTagFilters(){
+  TAG_GROUPS.forEach(({key})=>activeTagFilters[key].clear());
+  renderFilterModalBody();
+  updateTagFilterUI();
+  renderPaints();
+}
+function updateTagFilterUI(){
+  const total=TAG_GROUPS.reduce((n,{key})=>n+activeTagFilters[key].size,0);
+  const badge=document.getElementById('tag-filter-badge');
+  const btn=document.getElementById('tag-filter-btn');
+  if(badge){badge.style.display=total?'flex':'none';badge.textContent=total;}
+  if(btn){btn.classList.toggle('active',total>0);}
+  // Active chips strip
+  const chips=document.getElementById('active-chips');
+  if(!chips)return;
+  let h='';
+  TAG_GROUPS.forEach(({key,label})=>{
+    activeTagFilters[key].forEach(v=>{
+      h+=`<span class="chip" onclick="toggleTagFilter('${key}','${v}',document.querySelector('.fpill.on'))">${label}: ${v} <span class="chip-x">✕</span></span>`;
+    });
+  });
+  chips.innerHTML=h;
+  // re-attach click handlers to chips properly
+  chips.querySelectorAll('.chip').forEach(chip=>{
+    chip.onclick=()=>{
+      const [k,v]=chip.dataset.kv?.split('|')||[];
+    };
+  });
+  // Rebuild chips with data attributes for reliable removal
+  h='';
+  TAG_GROUPS.forEach(({key,label})=>{
+    activeTagFilters[key].forEach(v=>{
+      h+=`<span class="chip" data-kv="${key}|${v}">${label}: ${v} <span class="chip-x">✕</span></span>`;
+    });
+  });
+  chips.innerHTML=h;
+  chips.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click',()=>{
+      const[k,v]=chip.dataset.kv.split('|');
+      activeTagFilters[k].delete(v);
+      renderFilterModalBody();
+      updateTagFilterUI();
+      renderPaints();
+    });
+  });
+}
+function hideModal(id){document.getElementById(id)?.classList.remove('open');}
+window.addEventListener('scroll',()=>{
+  document.getElementById('back-to-top')?.classList.toggle('visible', window.scrollY > 400);
+});
 </script>
-</body>
+<button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+
+
 </html>
