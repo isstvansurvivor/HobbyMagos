@@ -4,35 +4,35 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hobby Materiel Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --bg:#0e0f14;--surface:#16181f;--surface2:#1e2130;--border:#2a2d3a;
-    --accent:#c8964a;--accent2:#8fb8d4;--danger:#c0574a;
+    --accent:#38bdc1;--accent2:#2a9096;--danger:#c0574a;
     --text:#ddd5c4;--text-muted:#7a7566;--text-dim:#4a4840;
-    --white:#f0ebe0;--green:#6aaa78;--wish:#8fb8d4;
+    --white:#e8eef4;--green:#6aaa78;--wish:#2a9096;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,serif;font-size:17px;min-height:100vh;
-    background-image:radial-gradient(ellipse 80% 50% at 20% 10%,rgba(200,150,74,.06) 0%,transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 90%,rgba(143,184,212,.04) 0%,transparent 60%);}
+  body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-size:16px;min-height:100vh;
+    background-image:radial-gradient(ellipse 80% 50% at 20% 10%,rgba(56,189,193,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 90%,rgba(42,144,150,.04) 0%,transparent 60%);}
   .screen{display:none;min-height:100vh;}
   .screen.active{display:flex;flex-direction:column;}
   .center-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
   .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2.5rem 2.8rem;width:100%;max-width:520px;
-    box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 0 1px rgba(200,150,74,.06);animation:fadeUp .4s ease both;}
-  h1{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:var(--white);line-height:1.2;margin-bottom:.4rem;}
-  h2{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:600;color:var(--white);margin-bottom:.4rem;}
+    box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 0 1px rgba(56,189,193,.06);animation:fadeUp .4s ease both;}
+  h1{font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--white);line-height:.95;margin-bottom:.4rem;}
+  h2{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--white);line-height:.95;margin-bottom:.4rem;}
   .subtitle{color:var(--text-muted);font-size:.95rem;font-style:italic;margin-bottom:2rem;line-height:1.5;}
-  .label{display:block;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem;font-family:'Crimson Pro',serif;font-weight:600;}
+  .label{display:block;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem;font-family:'Barlow',sans-serif;font-weight:600;}
   input[type="text"],input[type="password"],input[type="email"]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:7px;
-    color:var(--white);font-family:'Crimson Pro',serif;font-size:1rem;padding:.65rem .9rem;outline:none;transition:border-color .2s;margin-bottom:1.1rem;}
-  textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--white);font-family:'Crimson Pro',serif;
+    color:var(--white);font-family:'Barlow',sans-serif;font-size:1rem;padding:.65rem .9rem;outline:none;transition:border-color .2s;margin-bottom:1.1rem;}
+  textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--white);font-family:'Barlow',sans-serif;
     font-size:.95rem;padding:.65rem .9rem;outline:none;transition:border-color .2s;resize:vertical;min-height:100px;line-height:1.5;}
   input:focus,textarea:focus{border-color:var(--accent);}
   input::placeholder,textarea::placeholder{color:var(--text-dim);}
-  .btn{display:inline-block;padding:.7rem 1.8rem;border-radius:8px;border:none;cursor:pointer;font-family:'Crimson Pro',serif;font-size:1rem;font-weight:600;letter-spacing:.04em;transition:all .15s;}
+  .btn{display:inline-block;padding:.7rem 1.8rem;border-radius:8px;border:none;cursor:pointer;font-family:'Barlow',sans-serif;font-size:1rem;font-weight:600;letter-spacing:.04em;transition:all .15s;}
   .btn-primary{background:var(--accent);color:#0e0f14;width:100%;padding:.8rem;font-size:1.05rem;margin-top:.5rem;}
   .btn-primary:hover:not(:disabled){background:#d9a85a;transform:translateY(-1px);}
   .btn-primary:disabled{opacity:.5;cursor:not-allowed;}
@@ -42,13 +42,13 @@
   .style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-bottom:1.6rem;}
   .style-card{background:var(--bg);border:2px solid var(--border);border-radius:10px;padding:1rem .7rem;text-align:center;cursor:pointer;transition:all .2s;}
   .style-card:hover{border-color:var(--accent);}
-  .style-card.selected{border-color:var(--accent);background:rgba(200,150,74,.08);}
+  .style-card.selected{border-color:var(--accent);background:rgba(56,189,193,.08);}
   .style-card .icon{font-size:1.8rem;display:block;margin-bottom:.5rem;}
-  .style-card .name{font-family:'Playfair Display',serif;font-size:.9rem;font-weight:600;color:var(--white);display:block;margin-bottom:.25rem;}
+  .style-card .name{font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:600;color:var(--white);display:block;margin-bottom:.25rem;}
   .style-card .desc{font-size:.75rem;color:var(--text-muted);font-style:italic;line-height:1.3;}
   .style-card.selected .name{color:var(--accent);}
   .error{color:var(--danger);font-size:.85rem;margin-top:-.7rem;margin-bottom:.8rem;}
-  .link-btn{background:none;border:none;color:var(--accent2);cursor:pointer;font-family:'Crimson Pro',serif;font-size:.9rem;text-decoration:underline;padding:0;}
+  .link-btn{background:none;border:none;color:var(--accent2);cursor:pointer;font-family:'Barlow',sans-serif;font-size:.9rem;text-decoration:underline;padding:0;}
   .link-btn:hover{color:var(--accent);}
   @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
   @keyframes spin{to{transform:rotate(360deg)}}
@@ -62,22 +62,22 @@
   /* Topbar */
   #app-screen{flex-direction:column;}
   .topbar{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:.5rem;}
-  .topbar-brand{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--white);display:flex;align-items:center;gap:.6rem;}
+  .topbar-brand{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--white);display:flex;align-items:center;gap:.6rem;}
   .topbar-brand span{color:var(--accent);}
   .topbar-right{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
   .user-badge{font-size:.8rem;color:var(--text-muted);font-style:italic;}
   .user-badge b{color:var(--white);font-style:normal;}
   .progress-pills{display:flex;gap:.5rem;}
-  .progress-pill{background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:.3rem .9rem;font-size:.8rem;font-weight:600;font-family:'Crimson Pro',serif;white-space:nowrap;}
+  .progress-pill{background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:.3rem .9rem;font-size:.8rem;font-weight:600;font-family:'Barlow',sans-serif;white-space:nowrap;}
   .owned-pill{color:var(--green);border-color:rgba(106,170,120,.3);}
-  .wish-pill{color:var(--wish);border-color:rgba(143,184,212,.3);}
+  .wish-pill{color:var(--wish);border-color:rgba(42,144,150,.3);}
 
   /* App body */
   .app-body{max-width:1050px;margin:0 auto;padding:2rem 1.5rem 4rem;width:100%;}
   .app-intro{margin-bottom:1.8rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
   .app-intro h2{font-size:1.9rem;margin-bottom:.25rem;}
-  .style-badge{display:inline-block;background:rgba(200,150,74,.12);border:1px solid rgba(200,150,74,.3);color:var(--accent);border-radius:99px;padding:.2rem .8rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;font-family:'Crimson Pro',serif;margin-bottom:.5rem;}
-  .nudge{background:linear-gradient(135deg,rgba(143,184,212,.08),rgba(200,150,74,.08));border:1px solid rgba(143,184,212,.2);border-radius:10px;padding:1rem 1.2rem;display:flex;align-items:center;gap:.9rem;margin-bottom:1.8rem;font-size:.9rem;color:var(--text-muted);}
+  .style-badge{display:inline-block;background:rgba(56,189,193,.12);border:1px solid rgba(56,189,193,.3);color:var(--accent);border-radius:99px;padding:.2rem .8rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;font-family:'Barlow',sans-serif;margin-bottom:.5rem;}
+  .nudge{background:linear-gradient(135deg,rgba(42,144,150,.08),rgba(56,189,193,.08));border:1px solid rgba(42,144,150,.2);border-radius:10px;padding:1rem 1.2rem;display:flex;align-items:center;gap:.9rem;margin-bottom:1.8rem;font-size:.9rem;color:var(--text-muted);}
   .nudge-icon{font-size:1.4rem;flex-shrink:0;}
   .nudge a{color:var(--accent2);text-decoration:underline;cursor:pointer;}
 
@@ -87,23 +87,23 @@
   .search-wrap input{margin:0;padding-left:2.2rem;}
   .search-icon{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:.9rem;pointer-events:none;}
   .filter-btns{display:flex;gap:.4rem;flex-wrap:wrap;}
-  .filter-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);border-radius:99px;padding:.35rem .9rem;font-size:.78rem;cursor:pointer;font-family:'Crimson Pro',serif;letter-spacing:.05em;text-transform:uppercase;transition:all .15s;}
-  .filter-btn:hover,.filter-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(200,150,74,.08);}
-  .filter-btn.wish-filter.active{border-color:var(--wish);color:var(--wish);background:rgba(143,184,212,.08);}
+  .filter-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);border-radius:99px;padding:.35rem .9rem;font-size:.78rem;cursor:pointer;font-family:'Barlow',sans-serif;letter-spacing:.05em;text-transform:uppercase;transition:all .15s;}
+  .filter-btn:hover,.filter-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(56,189,193,.08);}
+  .filter-btn.wish-filter.active{border-color:var(--wish);color:var(--wish);background:rgba(42,144,150,.08);}
 
   /* Paint sections */
   .line-section{margin-bottom:2.5rem;}
-  .line-header{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--white);margin-bottom:1rem;padding:.65rem 1.1rem;background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;display:flex;align-items:baseline;justify-content:space-between;gap:.6rem;}
+  .line-header{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--white);margin-bottom:1rem;padding:.65rem 1.1rem;background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;display:flex;align-items:baseline;justify-content:space-between;gap:.6rem;}
   .line-counts{display:flex;gap:.8rem;}
-  .lc-owned{font-size:.73rem;color:var(--green);font-family:'Crimson Pro',serif;font-style:italic;font-weight:400;}
-  .lc-wish{font-size:.73rem;color:var(--wish);font-family:'Crimson Pro',serif;font-style:italic;font-weight:400;}
+  .lc-owned{font-size:.73rem;color:var(--green);font-family:'Barlow',sans-serif;font-style:italic;font-weight:400;}
+  .lc-wish{font-size:.73rem;color:var(--wish);font-family:'Barlow',sans-serif;font-style:italic;font-weight:400;}
   .group-header{font-size:.78rem;color:var(--text-muted);margin:1.1rem 0 .5rem;padding-bottom:.3rem;border-bottom:1px solid var(--border);display:flex;align-items:baseline;gap:.5rem;text-transform:uppercase;letter-spacing:.1em;font-weight:600;}
   .group-header .g-count{font-size:.7rem;color:var(--text-dim);font-style:italic;text-transform:none;letter-spacing:0;font-weight:400;}
-  .brand-header{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--accent);margin:2.5rem 0 1.2rem;padding:.5rem 0 .6rem;border-bottom:2px solid var(--accent);letter-spacing:.04em;}
-  .brand-header .brand-meta{font-size:.75rem;color:var(--text-muted);font-family:'Crimson Pro',serif;font-style:italic;font-weight:400;margin-left:.8rem;vertical-align:middle;letter-spacing:0;}
+  .brand-header{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:2.5rem 0 1.2rem;padding:.5rem 0 .6rem;border-bottom:2px solid var(--accent);letter-spacing:.04em;}
+  .brand-header .brand-meta{font-size:.75rem;color:var(--text-muted);font-family:'Barlow',sans-serif;font-style:italic;font-weight:400;margin-left:.8rem;vertical-align:middle;letter-spacing:0;}
   .quick-nav{display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;}
   .quick-nav-label{font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;font-weight:600;white-space:nowrap;}
-  .nav-select{background:var(--surface2);color:var(--white);border:1px solid var(--border);border-radius:8px;padding:.4rem .85rem .4rem .6rem;font-size:.8rem;font-family:'Crimson Pro',serif;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23a0896a' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .55rem center;padding-right:1.6rem;min-width:200px;}
+  .nav-select{background:var(--surface2);color:var(--white);border:1px solid var(--border);border-radius:8px;padding:.4rem .85rem .4rem .6rem;font-size:.8rem;font-family:'Barlow',sans-serif;font-weight:500;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2338bdc1' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .55rem center;padding-right:1.6rem;min-width:200px;}
   .nav-select:focus{outline:none;border-color:var(--accent);}
   .nav-select option{background:var(--surface2);color:var(--white);}
   .nav-select optgroup{background:var(--surface);color:var(--accent);font-style:normal;font-weight:700;}
@@ -119,9 +119,31 @@
   .filter-group{margin-bottom:1.4rem;}
   .filter-group-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;font-weight:700;color:var(--text-muted);margin-bottom:.55rem;}
   .filter-pills{display:flex;flex-wrap:wrap;gap:.4rem;}
-  .fpill{padding:.25rem .65rem;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-muted);font-size:.75rem;cursor:pointer;font-family:'Crimson Pro',serif;transition:all .15s;}
+  .fpill{padding:.25rem .65rem;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-muted);font-size:.75rem;cursor:pointer;font-family:'Barlow',sans-serif;transition:all .15s;}
   .fpill:hover{border-color:var(--accent);color:var(--accent);}
   .fpill.on{background:var(--accent);color:var(--bg);border-color:var(--accent);}
+  .scan-btn{background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 25%,transparent),color-mix(in srgb,var(--accent) 15%,transparent));color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);border-radius:20px;padding:.28rem .75rem;font-size:.75rem;cursor:pointer;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:.35rem;}
+  .scan-btn:hover{background:var(--accent);color:var(--bg);}
+  .scan-modal{max-width:580px;max-height:85vh;overflow-y:auto;}
+  .scan-drop{border:2px dashed var(--border);border-radius:12px;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:1.2rem;}
+  .scan-drop:hover,.scan-drop.drag-over{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,transparent);}
+  .scan-drop-icon{font-size:2.5rem;margin-bottom:.6rem;}
+  .scan-drop-label{font-size:.9rem;color:var(--text-muted);}
+  .scan-drop-sub{font-size:.75rem;color:var(--text-dim);margin-top:.3rem;}
+  .scan-preview{width:100%;max-height:220px;object-fit:contain;border-radius:8px;margin-bottom:1.2rem;border:1px solid var(--border);}
+  .scan-status{font-size:.85rem;color:var(--text-muted);font-style:italic;margin-bottom:1rem;min-height:1.3rem;text-align:center;}
+  .scan-results{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.2rem;max-height:280px;overflow-y:auto;}
+  .scan-result-item{display:flex;align-items:center;gap:.75rem;padding:.5rem .7rem;border-radius:8px;background:var(--surface2);border:1px solid var(--border);}
+  .scan-result-item.no-match{opacity:.45;}
+  .scan-result-swatch{width:1.4rem;height:1.4rem;border-radius:4px;flex-shrink:0;border:1px solid rgba(255,255,255,.12);}
+  .scan-result-info{flex:1;min-width:0;}
+  .scan-result-name{font-size:.82rem;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .scan-result-code{font-size:.7rem;color:var(--text-muted);}
+  .scan-result-tag{font-size:.65rem;padding:.1rem .4rem;border-radius:8px;background:color-mix(in srgb,var(--green) 18%,transparent);color:var(--green);border:1px solid color-mix(in srgb,var(--green) 35%,transparent);white-space:nowrap;}
+  .scan-result-tag.already{background:color-mix(in srgb,var(--text-muted) 15%,transparent);color:var(--text-muted);border-color:transparent;}
+  .scan-result-tag.no-match{background:color-mix(in srgb,#e05a2b 15%,transparent);color:#e05a2b;border-color:color-mix(in srgb,#e05a2b 30%,transparent);}
+  .scan-cb{width:1.1rem;height:1.1rem;accent-color:var(--accent);cursor:pointer;flex-shrink:0;}
+  .scan-summary{font-size:.8rem;color:var(--text-muted);margin-bottom:.8rem;text-align:center;}
   #back-to-top{position:fixed;bottom:2rem;right:2rem;width:2.6rem;height:2.6rem;border-radius:50%;background:var(--accent);color:var(--bg);border:none;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:100;}
   #back-to-top.visible{opacity:1;pointer-events:auto;}
   #back-to-top:hover{transform:translateY(-3px);}
@@ -131,7 +153,7 @@
   .paint-item{display:flex;align-items:center;gap:.55rem;padding:.45rem .6rem;border-radius:7px;border:1px solid transparent;transition:all .15s;}
   .paint-item:hover{background:var(--surface2);border-color:var(--border);}
   .paint-item.owned{background:rgba(106,170,120,.06);border-color:rgba(106,170,120,.2);}
-  .paint-item.wished{background:rgba(143,184,212,.05);border-color:rgba(143,184,212,.2);}
+  .paint-item.wished{background:rgba(42,144,150,.05);border-color:rgba(42,144,150,.2);}
   .paint-item.saving{opacity:.5;pointer-events:none;}
   .paint-swatch{width:19px;height:19px;border-radius:50%;flex-shrink:0;border:2px solid rgba(255,255,255,.12);box-shadow:0 1px 4px rgba(0,0,0,.4);}
   .paint-name{flex:1;font-size:.87rem;color:var(--text);line-height:1.2;}
@@ -143,7 +165,7 @@
   .paint-cols{display:flex;align-items:center;gap:0;flex-shrink:0;}
   .paint-col{display:flex;flex-direction:column;align-items:center;justify-content:center;width:52px;gap:.2rem;cursor:pointer;padding:.15rem .1rem;border-radius:5px;transition:background .12s;}
   .paint-col:hover{background:rgba(255,255,255,.04);}
-  .paint-col-label{font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);font-family:'Crimson Pro',serif;line-height:1;user-select:none;}
+  .paint-col-label{font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);font-family:'Barlow',sans-serif;line-height:1;user-select:none;}
   /* Owned box */
   .col-check{width:16px;height:16px;border-radius:4px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all .15s;}
   .paint-item.owned .col-check{background:var(--green);border-color:var(--green);}
@@ -152,7 +174,7 @@
   .paint-item.owned  .paint-col-label.owned-lbl {color:var(--green);}
   /* Wish star */
   .col-star{font-size:.95rem;line-height:1;color:var(--border);transition:all .15s;}
-  .paint-item.wished .col-star{color:var(--wish);filter:drop-shadow(0 0 3px rgba(143,184,212,.5));}
+  .paint-item.wished .col-star{color:var(--wish);filter:drop-shadow(0 0 3px rgba(42,144,150,.5));}
   .paint-item.wished .paint-col-label.wish-lbl{color:var(--wish);}
   /* Note icon */
   .col-note{font-size:.88rem;line-height:1;opacity:.25;transition:opacity .15s;}
@@ -176,9 +198,9 @@
   /* Note modal */
   .note-header{display:flex;align-items:center;gap:.8rem;margin-bottom:1.2rem;}
   .note-swatch{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.15);flex-shrink:0;}
-  .note-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--white);line-height:1.2;}
+  .note-title{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;color:var(--white);line-height:1.2;}
   .note-code{font-size:.75rem;color:var(--text-muted);font-style:italic;}
-  .btn-del{background:transparent;border:none;color:var(--danger);cursor:pointer;font-family:'Crimson Pro',serif;font-size:.85rem;padding:0;margin-right:auto;text-decoration:underline;opacity:.7;}
+  .btn-del{background:transparent;border:none;color:var(--danger);cursor:pointer;font-family:'Barlow',sans-serif;font-size:.85rem;padding:0;margin-right:auto;text-decoration:underline;opacity:.7;}
   .btn-del:hover{opacity:1;}
 
   /* Decorative */
@@ -198,7 +220,7 @@
 <div class="screen active" id="init-screen">
   <div class="init-inner" style="margin-top:40vh;">
     <div class="paint-drops">
-      <div class="drop" style="background:#c8964a;animation-delay:0s"></div>
+      <div class="drop" style="background:#38bdc1;animation-delay:0s"></div>
       <div class="drop" style="background:#6aaa78;animation-delay:.3s"></div>
       <div class="drop" style="background:#8fb8d4;animation-delay:.6s"></div>
       <div class="drop" style="background:#c0574a;animation-delay:.15s"></div>
@@ -214,7 +236,7 @@
     <div class="card">
       <div style="text-align:center;margin-bottom:1.8rem;">
         <div class="paint-drops">
-          <div class="drop" style="background:#c8964a;animation-delay:0s"></div>
+          <div class="drop" style="background:#38bdc1;animation-delay:0s"></div>
           <div class="drop" style="background:#6aaa78;animation-delay:.3s"></div>
           <div class="drop" style="background:#8fb8d4;animation-delay:.6s"></div>
           <div class="drop" style="background:#c0574a;animation-delay:.15s"></div>
@@ -328,7 +350,7 @@
 <!-- MAIN APP -->
 <div class="screen" id="app-screen">
   <div class="topbar">
-    <div class="topbar-brand">🎨 <span>Hobby Materiel Tracker</span></div>
+    <div class="topbar-brand"><span>Hobby Materiel Tracker</span></div>
     <div class="topbar-right">
       <div class="progress-pills">
         <div class="progress-pill owned-pill" id="owned-pill">0 owned</div>
@@ -353,12 +375,43 @@
         <button class="filter-btn"                data-filter="owned"   onclick="setFilter(this,'owned')">Owned</button>
         <button class="filter-btn wish-filter"    data-filter="wished"  onclick="setFilter(this,'wished')">★ Wishlist</button>
         <button class="filter-btn"                data-filter="missing" onclick="setFilter(this,'missing')">Missing</button>
+        <button class="scan-btn" onclick="openScanModal()">📷 Scan</button>
         <button class="filter-tag-btn" id="tag-filter-btn" onclick="renderFilterModalBody();showModal('tag-filter-modal')">🔽 Filter<span class="badge" id="tag-filter-badge" style="display:none"></span></button>
       </div>
     </div>
     <div class="active-chips" id="active-chips"></div>
     <div class="quick-nav" id="quick-nav"></div>
     <div id="paint-list"></div>
+    <div style="text-align:center;font-size:.72rem;color:var(--text-dim);padding:2rem 0 1rem;border-top:1px solid var(--border);margin-top:2rem;">&copy; 2025 HobbyMagos. All rights reserved.</div>
+  </div>
+</div>
+
+<!-- SCAN MODAL -->
+<div class="modal-overlay" id="scan-modal">
+  <div class="modal scan-modal">
+    <h2>📷 Scan Your Collection</h2>
+    <p class="modal-sub">Take a photo of your paints — Claude will identify them for you</p>
+
+    <div class="scan-drop" id="scan-drop" onclick="document.getElementById('scan-file-input').click()"
+         ondragover="event.preventDefault();this.classList.add('drag-over')"
+         ondragleave="this.classList.remove('drag-over')"
+         ondrop="handleScanDrop(event)">
+      <div class="scan-drop-icon">📸</div>
+      <div class="scan-drop-label">Tap to take a photo or upload an image</div>
+      <div class="scan-drop-sub">Works best with pots standing upright in good light</div>
+    </div>
+    <input type="file" id="scan-file-input" accept="image/*" capture="environment" style="display:none" onchange="handleScanFile(this.files[0])">
+
+    <img id="scan-preview" class="scan-preview" style="display:none">
+    <div class="scan-status" id="scan-status"></div>
+    <div class="scan-results" id="scan-results" style="display:none"></div>
+    <div class="scan-summary" id="scan-summary"></div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="resetScanModal()">Reset</button>
+      <button class="btn btn-ghost btn-sm" onclick="hideModal('scan-modal')">Cancel</button>
+      <button class="btn btn-sm" id="scan-confirm-btn" style="display:none" onclick="confirmScanResults()">✓ Log Selected</button>
+    </div>
   </div>
 </div>
 
@@ -1100,7 +1153,7 @@ const PAINTS = [
 
 const PAINT_MAP   = Object.fromEntries(PAINTS.map(p => [p.code, p]));
 const LINE_ORDER  = ["Standard Colors","Metallics","Transparents","Signature Series","AMP Colors","Fluorescents","Primers","Washes","Basing Textures","Metal Color","Model Color","Game Color"];
-const LINE_ICONS  = {"Standard Colors":"🎨","Metallics":"✨","Transparents":"💧","Signature Series":"⭐","AMP Colors":"🪖","Fluorescents":"💡","Primers":"🧱","Washes":"🌊","Basing Textures":"🌿","Metal Color":"🔩","Model Color":"🖌️","Game Color":"⚔️"};
+const LINE_ICONS  = {"Standard Colors":"","Metallics":"","Transparents":"","Signature Series":"","AMP Colors":"","Fluorescents":"","Primers":"","Washes":"","Basing Textures":"","Metal Color":"","Model Color":"","Game Color":""};
 const ALWAYS_SUBS = new Set(["Signature Series","AMP Colors","Metal Color","Model Color","Game Color"]);
 const COLOUR_SUBS = new Set(["Standard Colors"]);
 const BRAND_ORDER = ["Monument Hobbies","Vallejo"];
@@ -1108,7 +1161,7 @@ const BRAND_LINES = {
   "Monument Hobbies": ["Standard Colors","Metallics","Transparents","Signature Series","AMP Colors","Fluorescents","Primers","Washes","Basing Textures"],
   "Vallejo":          ["Metal Color","Model Color","Game Color"]
 };
-const BRAND_ICONS = {"Monument Hobbies":"🏔️","Vallejo":"🦅"};
+const BRAND_ICONS = {"Monument Hobbies":"","Vallejo":""};
 
 // ─── Tag derivation ───────────────────────────────────────────────────────
 const _SUB_FAM = {
@@ -1444,7 +1497,7 @@ function renderPaints() {
       const brandAll   = brandLines.flatMap(l => lines[l] ? Object.values(lines[l]).flat() : []);
       const bOwned     = brandAll.filter(p => ownedPaints.has(p.code)).length;
       const bTotal     = brandAll.length;
-      html += `<div class="brand-header" id="brand-${brand.replace(/\s+/g,'-').toLowerCase()}">${BRAND_ICONS[brand]||'🎨'} ${brand}<span class="brand-meta">${bOwned}/${bTotal} owned</span></div>`;
+      html += `<div class="brand-header" id="brand-${brand.replace(/\s+/g,'-').toLowerCase()}">${brand}<span class="brand-meta">${bOwned}/${bTotal} owned</span></div>`;
       lastBrand = brand;
     }
     const subs    = lines[lineName];
@@ -1456,7 +1509,7 @@ function renderPaints() {
 
     html += `<div class="line-section">
       <div class="line-header">
-        ${LINE_ICONS[lineName]||'🎨'} ${lineName}
+        ${lineName}
         <div class="line-counts">
           <span class="lc-owned">${ownedN}/${all.length} owned</span>${wishHtml}
         </div>
@@ -1567,7 +1620,7 @@ function renderNav() {
   BRAND_ORDER.forEach(brand => {
     const lines = (BRAND_LINES[brand] || []).filter(l => visibleLines.has(l));
     if (!lines.length) return;
-    opts += `<optgroup label="${BRAND_ICONS[brand]||''} ${brand}">`;
+    opts += `<optgroup label="${brand}">`;
     lines.forEach(l => { opts += `<option value="${l}">${l}</option>`; });
     opts += '</optgroup>';
   });
@@ -1662,6 +1715,231 @@ function updateTagFilterUI(){
   });
 }
 function hideModal(id){document.getElementById(id)?.classList.remove('open');}
+
+// ─── Scan feature ─────────────────────────────────────────────────────────
+let scanMatches = [];   // [{paint, checked}]
+
+function openScanModal() {
+  resetScanModal();
+  showModal('scan-modal');
+}
+
+function resetScanModal() {
+  scanMatches = [];
+  document.getElementById('scan-preview').style.display = 'none';
+  document.getElementById('scan-preview').src = '';
+  document.getElementById('scan-drop').style.display = '';
+  document.getElementById('scan-results').style.display = 'none';
+  document.getElementById('scan-results').innerHTML = '';
+  document.getElementById('scan-status').textContent = '';
+  document.getElementById('scan-summary').textContent = '';
+  document.getElementById('scan-confirm-btn').style.display = 'none';
+  document.getElementById('scan-file-input').value = '';
+}
+
+function handleScanDrop(e) {
+  e.preventDefault();
+  document.getElementById('scan-drop').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) handleScanFile(file);
+}
+
+function handleScanFile(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    const preview = document.getElementById('scan-preview');
+    preview.src = dataUrl;
+    preview.style.display = 'block';
+    document.getElementById('scan-drop').style.display = 'none';
+    runScan(dataUrl);
+  };
+  reader.readAsDataURL(file);
+}
+
+function _fuzzyMatch(raw) {
+  // 1. exact code match (strip spaces/dots)
+  const normRaw = raw.replace(/[\s.]/g,'').toUpperCase();
+  for (const p of PAINTS) {
+    if (p.code.replace(/[\s.]/g,'').toUpperCase() === normRaw) return p;
+  }
+  // 2. name match — normalise both sides
+  const rn = raw.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+  let best = null, bestScore = 0;
+  for (const p of PAINTS) {
+    const pn = p.name.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+    if (pn === rn) return p;   // exact
+    // token overlap score
+    const rTokens = new Set(rn.split(' ').filter(t => t.length > 2));
+    const pTokens = new Set(pn.split(' ').filter(t => t.length > 2));
+    let hits = 0;
+    rTokens.forEach(t => { if(pTokens.has(t)) hits++; });
+    const score = hits / Math.max(rTokens.size, pTokens.size, 1);
+    if (score > bestScore && score >= 0.5) { bestScore = score; best = p; }
+  }
+  return best;
+}
+
+async function runScan(dataUrl) {
+  document.getElementById('scan-status').textContent = '🔍 Analysing image…';
+  document.getElementById('scan-confirm-btn').style.display = 'none';
+
+  const base64 = dataUrl.split(',')[1];
+  const mediaType = dataUrl.split(';')[0].split(':')[1];
+
+  const prompt = `You are analysing a photo of hobby paint pots (miniature wargaming / modelling paints).
+List every paint pot you can see. For each one, return:
+- The paint name as printed on the label
+- The product code if visible (e.g. 70.951, 72.001, 001, S01)
+- The manufacturer if identifiable (Vallejo, Monument Hobbies / ProAcryl, Citadel, etc.)
+
+Return ONLY a JSON array, no prose, no markdown fences. Example format:
+[{"name":"Ultramarine Blue","code":"70.839","manufacturer":"Vallejo"},{"name":"Dark Jade","code":"001","manufacturer":"Monument Hobbies"}]
+If you cannot identify any paints, return an empty array [].`;
+
+  let raw;
+  try {
+    const res = await fetch('/.netlify/functions/scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
+    });
+    const data = await res.json();
+    raw = data.content?.find(b => b.type === 'text')?.text || '[]';
+  } catch(err) {
+    document.getElementById('scan-status').textContent = '❌ Network error — please try again.';
+    return;
+  }
+
+  // Parse response
+  let identified = [];
+  try {
+    const clean = raw.replace(/^```[\w]*\n?/,'').replace(/\n?```$/,'').trim();
+    identified = JSON.parse(clean);
+  } catch {
+    document.getElementById('scan-status').textContent = '❌ Could not parse response — try a clearer photo.';
+    return;
+  }
+
+  if (!identified.length) {
+    document.getElementById('scan-status').textContent = '🤷 No paints detected — try better lighting or a closer shot.';
+    return;
+  }
+
+  // Match against PAINTS database — only show Monument Hobbies and Vallejo matches
+  scanMatches = [];
+  const unmatched = [];
+  identified.forEach(item => {
+    // Skip non-tracked manufacturers
+    const mfr = (item.manufacturer||'').toLowerCase();
+    if (mfr && !mfr.includes('vallejo') && !mfr.includes('monument') && !mfr.includes('proacryl')) {
+      unmatched.push(item.name);
+      return;
+    }
+    const paint = _fuzzyMatch(item.code || '') || _fuzzyMatch(item.name || '');
+    if (paint) {
+      scanMatches.push({ paint, checked: !ownedPaints.has(paint.code) });
+    } else {
+      unmatched.push(item.name);
+    }
+  });
+
+  renderScanResults(unmatched);
+}
+
+function renderScanResults(unmatched = []) {
+  const container = document.getElementById('scan-results');
+  const newCount  = scanMatches.filter(m => m.checked).length;
+
+  if (!scanMatches.length && !unmatched.length) {
+    document.getElementById('scan-status').textContent = '🤷 No matching paints found in your collection database.';
+    return;
+  }
+
+  document.getElementById('scan-status').textContent =
+    `Found ${scanMatches.length + unmatched.length} paint${scanMatches.length + unmatched.length !== 1 ? 's' : ''} — ${scanMatches.length} matched in your database.`;
+
+  let h = '';
+  scanMatches.forEach((m, i) => {
+    const already = ownedPaints.has(m.paint.code);
+    const tag     = already ? '<span class="scan-result-tag already">Already owned</span>' : '<span class="scan-result-tag">New</span>';
+    const checked = m.checked ? 'checked' : '';
+    h += `<label class="scan-result-item">
+      <input type="checkbox" class="scan-cb" ${checked} ${already ? 'disabled' : ''} onchange="scanMatches[${i}].checked=this.checked;updateScanSummary()">
+      <div class="scan-result-swatch" style="background:${m.paint.hex}"></div>
+      <div class="scan-result-info">
+        <div class="scan-result-name">${m.paint.name}</div>
+        <div class="scan-result-code">${m.paint.code} · ${m.paint.line}</div>
+      </div>
+      ${tag}
+    </label>`;
+  });
+
+  unmatched.forEach(name => {
+    h += `<div class="scan-result-item no-match">
+      <div class="scan-result-swatch" style="background:#444"></div>
+      <div class="scan-result-info">
+        <div class="scan-result-name">${name}</div>
+        <div class="scan-result-code">Not in database</div>
+      </div>
+      <span class="scan-result-tag no-match">No match</span>
+    </div>`;
+  });
+
+  container.innerHTML = h;
+  container.style.display = 'flex';
+  updateScanSummary();
+}
+
+function updateScanSummary() {
+  const toAdd = scanMatches.filter(m => m.checked && !ownedPaints.has(m.paint.code)).length;
+  const btn   = document.getElementById('scan-confirm-btn');
+  const sum   = document.getElementById('scan-summary');
+  if (toAdd > 0) {
+    btn.style.display = '';
+    btn.textContent   = `✓ Log ${toAdd} paint${toAdd !== 1 ? 's' : ''} as owned`;
+    sum.textContent   = `${toAdd} paint${toAdd !== 1 ? 's' : ''} will be added to your collection.`;
+  } else {
+    btn.style.display = 'none';
+    sum.textContent   = scanMatches.some(m => ownedPaints.has(m.paint.code))
+      ? 'All matched paints are already in your collection.'
+      : '';
+  }
+}
+
+async function confirmScanResults() {
+  const toAdd = scanMatches.filter(m => m.checked && !ownedPaints.has(m.paint.code));
+  if (!toAdd.length) return;
+
+  document.getElementById('scan-confirm-btn').textContent = 'Saving…';
+  document.getElementById('scan-confirm-btn').disabled = true;
+
+  const rows = toAdd.map(m => ({ user_id: currentUser.id, paint_code: m.paint.code }));
+  const { error } = await sb.from('owned_paints').insert(rows);
+
+  if (error) {
+    showToast('Could not save — please try again.', true);
+    document.getElementById('scan-confirm-btn').textContent = '✓ Log Selected';
+    document.getElementById('scan-confirm-btn').disabled = false;
+    return;
+  }
+
+  toAdd.forEach(m => ownedPaints.add(m.paint.code));
+  hideModal('scan-modal');
+  renderPaints();
+  showToast(`${toAdd.length} paint${toAdd.length !== 1 ? 's' : ''} added to your collection! 🎨`);
+}
 window.addEventListener('scroll',()=>{
   document.getElementById('back-to-top')?.classList.toggle('visible', window.scrollY > 400);
 });
