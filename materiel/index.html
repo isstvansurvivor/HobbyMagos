@@ -1,807 +1,1672 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jolt VC — Deep Tech Venture</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hobby Materiel Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg:#0e0f14;--surface:#16181f;--surface2:#1e2130;--border:#2a2d3a;
+    --accent:#c8964a;--accent2:#8fb8d4;--danger:#c0574a;
+    --text:#ddd5c4;--text-muted:#7a7566;--text-dim:#4a4840;
+    --white:#f0ebe0;--green:#6aaa78;--wish:#8fb8d4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,serif;font-size:17px;min-height:100vh;
+    background-image:radial-gradient(ellipse 80% 50% at 20% 10%,rgba(200,150,74,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 90%,rgba(143,184,212,.04) 0%,transparent 60%);}
+  .screen{display:none;min-height:100vh;}
+  .screen.active{display:flex;flex-direction:column;}
+  .center-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2.5rem 2.8rem;width:100%;max-width:520px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 0 1px rgba(200,150,74,.06);animation:fadeUp .4s ease both;}
+  h1{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:var(--white);line-height:1.2;margin-bottom:.4rem;}
+  h2{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:600;color:var(--white);margin-bottom:.4rem;}
+  .subtitle{color:var(--text-muted);font-size:.95rem;font-style:italic;margin-bottom:2rem;line-height:1.5;}
+  .label{display:block;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem;font-family:'Crimson Pro',serif;font-weight:600;}
+  input[type="text"],input[type="password"],input[type="email"]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:7px;
+    color:var(--white);font-family:'Crimson Pro',serif;font-size:1rem;padding:.65rem .9rem;outline:none;transition:border-color .2s;margin-bottom:1.1rem;}
+  textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--white);font-family:'Crimson Pro',serif;
+    font-size:.95rem;padding:.65rem .9rem;outline:none;transition:border-color .2s;resize:vertical;min-height:100px;line-height:1.5;}
+  input:focus,textarea:focus{border-color:var(--accent);}
+  input::placeholder,textarea::placeholder{color:var(--text-dim);}
+  .btn{display:inline-block;padding:.7rem 1.8rem;border-radius:8px;border:none;cursor:pointer;font-family:'Crimson Pro',serif;font-size:1rem;font-weight:600;letter-spacing:.04em;transition:all .15s;}
+  .btn-primary{background:var(--accent);color:#0e0f14;width:100%;padding:.8rem;font-size:1.05rem;margin-top:.5rem;}
+  .btn-primary:hover:not(:disabled){background:#d9a85a;transform:translateY(-1px);}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+  .btn-ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border);font-size:.85rem;}
+  .btn-ghost:hover{border-color:var(--text-muted);color:var(--text);}
+  .btn-sm{padding:.4rem 1rem;font-size:.88rem;}
+  .style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-bottom:1.6rem;}
+  .style-card{background:var(--bg);border:2px solid var(--border);border-radius:10px;padding:1rem .7rem;text-align:center;cursor:pointer;transition:all .2s;}
+  .style-card:hover{border-color:var(--accent);}
+  .style-card.selected{border-color:var(--accent);background:rgba(200,150,74,.08);}
+  .style-card .icon{font-size:1.8rem;display:block;margin-bottom:.5rem;}
+  .style-card .name{font-family:'Playfair Display',serif;font-size:.9rem;font-weight:600;color:var(--white);display:block;margin-bottom:.25rem;}
+  .style-card .desc{font-size:.75rem;color:var(--text-muted);font-style:italic;line-height:1.3;}
+  .style-card.selected .name{color:var(--accent);}
+  .error{color:var(--danger);font-size:.85rem;margin-top:-.7rem;margin-bottom:.8rem;}
+  .link-btn{background:none;border:none;color:var(--accent2);cursor:pointer;font-family:'Crimson Pro',serif;font-size:.9rem;text-decoration:underline;padding:0;}
+  .link-btn:hover{color:var(--accent);}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spinner{width:18px;height:18px;border:2px solid rgba(14,15,20,.3);border-top-color:#0e0f14;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:.5rem;}
 
-  <style>
-    :root {
-      --white:   #FAFAF8;
-      --ink:     #0E0E0C;
-      --mid:     #6B6B60;
-      --rule:    #D8D8D2;
-      --jolt:    #D4A843;         /* amber — charged, not garish */
-      --jolt-dk: #A8832A;
-      --sans:    'DM Sans', sans-serif;
-      --serif:   'Cormorant Garamond', Georgia, serif;
-    }
+  /* Init */
+  #init-screen{align-items:center;justify-content:center;}
+  .init-inner{text-align:center;}
+  .init-inner p{color:var(--text-muted);font-style:italic;margin-top:.8rem;}
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  /* Topbar */
+  #app-screen{flex-direction:column;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:.5rem;}
+  .topbar-brand{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--white);display:flex;align-items:center;gap:.6rem;}
+  .topbar-brand span{color:var(--accent);}
+  .topbar-right{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+  .user-badge{font-size:.8rem;color:var(--text-muted);font-style:italic;}
+  .user-badge b{color:var(--white);font-style:normal;}
+  .progress-pills{display:flex;gap:.5rem;}
+  .progress-pill{background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:.3rem .9rem;font-size:.8rem;font-weight:600;font-family:'Crimson Pro',serif;white-space:nowrap;}
+  .owned-pill{color:var(--green);border-color:rgba(106,170,120,.3);}
+  .wish-pill{color:var(--wish);border-color:rgba(143,184,212,.3);}
 
-    html { scroll-behavior: smooth; }
+  /* App body */
+  .app-body{max-width:1050px;margin:0 auto;padding:2rem 1.5rem 4rem;width:100%;}
+  .app-intro{margin-bottom:1.8rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+  .app-intro h2{font-size:1.9rem;margin-bottom:.25rem;}
+  .style-badge{display:inline-block;background:rgba(200,150,74,.12);border:1px solid rgba(200,150,74,.3);color:var(--accent);border-radius:99px;padding:.2rem .8rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;font-family:'Crimson Pro',serif;margin-bottom:.5rem;}
+  .nudge{background:linear-gradient(135deg,rgba(143,184,212,.08),rgba(200,150,74,.08));border:1px solid rgba(143,184,212,.2);border-radius:10px;padding:1rem 1.2rem;display:flex;align-items:center;gap:.9rem;margin-bottom:1.8rem;font-size:.9rem;color:var(--text-muted);}
+  .nudge-icon{font-size:1.4rem;flex-shrink:0;}
+  .nudge a{color:var(--accent2);text-decoration:underline;cursor:pointer;}
 
-    body {
-      background: var(--white);
-      color: var(--ink);
-      font-family: var(--sans);
-      font-weight: 300;
-      font-size: 16px;
-      line-height: 1.7;
-      -webkit-font-smoothing: antialiased;
-    }
+  /* Controls */
+  .controls{display:flex;gap:.8rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center;}
+  .search-wrap{position:relative;flex:1;min-width:200px;}
+  .search-wrap input{margin:0;padding-left:2.2rem;}
+  .search-icon{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:.9rem;pointer-events:none;}
+  .filter-btns{display:flex;gap:.4rem;flex-wrap:wrap;}
+  .filter-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);border-radius:99px;padding:.35rem .9rem;font-size:.78rem;cursor:pointer;font-family:'Crimson Pro',serif;letter-spacing:.05em;text-transform:uppercase;transition:all .15s;}
+  .filter-btn:hover,.filter-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(200,150,74,.08);}
+  .filter-btn.wish-filter.active{border-color:var(--wish);color:var(--wish);background:rgba(143,184,212,.08);}
 
-    /* ── NAV ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.4rem 3rem;
-      background: rgba(250,250,248,0.92);
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid transparent;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    nav.scrolled {
-      border-color: var(--rule);
-      box-shadow: 0 1px 12px rgba(0,0,0,0.05);
-    }
-    .nav-logo {
-      font-family: var(--serif);
-      font-size: 1.55rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      color: var(--ink);
-      text-decoration: none;
-    }
-    .nav-logo span { color: var(--jolt); }
-    .nav-links { display: flex; gap: 2.2rem; list-style: none; }
-    .nav-links a {
-      font-size: 0.8rem;
-      font-weight: 400;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--mid);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--ink); }
+  /* Paint sections */
+  .line-section{margin-bottom:2.5rem;}
+  .line-header{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--white);margin-bottom:1rem;padding:.65rem 1.1rem;background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;display:flex;align-items:baseline;justify-content:space-between;gap:.6rem;}
+  .line-counts{display:flex;gap:.8rem;}
+  .lc-owned{font-size:.73rem;color:var(--green);font-family:'Crimson Pro',serif;font-style:italic;font-weight:400;}
+  .lc-wish{font-size:.73rem;color:var(--wish);font-family:'Crimson Pro',serif;font-style:italic;font-weight:400;}
+  .group-header{font-size:.78rem;color:var(--text-muted);margin:1.1rem 0 .5rem;padding-bottom:.3rem;border-bottom:1px solid var(--border);display:flex;align-items:baseline;gap:.5rem;text-transform:uppercase;letter-spacing:.1em;font-weight:600;}
+  .group-header .g-count{font-size:.7rem;color:var(--text-dim);font-style:italic;text-transform:none;letter-spacing:0;font-weight:400;}
+  .brand-header{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--accent);margin:2.5rem 0 1.2rem;padding:.5rem 0 .6rem;border-bottom:2px solid var(--accent);letter-spacing:.04em;}
+  .brand-header .brand-meta{font-size:.75rem;color:var(--text-muted);font-family:'Crimson Pro',serif;font-style:italic;font-weight:400;margin-left:.8rem;vertical-align:middle;letter-spacing:0;}
+  .quick-nav{display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;}
+  .quick-nav-label{font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;font-weight:600;white-space:nowrap;}
+  .nav-select{background:var(--surface2);color:var(--white);border:1px solid var(--border);border-radius:8px;padding:.4rem .85rem .4rem .6rem;font-size:.8rem;font-family:'Crimson Pro',serif;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23a0896a' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .55rem center;padding-right:1.6rem;min-width:200px;}
+  .nav-select:focus{outline:none;border-color:var(--accent);}
+  .nav-select option{background:var(--surface2);color:var(--white);}
+  .nav-select optgroup{background:var(--surface);color:var(--accent);font-style:normal;font-weight:700;}
+  .filter-tag-btn{position:relative;background:var(--surface2);color:var(--text-muted);border:1px solid var(--border);border-radius:20px;padding:.28rem .75rem;font-size:.75rem;cursor:pointer;transition:all .15s;white-space:nowrap;}
+  .filter-tag-btn:hover,.filter-tag-btn.active{background:var(--accent);color:var(--bg);border-color:var(--accent);}
+  .filter-tag-btn .badge{position:absolute;top:-.35rem;right:-.35rem;background:#e05a2b;color:#fff;border-radius:50%;width:1.1rem;height:1.1rem;font-size:.6rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
+  .active-chips{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;min-height:0;}
+  .active-chips:empty{display:none;}
+  .chip{font-size:.7rem;padding:.18rem .55rem .18rem .6rem;border-radius:20px;background:color-mix(in srgb,var(--accent) 20%,transparent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);color:var(--accent);display:flex;align-items:center;gap:.3rem;cursor:pointer;}
+  .chip:hover{background:color-mix(in srgb,var(--accent) 35%,transparent);}
+  .chip-x{opacity:.7;font-size:.8rem;line-height:1;}
+  .filter-modal{max-width:540px;}
+  .filter-group{margin-bottom:1.4rem;}
+  .filter-group-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;font-weight:700;color:var(--text-muted);margin-bottom:.55rem;}
+  .filter-pills{display:flex;flex-wrap:wrap;gap:.4rem;}
+  .fpill{padding:.25rem .65rem;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-muted);font-size:.75rem;cursor:pointer;font-family:'Crimson Pro',serif;transition:all .15s;}
+  .fpill:hover{border-color:var(--accent);color:var(--accent);}
+  .fpill.on{background:var(--accent);color:var(--bg);border-color:var(--accent);}
+  #back-to-top{position:fixed;bottom:2rem;right:2rem;width:2.6rem;height:2.6rem;border-radius:50%;background:var(--accent);color:var(--bg);border:none;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:100;}
+  #back-to-top.visible{opacity:1;pointer-events:auto;}
+  #back-to-top:hover{transform:translateY(-3px);}
 
-    /* ── HERO ── */
-    #hero {
-      min-height: 100vh;
-      display: flex; flex-direction: column; justify-content: flex-end;
-      padding: 0 3rem 5rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .hero-rule {
-      position: absolute; top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--jolt) 0%, var(--jolt-dk) 100%);
-    }
-    .hero-bg-text {
-      position: absolute;
-      top: 50%; left: -0.02em;
-      transform: translateY(-52%);
-      font-family: var(--serif);
-      font-size: clamp(10rem, 22vw, 22rem);
-      font-weight: 300;
-      color: transparent;
-      -webkit-text-stroke: 1px rgba(14,14,12,0.06);
-      pointer-events: none;
-      white-space: nowrap;
-      user-select: none;
-      letter-spacing: -0.02em;
-    }
-    .hero-content { position: relative; max-width: 820px; }
-    .hero-eyebrow {
-      font-size: 0.75rem;
-      font-weight: 400;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--jolt);
-      margin-bottom: 1.4rem;
-      opacity: 0;
-      animation: fadeUp 0.8s 0.2s forwards;
-    }
-    .hero-headline {
-      font-family: var(--serif);
-      font-size: clamp(3.2rem, 6vw, 5.8rem);
-      font-weight: 300;
-      line-height: 1.08;
-      letter-spacing: -0.01em;
-      margin-bottom: 2rem;
-      opacity: 0;
-      animation: fadeUp 0.8s 0.4s forwards;
-    }
-    .hero-headline em { font-style: italic; color: var(--jolt); }
-    .hero-sub {
-      font-size: 1.05rem;
-      font-weight: 300;
-      color: var(--mid);
-      max-width: 540px;
-      line-height: 1.75;
-      opacity: 0;
-      animation: fadeUp 0.8s 0.6s forwards;
-    }
-    .hero-cta {
-      margin-top: 2.4rem;
-      opacity: 0;
-      animation: fadeUp 0.8s 0.8s forwards;
-    }
-    .btn {
-      display: inline-block;
-      padding: 0.75rem 2rem;
-      font-family: var(--sans);
-      font-size: 0.78rem;
-      font-weight: 500;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      text-decoration: none;
-      border: 1.5px solid var(--ink);
-      color: var(--ink);
-      transition: background 0.22s, color 0.22s, border-color 0.22s;
-    }
-    .btn:hover { background: var(--ink); color: var(--white); }
-    .btn.btn-accent {
-      background: var(--jolt);
-      border-color: var(--jolt);
-      color: var(--ink);
-    }
-    .btn.btn-accent:hover { background: var(--jolt-dk); border-color: var(--jolt-dk); }
-    .hero-scroll-hint {
-      position: absolute; bottom: 2.2rem; right: 3rem;
-      font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--rule);
-      writing-mode: vertical-rl;
-      display: flex; align-items: center; gap: 0.6rem;
-      opacity: 0;
-      animation: fadeIn 1s 1.2s forwards;
-    }
-    .hero-scroll-hint::before {
-      content: '';
-      display: block;
-      width: 1px; height: 48px;
-      background: var(--jolt);
-    }
+  /* Paint items */
+  .paint-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:.45rem;}
+  .paint-item{display:flex;align-items:center;gap:.55rem;padding:.45rem .6rem;border-radius:7px;border:1px solid transparent;transition:all .15s;}
+  .paint-item:hover{background:var(--surface2);border-color:var(--border);}
+  .paint-item.owned{background:rgba(106,170,120,.06);border-color:rgba(106,170,120,.2);}
+  .paint-item.wished{background:rgba(143,184,212,.05);border-color:rgba(143,184,212,.2);}
+  .paint-item.saving{opacity:.5;pointer-events:none;}
+  .paint-swatch{width:19px;height:19px;border-radius:50%;flex-shrink:0;border:2px solid rgba(255,255,255,.12);box-shadow:0 1px 4px rgba(0,0,0,.4);}
+  .paint-name{flex:1;font-size:.87rem;color:var(--text);line-height:1.2;}
+  .paint-item.owned .paint-name{color:var(--white);}
+  .paint-item.wished .paint-name{color:var(--accent2);}
+  .paint-code{font-size:.68rem;color:var(--text-dim);font-style:italic;flex-shrink:0;}
 
-    /* ── SECTION SCAFFOLDING ── */
-    section { padding: 7rem 3rem; }
-    .section-label {
-      font-size: 0.72rem;
-      font-weight: 400;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--jolt);
-      margin-bottom: 1rem;
-    }
-    .section-title {
-      font-family: var(--serif);
-      font-size: clamp(2.4rem, 4vw, 3.6rem);
-      font-weight: 300;
-      line-height: 1.12;
-      letter-spacing: -0.01em;
-      margin-bottom: 2.4rem;
-    }
-    .divider {
-      height: 1px;
-      background: var(--rule);
-      margin: 0 3rem;
-    }
+  /* Three-column action area */
+  .paint-cols{display:flex;align-items:center;gap:0;flex-shrink:0;}
+  .paint-col{display:flex;flex-direction:column;align-items:center;justify-content:center;width:52px;gap:.2rem;cursor:pointer;padding:.15rem .1rem;border-radius:5px;transition:background .12s;}
+  .paint-col:hover{background:rgba(255,255,255,.04);}
+  .paint-col-label{font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);font-family:'Crimson Pro',serif;line-height:1;user-select:none;}
+  /* Owned box */
+  .col-check{width:16px;height:16px;border-radius:4px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all .15s;}
+  .paint-item.owned .col-check{background:var(--green);border-color:var(--green);}
+  .check-mark{display:none;color:#0e0f14;font-size:9px;font-weight:900;}
+  .paint-item.owned .check-mark{display:block;}
+  .paint-item.owned  .paint-col-label.owned-lbl {color:var(--green);}
+  /* Wish star */
+  .col-star{font-size:.95rem;line-height:1;color:var(--border);transition:all .15s;}
+  .paint-item.wished .col-star{color:var(--wish);filter:drop-shadow(0 0 3px rgba(143,184,212,.5));}
+  .paint-item.wished .paint-col-label.wish-lbl{color:var(--wish);}
+  /* Note icon */
+  .col-note{font-size:.88rem;line-height:1;opacity:.25;transition:opacity .15s;}
+  .has-note .col-note{opacity:.9;}
+  .has-note .paint-col-label.note-lbl{color:var(--accent);}
+  /* Buy column */
+  .col-buy{font-size:.85rem;line-height:1;color:var(--accent);opacity:.4;transition:opacity .15s;}
+  .paint-col:hover .col-buy{opacity:1;}
+  .paint-col.buy-col{text-decoration:none;}
 
-    /* ── THESIS ── */
-    #thesis { background: var(--white); }
-    .thesis-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 5rem;
-      max-width: 1100px;
-    }
-    .thesis-body {
-      font-size: 1.08rem;
-      color: var(--mid);
-      line-height: 1.8;
-    }
-    .thesis-body p + p { margin-top: 1.2em; }
-    .thesis-pillars { display: flex; flex-direction: column; gap: 1.6rem; }
-    .pillar {
-      padding: 1.6rem;
-      border: 1px solid var(--rule);
-      position: relative;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .pillar:hover {
-      border-color: var(--jolt);
-      box-shadow: 4px 4px 0 var(--jolt);
-    }
-    .pillar-num {
-      font-family: var(--serif);
-      font-size: 2.2rem;
-      font-weight: 300;
-      color: var(--rule);
-      line-height: 1;
-      margin-bottom: 0.5rem;
-    }
-    .pillar h3 {
-      font-family: var(--serif);
-      font-size: 1.25rem;
-      font-weight: 400;
-      margin-bottom: 0.4rem;
-    }
-    .pillar p { font-size: 0.88rem; color: var(--mid); line-height: 1.65; }
+  .empty-state{text-align:center;padding:3rem 1rem;color:var(--text-muted);font-style:italic;}
 
-    /* Focus tags */
-    .focus-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 2rem; }
-    .tag {
-      font-size: 0.72rem;
-      font-weight: 400;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 0.35rem 0.9rem;
-      border: 1px solid var(--rule);
-      color: var(--mid);
-    }
+  /* Modals */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;align-items:center;justify-content:center;padding:1rem;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2rem 2.2rem;width:100%;max-width:440px;animation:fadeUp .25s ease both;}
+  .modal h2{margin-bottom:.3rem;}
+  .modal-sub{font-size:.8rem;color:var(--text-muted);font-style:italic;margin-bottom:1.2rem;}
+  .modal-footer{display:flex;gap:.6rem;margin-top:1rem;justify-content:flex-end;align-items:center;}
 
-    /* ── PORTFOLIO ── */
-    #portfolio { background: #F5F5F1; }
-    .portfolio-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.5px;
-      background: var(--rule);
-      border: 1px solid var(--rule);
-      max-width: 1100px;
-    }
-    .portfolio-card {
-      background: var(--white);
-      padding: 2.4rem;
-      text-decoration: none;
-      color: var(--ink);
-      display: flex; flex-direction: column;
-      transition: background 0.2s;
-      position: relative;
-    }
-    .portfolio-card:hover { background: var(--ink); }
-    .portfolio-card:hover .card-name,
-    .portfolio-card:hover .card-desc,
-    .portfolio-card:hover .card-tag { color: rgba(250,250,248,0.7); }
-    .portfolio-card:hover .card-name { color: var(--white); }
-    .portfolio-card:hover .card-arrow { color: var(--jolt); }
-    .card-logo-wrap {
-      height: 44px;
-      display: flex; align-items: center;
-      margin-bottom: 1.6rem;
-    }
-    .card-logo-placeholder {
-      font-family: var(--serif);
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: var(--ink);
-    }
-    .portfolio-card:hover .card-logo-placeholder { color: var(--white); }
-    .card-name {
-      font-family: var(--serif);
-      font-size: 1.35rem;
-      font-weight: 400;
-      margin-bottom: 0.5rem;
-      transition: color 0.2s;
-    }
-    .card-tag {
-      font-size: 0.68rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--jolt);
-      margin-bottom: 0.8rem;
-      transition: color 0.2s;
-    }
-    .portfolio-card:hover .card-tag { color: var(--jolt); }
-    .card-desc { font-size: 0.88rem; color: var(--mid); line-height: 1.65; flex: 1; transition: color 0.2s; }
-    .card-arrow {
-      margin-top: 1.4rem;
-      font-size: 1.1rem;
-      color: var(--rule);
-      transition: color 0.2s;
-    }
+  /* Note modal */
+  .note-header{display:flex;align-items:center;gap:.8rem;margin-bottom:1.2rem;}
+  .note-swatch{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.15);flex-shrink:0;}
+  .note-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--white);line-height:1.2;}
+  .note-code{font-size:.75rem;color:var(--text-muted);font-style:italic;}
+  .btn-del{background:transparent;border:none;color:var(--danger);cursor:pointer;font-family:'Crimson Pro',serif;font-size:.85rem;padding:0;margin-right:auto;text-decoration:underline;opacity:.7;}
+  .btn-del:hover{opacity:1;}
 
-    /* ── TEAM ── */
-    #team { background: var(--white); }
-    .team-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 3rem;
-      max-width: 880px;
-    }
-    .team-card { display: flex; flex-direction: column; }
-    .headshot-wrap {
-      width: 100%; aspect-ratio: 3/3.5;
-      background: #EAEAE5;
-      margin-bottom: 1.6rem;
-      overflow: hidden;
-      position: relative;
-    }
-    .headshot-placeholder {
-      width: 100%; height: 100%;
-      display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 0.6rem;
-    }
-    .headshot-icon {
-      width: 64px; height: 64px;
-      border-radius: 50%;
-      background: var(--rule);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .headshot-icon svg { width: 32px; height: 32px; fill: var(--mid); }
-    .headshot-label { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rule); }
-    .team-name {
-      font-family: var(--serif);
-      font-size: 1.7rem;
-      font-weight: 400;
-      line-height: 1.15;
-      margin-bottom: 0.2rem;
-    }
-    .team-title {
-      font-size: 0.75rem;
-      font-weight: 400;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--jolt);
-      margin-bottom: 1rem;
-    }
-    .team-bio { font-size: 0.92rem; color: var(--mid); line-height: 1.75; margin-bottom: 1.2rem; }
-    .team-linkedin {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--ink); text-decoration: none;
-      border-bottom: 1px solid var(--rule);
-      padding-bottom: 0.1rem;
-      transition: border-color 0.2s, color 0.2s;
-    }
-    .team-linkedin:hover { color: var(--jolt); border-color: var(--jolt); }
+  /* Decorative */
+  .paint-drops{display:flex;justify-content:center;gap:.4rem;margin-bottom:.8rem;}
+  .drop{width:12px;height:12px;border-radius:50%;animation:drip 2s ease-in-out infinite;}
+  @keyframes drip{0%,100%{transform:translateY(0);opacity:.7}50%{transform:translateY(4px);opacity:1}}
 
-    /* ── CONTACT ── */
-    #contact { background: var(--ink); color: var(--white); }
-    #contact .section-label { color: var(--jolt); }
-    #contact .section-title { color: var(--white); }
-    .contact-grid {
-      display: grid;
-      grid-template-columns: 1fr 1.4fr;
-      gap: 5rem;
-      max-width: 1000px;
-      align-items: start;
-    }
-    .contact-intro { font-size: 1rem; color: rgba(250,250,248,0.6); line-height: 1.8; }
-    .contact-intro p + p { margin-top: 1em; }
-    .contact-direct { margin-top: 2rem; }
-    .contact-direct a {
-      display: block;
-      font-family: var(--serif);
-      font-size: 1.1rem;
-      color: var(--white);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(255,255,255,0.15);
-      padding-bottom: 0.3rem;
-      transition: color 0.2s, border-color 0.2s;
-    }
-    .contact-direct a:hover { color: var(--jolt); border-color: var(--jolt); }
-    .contact-label { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(250,250,248,0.3); margin-bottom: 0.4rem; }
-    .form-field { margin-bottom: 1.4rem; }
-    .form-field label {
-      display: block;
-      font-size: 0.7rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: rgba(250,250,248,0.4);
-      margin-bottom: 0.5rem;
-    }
-    .form-field input,
-    .form-field select,
-    .form-field textarea {
-      width: 100%;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.12);
-      color: var(--white);
-      font-family: var(--sans);
-      font-size: 0.92rem;
-      font-weight: 300;
-      padding: 0.75rem 1rem;
-      outline: none;
-      transition: border-color 0.2s;
-      appearance: none;
-      -webkit-appearance: none;
-    }
-    .form-field input:focus,
-    .form-field select:focus,
-    .form-field textarea:focus { border-color: var(--jolt); }
-    .form-field textarea { resize: vertical; min-height: 110px; }
-    .form-field select option { background: var(--ink); }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .form-submit {
-      width: 100%;
-      padding: 0.9rem;
-      background: var(--jolt);
-      border: none;
-      color: var(--ink);
-      font-family: var(--sans);
-      font-size: 0.78rem;
-      font-weight: 500;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .form-submit:hover { background: var(--jolt-dk); }
-    .form-note { font-size: 0.75rem; color: rgba(250,250,248,0.3); margin-top: 0.8rem; }
-
-    /* ── FOOTER ── */
-    footer {
-      background: var(--ink);
-      color: rgba(250,250,248,0.3);
-      padding: 2rem 3rem;
-      display: flex; justify-content: space-between; align-items: center;
-      border-top: 1px solid rgba(255,255,255,0.07);
-      font-size: 0.78rem;
-      letter-spacing: 0.05em;
-    }
-    footer a { color: rgba(250,250,248,0.3); text-decoration: none; transition: color 0.2s; }
-    footer a:hover { color: var(--jolt); }
-    .footer-logo {
-      font-family: var(--serif);
-      font-size: 1.2rem;
-      color: rgba(250,250,248,0.5);
-    }
-    .footer-logo span { color: var(--jolt); }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-    .reveal {
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: none;
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 820px) {
-      nav { padding: 1.2rem 1.5rem; }
-      .nav-links { gap: 1.4rem; }
-      section { padding: 5rem 1.5rem; }
-      .divider { margin: 0 1.5rem; }
-      #hero { padding: 0 1.5rem 4rem; }
-      .thesis-grid,
-      .contact-grid,
-      .team-grid { grid-template-columns: 1fr; gap: 2.5rem; }
-      .form-row { grid-template-columns: 1fr; }
-      .hero-scroll-hint { display: none; }
-      .portfolio-grid { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 480px) {
-      .nav-links { display: none; }
-    }
-  </style>
+  /* Toast */
+  .toast{position:fixed;bottom:2rem;right:2rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.7rem 1.2rem;font-size:.85rem;color:var(--text);z-index:200;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;}
+  .toast.show{opacity:1;transform:translateY(0);}
+  .toast.error{border-color:var(--danger);color:var(--danger);}
+</style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav id="navbar">
-    <a href="#hero" class="nav-logo">Jolt<span>.</span>VC</a>
-    <ul class="nav-links">
-      <li><a href="#thesis">Thesis</a></li>
-      <li><a href="#portfolio">Portfolio</a></li>
-      <li><a href="#team">Team</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-  </nav>
+<!-- INIT -->
+<div class="screen active" id="init-screen">
+  <div class="init-inner" style="margin-top:40vh;">
+    <div class="paint-drops">
+      <div class="drop" style="background:#c8964a;animation-delay:0s"></div>
+      <div class="drop" style="background:#6aaa78;animation-delay:.3s"></div>
+      <div class="drop" style="background:#8fb8d4;animation-delay:.6s"></div>
+      <div class="drop" style="background:#c0574a;animation-delay:.15s"></div>
+      <div class="drop" style="background:#b07ab4;animation-delay:.45s"></div>
+    </div>
+    <p>Loading…</p>
+  </div>
+</div>
 
-  <!-- HERO -->
-  <section id="hero">
-    <div class="hero-rule"></div>
-    <div class="hero-bg-text" aria-hidden="true">JOLT</div>
-    <div class="hero-content">
-      <p class="hero-eyebrow">Deep Tech Venture — Los Angeles</p>
-      <!-- EDIT: Replace with your tagline -->
-      <h1 class="hero-headline">Backing the builders<br>who change what's<br><em>possible.</em></h1>
-      <!-- EDIT: Replace with your 1–2 sentence descriptor -->
-      <p class="hero-sub">Jolt VC is a ~$10M deep tech syndicate investing at pre-seed through Series A in founders weaponizing science and engineering to build the next generation of category-defining companies.</p>
-      <div class="hero-cta">
-        <a href="#contact" class="btn btn-accent">Pitch Us</a>
-        &nbsp;&nbsp;
-        <a href="#portfolio" class="btn">Our Portfolio</a>
+<!-- WELCOME -->
+<div class="screen" id="welcome-screen">
+  <div class="center-wrap">
+    <div class="card">
+      <div style="text-align:center;margin-bottom:1.8rem;">
+        <div class="paint-drops">
+          <div class="drop" style="background:#c8964a;animation-delay:0s"></div>
+          <div class="drop" style="background:#6aaa78;animation-delay:.3s"></div>
+          <div class="drop" style="background:#8fb8d4;animation-delay:.6s"></div>
+          <div class="drop" style="background:#c0574a;animation-delay:.15s"></div>
+          <div class="drop" style="background:#b07ab4;animation-delay:.45s"></div>
+        </div>
+        <h1 style="text-align:center;font-size:1.8rem;">Hobby Materiel Tracker</h1>
+        <p style="font-style:italic;color:var(--text-muted);text-align:center;font-size:.85rem;margin-top:.3rem;">by Monument Hobbies</p>
+      </div>
+      <p class="subtitle" style="text-align:center;margin-bottom:1.8rem;">Track your collection, build your wishlist, and never buy a duplicate again.</p>
+      <button class="btn btn-primary" onclick="showScreen('register-screen')">Create an Account</button>
+      <div style="text-align:center;margin-top:1rem;font-size:.88rem;color:var(--text-muted);">
+        Already have one? <button class="link-btn" onclick="showScreen('login-screen')">Sign in</button>
       </div>
     </div>
-    <div class="hero-scroll-hint">Scroll</div>
-  </section>
+  </div>
+</div>
 
-  <div class="divider"></div>
+<!-- REGISTER -->
+<div class="screen" id="register-screen">
+  <div class="center-wrap">
+    <div class="card">
+      <h2>Create Account</h2>
+      <p class="subtitle">Your collection will be saved and accessible anywhere.</p>
+      <label class="label">Username</label>
+      <input type="text" id="reg-username" placeholder="e.g. nightshade_painter" autocomplete="off">
+      <div class="error" id="reg-user-error"></div>
+      <label class="label">Email</label>
+      <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="off">
+      <label class="label">Password</label>
+      <input type="password" id="reg-password" placeholder="At least 6 characters">
+      <label class="label">Confirm Password</label>
+      <input type="password" id="reg-confirm" placeholder="Repeat your password">
+      <div class="error" id="reg-pass-error"></div>
+      <button class="btn btn-primary" id="reg-btn" onclick="handleRegister()">Continue →</button>
+      <div style="text-align:center;margin-top:.9rem;font-size:.88rem;color:var(--text-muted);">
+        <button class="link-btn" onclick="showScreen('welcome-screen')">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-  <!-- THESIS -->
-  <section id="thesis">
-    <div class="section-label reveal">Investment Thesis</div>
-    <div class="thesis-grid">
+<!-- LOGIN -->
+<div class="screen" id="login-screen">
+  <div class="center-wrap">
+    <div class="card">
+      <h2>Welcome Back</h2>
+      <p class="subtitle">Sign in to pick up where you left off.</p>
+      <label class="label">Email</label>
+      <input type="email" id="login-email" placeholder="you@example.com" autocomplete="off">
+      <label class="label">Password</label>
+      <input type="password" id="login-password" placeholder="Your password">
+      <div class="error" id="login-error"></div>
+      <button class="btn btn-primary" id="login-btn" onclick="handleLogin()">Sign In</button>
+      <div style="text-align:center;margin-top:.9rem;font-size:.88rem;color:var(--text-muted);">
+        <button class="link-btn" onclick="showScreen('welcome-screen')">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STYLE -->
+<div class="screen" id="style-screen">
+  <div class="center-wrap">
+    <div class="card" style="max-width:580px;">
+      <h2>How do you paint?</h2>
+      <p class="subtitle">This helps us personalise your experience.</p>
+      <div class="style-grid">
+        <div class="style-card" data-style="Competition" onclick="selectStyle(this)">
+          <span class="icon">🏆</span><span class="name">Competition</span>
+          <span class="desc">NMM, OSL, and advanced blending for the podium</span>
+        </div>
+        <div class="style-card" data-style="Display" onclick="selectStyle(this)">
+          <span class="icon">🖼️</span><span class="name">Display</span>
+          <span class="desc">Showcase pieces with depth and storytelling</span>
+        </div>
+        <div class="style-card" data-style="Gaming" onclick="selectStyle(this)">
+          <span class="icon">🎲</span><span class="name">Gaming</span>
+          <span class="desc">Efficient, bold, tabletop-ready armies</span>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="style-btn" onclick="handleStyleSelect()">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="screen" id="profile-screen">
+  <div class="center-wrap">
+    <div class="card">
+      <h2>Tell us about yourself</h2>
+      <p class="subtitle">Just a few details so your dashboard feels like yours.</p>
+      <label class="label">Display Name <span style="color:var(--text-muted);font-size:.75em;">(optional)</span></label>
+      <input type="text" id="profile-name" placeholder="e.g. Lady Grimdark">
+      <label class="label">Experience Level</label>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.2rem;">
+        <div class="filter-btn" data-xp="Beginner"     onclick="selectXP(this)">Beginner</div>
+        <div class="filter-btn" data-xp="Intermediate" onclick="selectXP(this)">Intermediate</div>
+        <div class="filter-btn" data-xp="Advanced"     onclick="selectXP(this)">Advanced</div>
+        <div class="filter-btn" data-xp="Veteran"      onclick="selectXP(this)">Veteran</div>
+      </div>
+      <label class="label">Favourite Hobby System <span style="color:var(--text-muted);font-size:.75em;">(optional)</span></label>
+      <input type="text" id="profile-system" placeholder="e.g. Warhammer 40K, Kings of War…">
+      <button class="btn btn-primary" id="profile-btn" onclick="handleProfileSave()">Enter My Collection →</button>
+      <div style="text-align:center;margin-top:.9rem;">
+        <button class="link-btn" onclick="handleProfileSave()" style="font-size:.82rem;">Skip for now</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="screen" id="app-screen">
+  <div class="topbar">
+    <div class="topbar-brand">🎨 <span>Hobby Materiel Tracker</span></div>
+    <div class="topbar-right">
+      <div class="progress-pills">
+        <div class="progress-pill owned-pill" id="owned-pill">0 owned</div>
+        <div class="progress-pill wish-pill"  id="wish-pill">0 wishlisted</div>
+      </div>
+      <div class="user-badge">Welcome <b id="topbar-username"></b></div>
+      <button class="btn btn-ghost btn-sm" onclick="handleLogout()">Log Out</button>
+    </div>
+  </div>
+  <div class="app-body">
+    <div class="nudge" id="profile-nudge" style="display:none;">
+      <div class="nudge-icon">✏️</div>
+      <div>Complete your painter profile to personalise your experience. <a onclick="showModal('profile-modal')">Finish setup →</a></div>
+    </div>
+    <div class="controls">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Search by name or code…" oninput="renderPaints()" style="margin:0;">
+      </div>
+      <div class="filter-btns">
+        <button class="filter-btn active"         data-filter="all"     onclick="setFilter(this,'all')">All</button>
+        <button class="filter-btn"                data-filter="owned"   onclick="setFilter(this,'owned')">Owned</button>
+        <button class="filter-btn wish-filter"    data-filter="wished"  onclick="setFilter(this,'wished')">★ Wishlist</button>
+        <button class="filter-btn"                data-filter="missing" onclick="setFilter(this,'missing')">Missing</button>
+        <button class="filter-tag-btn" id="tag-filter-btn" onclick="renderFilterModalBody();showModal('tag-filter-modal')">🔽 Filter<span class="badge" id="tag-filter-badge" style="display:none"></span></button>
+      </div>
+    </div>
+    <div class="active-chips" id="active-chips"></div>
+    <div class="quick-nav" id="quick-nav"></div>
+    <div id="paint-list"></div>
+  </div>
+</div>
+
+<!-- TAG FILTER MODAL -->
+<div class="modal-overlay" id="tag-filter-modal">
+  <div class="modal filter-modal">
+    <h2>Filter Paints</h2>
+    <p class="modal-sub">AND between groups · OR within a group</p>
+    <div id="filter-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="clearTagFilters()">Clear all</button>
+      <button class="btn btn-sm" onclick="hideModal('tag-filter-modal')">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="profile-modal">
+  <div class="modal">
+    <h2>Your Profile</h2>
+    <label class="label" style="margin-top:.8rem;">Display Name</label>
+    <input type="text" id="modal-name" placeholder="e.g. Lady Grimdark">
+    <label class="label">Experience Level</label>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+      <div class="filter-btn" data-xp="Beginner"     onclick="selectXPModal(this)">Beginner</div>
+      <div class="filter-btn" data-xp="Intermediate" onclick="selectXPModal(this)">Intermediate</div>
+      <div class="filter-btn" data-xp="Advanced"     onclick="selectXPModal(this)">Advanced</div>
+      <div class="filter-btn" data-xp="Veteran"      onclick="selectXPModal(this)">Veteran</div>
+    </div>
+    <label class="label">Favourite System</label>
+    <input type="text" id="modal-system" placeholder="e.g. Warhammer 40K">
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('profile-modal')">Cancel</button>
+      <button class="btn btn-primary" id="modal-save-btn" style="width:auto;" onclick="saveModalProfile()">Save Profile</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTE MODAL -->
+<div class="modal-overlay" id="note-modal">
+  <div class="modal">
+    <div class="note-header">
+      <div class="note-swatch" id="note-modal-swatch"></div>
       <div>
-        <h2 class="section-title reveal">We invest at the<br>frontier of science<br><em style="font-style:italic;">and technology.</em></h2>
-        <!-- EDIT: Replace with your thesis paragraph(s) -->
-        <div class="thesis-body reveal">
-          <p>Jolt backs exceptional founders at the intersection of deep science and transformative technology — teams who are building platforms, not just products, in markets that don't yet fully exist.</p>
-          <p>We move fast, write conviction-led checks, and bring operational depth from our own experience as founders and scientists. Beyond capital, we open doors to strategic partners, CDMOs, pharma, and follow-on investors who move the needle.</p>
-          <p>Our check sizes range from pre-seed through Series A, targeting companies where scientific de-risking is the primary value driver and where a founder's technical edge is the moat.</p>
-        </div>
-        <!-- EDIT: Update tags to match your actual focus areas -->
-        <div class="focus-tags reveal">
-          <span class="tag">Biotech / Life Sciences</span>
-          <span class="tag">Deep Tech</span>
-          <span class="tag">Climate / Hard Tech</span>
-          <span class="tag">AI / Software</span>
-          <span class="tag">Fintech</span>
-          <span class="tag">Pre-Seed → Series A</span>
-        </div>
-      </div>
-      <div class="thesis-pillars reveal">
-        <div class="pillar">
-          <div class="pillar-num">01</div>
-          <h3>Conviction from Day One</h3>
-          <p>We invest early and back founders decisively — with capital, introductions, and genuine partnership from the first call.</p>
-        </div>
-        <div class="pillar">
-          <div class="pillar-num">02</div>
-          <h3>Operational Depth</h3>
-          <p>Our GPs are scientists and operators who have built and funded companies. We understand the technical and commercial challenges you face because we've faced them.</p>
-        </div>
-        <div class="pillar">
-          <div class="pillar-num">03</div>
-          <h3>Network That Moves Needles</h3>
-          <p>Access to our portfolio, strategic partners, CDMOs, and a curated network of co-investors who can lead follow-on rounds.</p>
-        </div>
-        <div class="pillar">
-          <div class="pillar-num">04</div>
-          <h3>Frontier Focus</h3>
-          <p>Deep tech, biotech, hard tech — whatever you call it, we've been steeped in science-driven innovation and know how to underwrite technical risk.</p>
-        </div>
+        <div class="note-title" id="note-modal-name"></div>
+        <div class="note-code"  id="note-modal-code"></div>
       </div>
     </div>
-  </section>
-
-  <div class="divider"></div>
-
-  <!-- PORTFOLIO -->
-  <section id="portfolio">
-    <div class="section-label reveal">Portfolio</div>
-    <h2 class="section-title reveal" style="margin-bottom:2.4rem;">Companies we've<br>backed.</h2>
-
-    <!-- EDIT: Replace each card with your actual portfolio companies -->
-    <div class="portfolio-grid reveal">
-
-      <a href="#" class="portfolio-card" target="_blank" rel="noopener">
-        <div class="card-logo-wrap">
-          <div class="card-logo-placeholder">Co. One</div>
-        </div>
-        <div class="card-tag">Biotech · Pre-Seed</div>
-        <div class="card-name">Portfolio Company One</div>
-        <div class="card-desc">One-line description of what this company does and why it matters. Replace with the real company name and URL.</div>
-        <div class="card-arrow">→</div>
-      </a>
-
-      <a href="#" class="portfolio-card" target="_blank" rel="noopener">
-        <div class="card-logo-wrap">
-          <div class="card-logo-placeholder">Co. Two</div>
-        </div>
-        <div class="card-tag">Deep Tech · Seed</div>
-        <div class="card-name">Portfolio Company Two</div>
-        <div class="card-desc">One-line description of what this company does and why it matters. Replace with the real company name and URL.</div>
-        <div class="card-arrow">→</div>
-      </a>
-
-      <a href="#" class="portfolio-card" target="_blank" rel="noopener">
-        <div class="card-logo-wrap">
-          <div class="card-logo-placeholder">Co. Three</div>
-        </div>
-        <div class="card-tag">Climate · Seed</div>
-        <div class="card-name">Portfolio Company Three</div>
-        <div class="card-desc">One-line description of what this company does and why it matters. Replace with the real company name and URL.</div>
-        <div class="card-arrow">→</div>
-      </a>
-
-      <a href="#" class="portfolio-card" target="_blank" rel="noopener">
-        <div class="card-logo-wrap">
-          <div class="card-logo-placeholder">Co. Four</div>
-        </div>
-        <div class="card-tag">AI · Pre-Seed</div>
-        <div class="card-name">Portfolio Company Four</div>
-        <div class="card-desc">One-line description of what this company does and why it matters. Replace with the real company name and URL.</div>
-        <div class="card-arrow">→</div>
-      </a>
-
-      <a href="#" class="portfolio-card" target="_blank" rel="noopener">
-        <div class="card-logo-wrap">
-          <div class="card-logo-placeholder">Co. Five</div>
-        </div>
-        <div class="card-tag">Fintech · Series A</div>
-        <div class="card-name">Portfolio Company Five</div>
-        <div class="card-desc">One-line description of what this company does and why it matters. Replace with the real company name and URL.</div>
-        <div class="card-arrow">→</div>
-      </a>
-
-      <a href="#" class="portfolio-card" target="_blank" rel="noopener">
-        <div class="card-logo-wrap">
-          <div class="card-logo-placeholder">Co. Six</div>
-        </div>
-        <div class="card-tag">Hard Tech · Seed</div>
-        <div class="card-name">Portfolio Company Six</div>
-        <div class="card-desc">One-line description of what this company does and why it matters. Replace with the real company name and URL.</div>
-        <div class="card-arrow">→</div>
-      </a>
-
+    <label class="label">Your Notes</label>
+    <textarea id="note-textarea" placeholder="Colours you've mixed with this, techniques that worked, project ideas…"></textarea>
+    <div class="modal-footer">
+      <button class="btn-del" id="note-delete-btn" onclick="deleteNote()" style="display:none;">Delete note</button>
+      <button class="btn btn-ghost" onclick="closeModal('note-modal')">Cancel</button>
+      <button class="btn btn-primary" id="note-save-btn" style="width:auto;" onclick="saveNote()">Save Note</button>
     </div>
-  </section>
+  </div>
+</div>
 
-  <div class="divider"></div>
+<div class="toast" id="toast"></div>
 
-  <!-- TEAM -->
-  <section id="team">
-    <div class="section-label reveal">The Team</div>
-    <h2 class="section-title reveal">People behind<br>the fund.</h2>
-    <div class="team-grid">
+<script>
+// ─── Affiliate ────────────────────────────────
+const AFFILIATE_ID = 'YOUR_RFSN_ID'; // ← paste your Refersion ID from the Monumentals portal
 
-      <!-- EDIT: Joe Turner -->
-      <div class="team-card reveal">
-        <div class="headshot-wrap">
-          <!-- Replace the placeholder below with: <img src="joe-turner.jpg" alt="Joe Turner" style="width:100%;height:100%;object-fit:cover;"> -->
-          <div class="headshot-placeholder">
-            <div class="headshot-icon">
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-            </div>
-            <span class="headshot-label">Photo coming soon</span>
-          </div>
-        </div>
-        <div class="team-name">Joe Turner</div>
-        <div class="team-title">Founding General Partner</div>
-        <!-- EDIT: Replace with Joe's real bio -->
-        <div class="team-bio">Joe Turner is a [background] with experience in [domain]. Prior to Jolt, he [previous roles / companies / notable accomplishments]. He brings [key value-add] to Jolt's portfolio founders.</div>
-        <!-- EDIT: Replace # with Joe's LinkedIn URL -->
-        <a href="#" class="team-linkedin" target="_blank" rel="noopener">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.37V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.59 0 4.26 2.37 4.26 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
-          LinkedIn
-        </a>
-      </div>
+const SLUG_MAP = {
+  // Standard Colors
+  "001":"pro-acryl-bold-titanium-white","002":"pro-acryl-coal-black",
+  "003":"pro-acryl-bold-pyrrole-red","004":"pro-acryl-green",
+  "005":"pro-acryl-blue","006":"pro-acryl-golden-yellow",
+  "007":"pro-acryl-orange","008":"pro-acryl-burnt-red",
+  "009":"pro-acryl-mahogany","010":"pro-acryl-purple",
+  "011":"pro-acryl-magenta","012":"pro-acryl-sky-blue",
+  "013":"pro-acryl-faded-ultramarine","014":"pro-acryl-dark-grey-blue",
+  "015":"pro-acryl-bright-warm-grey","016":"pro-acryl-dark-warm-grey",
+  "017":"pro-acryl-golden-brown","018":"pro-acryl-light-umber",
+  "019":"pro-acryl-dark-umber","020":"pro-acryl-camo-green",
+  "021":"pro-acryl-jade","022":"pro-acryl-bright-ivory",
+  "023":"pro-acryl-ivory","024":"pro-acryl-tan-flesh",
+  "034":"pro-acryl-dark-blue","035":"pro-acryl-dark-purple",
+  "036":"pro-acryl-dark-camo-green","037":"pro-acryl-burnt-orange",
+  "038":"pro-acryl-yellow-ochre","039":"pro-acryl-bright-yellow-green",
+  "040":"pro-acryl-black-brown","041":"pro-acryl-olive-flesh",
+  "042":"pro-acryl-shadow-flesh","043":"pro-acryl-pale-pink",
+  "044":"pro-acryl-dark-neutral-grey","045":"pro-acryl-bright-neutral-grey",
+  "054":"pro-acryl-turquoise","055":"pro-acryl-grey-blue",
+  "056":"pro-acryl-blue-black","057":"pro-acryl-black-green",
+  "058":"pro-acryl-bright-pale-green","059":"pro-acryl-burnt-sienna",
+  "060":"pro-acryl-pale-yellow","061":"061-pro-acryl-khaki",
+  "062":"pro-acryl-dark-golden-brown","063":"pro-acryl-faded-plum",
+  "065":"065-pro-acryl-yellow-green","066":"066-pro-acryl-faded-green",
+  "067":"067-pro-acryl-bright-jade","068":"068-pro-acryl-dark-flesh",
+  "069":"069-pro-acryl-burgundy","070":"070-pro-acryl-plum",
+  "071":"071-pro-acryl-pink","072":"072-pro-acryl-warm-yellow",
+  "073":"073-pro-acryl-warm-flesh","074":"074-pro-acryl-warm-grey",
+  "075":"075-pro-acryl-neutral-grey",
+  // Metallics
+  "025":"pro-acryl-silver","026":"pro-acryl-light-bronze",
+  "027":"pro-acryl-copper","028":"pro-acryl-rich-gold",
+  "029":"pro-acryl-white-gold","030":"pro-acryl-dark-silver",
+  "031":"pro-acryl-bright-gold","032":"pro-acryl-bronze",
+  "033":"pro-acryl-metallic-medium",
+  // Transparents
+  "046":"pro-acryl-transparent-blue","047":"pro-acryl-transparent-red",
+  "048":"pro-acryl-transparent-green","049":"pro-acryl-transparent-yellow",
+  "050":"pro-acryl-transparent-orange","051":"pro-acryl-transparent-purple",
+  "052":"pro-acryl-transparent-brown","053":"pro-acryl-transparent-black",
+  "064":"064-pro-acryl-transparent-white",
+  // Signature Series
+  "S01":"s01-pro-acryl-dark-jade","S02":"s02-vince-venturella-paynes-grey",
+  "S03":"s03-vince-venturella-royal-purple","S04":"s04-vince-venturella-white-blue",
+  "S05":"s05-vince-venturella-beige-red","S06":"s06-vince-venturella-dark-yellow-green",
+  "S07":"s07-ninjon-dark-ivory","S08":"s08-ninjon-dark-warm-flesh",
+  "S09":"s09-ninjon-warm-brown","S10":"s10-ninjon-dark-magenta",
+  "S11":"s11-ninjon-dark-plum","S12":"s12-ninjon-red-grey",
+  "S13":"s13-ben-komets-dark-sea-ben","S14":"s14-ben-komets-petroleum-brown",
+  "S15":"s15-ben-komets-dark-burgundy","S16":"s16-ben-komets-green-oxide",
+  "S17":"s17-ben-komets-advanced-flesh-tone","S18":"s18-ben-komets-heavy-warm-white",
+  "S19":"s19-matt-cexwish-dark-crimson","S20":"s20-matt-cexwish-dark-emerald",
+  "S21":"s21-matt-cexwish-heavy-titanium-white","S22":"s21-matt-cexwish-brown-grey",
+  "S23":"s23-matt-cexwish-bone","S24":"s24-matt-cexwish-dark-bronze",
+  "S25":"s25-flameon-dark-green-brown","S26":"s26-flameon-dark-orange-brown",
+  "S27":"s27-flameon-orange-brown","S28":"s28-flameon-caramel-brown",
+  "S29":"s29-flameon-bright-yellow-ochre","S30":"s30-flameon-bright-pale-yellow",
+  "S31":"s31-rogue-hobbies-orange-red","S32":"s32-rogue-hobbies-dark-hot-pink",
+  "S33":"s33-rogue-hobbies-bright-green","S34":"s34-rogue-hobbies-dark-turquoise",
+  "S35":"s35-rogue-hobbies-ultramarine","S36":"s36-rogue-hobbies-bismuth-yellow",
+  "S37":"s37-adepticon-red-oxide","S38":"s38-adepticon-orange-oxide",
+  "S39":"s39-adepticon-satin-black","S40":"s40-adepticon-drab-brown",
+  "S41":"s41-adepticon-bright-shadow-flesh","S42":"s42-adepticon-magnesium",
+  "S49":"s49-nova-orange",
+  // AMP Colors
+  "AMP002":"amp-colors-002-cool-grey","AMP004":"amp-colors-004-black-red",
+  "AMP005":"amp-colors-005-dark-navy-blue","AMP006":"amp-colors-006-beige-grey",
+  "AMP007":"amp-colors-007-orange-yellow","AMP008":"amp-colors-008-peach-flesh",
+  "AMP009":"amp-colors-009-bright-green-blue","AMP010":"amp-colors-010-steel",
+  "AMP011":"amp-colors-011-magenta-wash","AMP012":"amp-colors-012-petroleum-brown-wash",
+  "AMP013":"amp-colors-013-slate-grey","AMP017":"amp-colors-017-red-orange",
+  "AMP018":"amp-colors-018-burnt-umber","AMP020":"amp-colors-020-green-brown",
+  "AMP021":"amp-colors-021-bright-brown-grey","AMP022":"amp-colors-022-grey-green",
+  "AMP023":"amp-colors-023-brown-grey-wash","AMP024":"amp-colors-024-paynes-grey-wash",
+  // Fluorescents
+  "F01":"f01-fluorescent-red","F02":"f02-pro-acryl-fluorescent-orange",
+  "F03":"f03-pro-acryl-fluorescent-yellow","F04":"f04-pro-acryl-fluorescent-green",
+  "F05":"f05-pro-acryl-fluorescent-purple","F06":"f06-pro-acryl-fluorescent-pink",
+  // Primers
+  "P-002":"pro-acryl-prime-black","P-003":"pro-acryl-prime-white",
+  "P-005":"pro-acryl-prime-dark-neutral-grey",
+  "P-007":"pro-acryl-prime-dark-camo-green",
+  "P-011":"pro-acryl-prime-black-brown",
+  // Washes
+  "200":"076-pro-acryl-black-wash","201":"201-pro-acryl-brown-wash","202":"202-pro-acryl-flesh-wash",
+  // Basing Textures
+  "T01":"pro-acryl-basing-textures","T02":"pro-acryl-basing-textures-coarse-120ml",
+  "T03":"pro-acryl-basing-textures-red-earth-fine-120ml","T04":"pro-acryl-basing-textures-golden-earth-fine-120ml",
+  "T05":"pro-acryl-basing-textures-concrete-super-fine-120ml","T06":"pro-acryl-basing-textures-snow-ultra-fine-120ml",
+  "T07":"pro-acryl-basing-textures-brown-earth-fine-120ml","T08":"pro-acryl-basing-textures-brown-earth-coarse-120ml",
+};
 
-      <!-- EDIT: Andrew Gray -->
-      <div class="team-card reveal">
-        <div class="headshot-wrap">
-          <!-- Replace the placeholder below with: <img src="andrew-gray.jpg" alt="Andrew Gray" style="width:100%;height:100%;object-fit:cover;"> -->
-          <div class="headshot-placeholder">
-            <div class="headshot-icon">
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-            </div>
-            <span class="headshot-label">Photo coming soon</span>
-          </div>
-        </div>
-        <div class="team-name">Andrew Gray, PhD</div>
-        <div class="team-title">Managing Partner</div>
-        <!-- EDIT: Refine or replace with your preferred bio copy -->
-        <div class="team-bio">Andrew Gray is a two-time biotech founder and immunologist (PhD, USC) with deep expertise in cell therapy manufacturing and drug delivery. He is CEO of CellEcho Biotech (NSF SBIR), developing a microfluidic platform for next-generation ex vivo cell therapies, and brings a rare combination of scientific depth and venture operational experience to Jolt's portfolio.</div>
-        <!-- EDIT: Replace # with your LinkedIn URL -->
-        <a href="#" class="team-linkedin" target="_blank" rel="noopener">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.37V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.59 0 4.26 2.37 4.26 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
-          LinkedIn
-        </a>
-      </div>
+function buyUrl(code) {
+  if (code.startsWith('VMC') || code.startsWith('VGC')) {
+    const num = code.replace(/^[A-Z]+/, '').replace('.','');  // "70.951" → "70951"
+    return `https://acrylicosvallejo.com/en/?s=${num}`;
+  }
+  const name = PAINT_MAP[code]?.name || code;
+  const base = `https://monumenthobbies.com/search?q=${encodeURIComponent(name)}`;
+  return AFFILIATE_ID === 'YOUR_RFSN_ID'
+    ? base
+    : `${base}&rfsn=${AFFILIATE_ID}`;
+}
 
-    </div>
-  </section>
+// ─── Supabase ─────────────────────────────────
+const { createClient } = supabase;
+const sb = createClient(
+  'https://nefoybidbeybjaepfgao.supabase.co',
+  'sb_publishable_2GEqVM0FIzy8pid7pPcf0g_KxkE8d63'
+);
 
-  <div class="divider" style="margin:0;"></div>
+// ─── Paint data ───────────────────────────────
+const PAINTS = [
+  // STANDARD COLORS
+  {code:"001",name:"Bold Titanium White", line:"Standard Colors",sub:"Whites",  hex:"#F4F4F2"},
+  {code:"002",name:"Coal Black",          line:"Standard Colors",sub:"Blacks",  hex:"#1e1e22"},
+  {code:"003",name:"Bold Pyrrole Red",    line:"Standard Colors",sub:"Reds",    hex:"#C82020"},
+  {code:"004",name:"Green",               line:"Standard Colors",sub:"Greens",  hex:"#2A7A30"},
+  {code:"005",name:"Blue",                line:"Standard Colors",sub:"Blues",   hex:"#2040A8"},
+  {code:"006",name:"Golden Yellow",       line:"Standard Colors",sub:"Yellows", hex:"#E8A820"},
+  {code:"007",name:"Orange",              line:"Standard Colors",sub:"Oranges", hex:"#E06020"},
+  {code:"008",name:"Burnt Red",           line:"Standard Colors",sub:"Reds",    hex:"#922018"},
+  {code:"009",name:"Mahogany",            line:"Standard Colors",sub:"Browns",  hex:"#6A2A18"},
+  {code:"010",name:"Purple",              line:"Standard Colors",sub:"Purples", hex:"#6A1888"},
+  {code:"011",name:"Magenta",             line:"Standard Colors",sub:"Pinks",   hex:"#C02088"},
+  {code:"012",name:"Sky Blue",            line:"Standard Colors",sub:"Blues",   hex:"#5090C8"},
+  {code:"013",name:"Faded Ultramarine",   line:"Standard Colors",sub:"Blues",   hex:"#5868A0"},
+  {code:"014",name:"Dark Grey Blue",      line:"Standard Colors",sub:"Blues",   hex:"#384860"},
+  {code:"015",name:"Bright Warm Grey",    line:"Standard Colors",sub:"Greys",   hex:"#B8B0A4"},
+  {code:"016",name:"Dark Warm Grey",      line:"Standard Colors",sub:"Greys",   hex:"#706860"},
+  {code:"017",name:"Golden Brown",        line:"Standard Colors",sub:"Browns",  hex:"#A06828"},
+  {code:"018",name:"Light Umber",         line:"Standard Colors",sub:"Browns",  hex:"#8A5830"},
+  {code:"019",name:"Dark Umber",          line:"Standard Colors",sub:"Browns",  hex:"#503020"},
+  {code:"020",name:"Camo Green",          line:"Standard Colors",sub:"Greens",  hex:"#5A6030"},
+  {code:"021",name:"Jade",                line:"Standard Colors",sub:"Greens",  hex:"#2A7860"},
+  {code:"022",name:"Bright Ivory",        line:"Standard Colors",sub:"Whites",  hex:"#EEE8CC"},
+  {code:"023",name:"Ivory",               line:"Standard Colors",sub:"Whites",  hex:"#E0D8B8"},
+  {code:"024",name:"Tan Flesh",           line:"Standard Colors",sub:"Flesh",   hex:"#D4A878"},
+  {code:"034",name:"Dark Blue",           line:"Standard Colors",sub:"Blues",   hex:"#1A2880"},
+  {code:"035",name:"Dark Purple",         line:"Standard Colors",sub:"Purples", hex:"#401060"},
+  {code:"036",name:"Dark Camo Green",     line:"Standard Colors",sub:"Greens",  hex:"#3A4020"},
+  {code:"037",name:"Burnt Orange",        line:"Standard Colors",sub:"Oranges", hex:"#C04818"},
+  {code:"038",name:"Yellow Ochre",        line:"Standard Colors",sub:"Yellows", hex:"#C89030"},
+  {code:"039",name:"Bright Yellow Green", line:"Standard Colors",sub:"Greens",  hex:"#80B020"},
+  {code:"040",name:"Black Brown",         line:"Standard Colors",sub:"Browns",  hex:"#2A1A10"},
+  {code:"041",name:"Olive Flesh",         line:"Standard Colors",sub:"Flesh",   hex:"#B09060"},
+  {code:"042",name:"Shadow Flesh",        line:"Standard Colors",sub:"Flesh",   hex:"#987060"},
+  {code:"043",name:"Pale Pink",           line:"Standard Colors",sub:"Pinks",   hex:"#E8C0C0"},
+  {code:"044",name:"Dark Neutral Grey",   line:"Standard Colors",sub:"Greys",   hex:"#484848"},
+  {code:"045",name:"Bright Neutral Grey", line:"Standard Colors",sub:"Greys",   hex:"#989898"},
+  {code:"054",name:"Turquoise",           line:"Standard Colors",sub:"Blues",   hex:"#20A898"},
+  {code:"055",name:"Grey Blue",           line:"Standard Colors",sub:"Blues",   hex:"#607898"},
+  {code:"056",name:"Blue Black",          line:"Standard Colors",sub:"Blues",   hex:"#181E30"},
+  {code:"057",name:"Black Green",         line:"Standard Colors",sub:"Greens",  hex:"#1A2820"},
+  {code:"058",name:"Bright Pale Green",   line:"Standard Colors",sub:"Greens",  hex:"#98D090"},
+  {code:"059",name:"Burnt Sienna",        line:"Standard Colors",sub:"Browns",  hex:"#9A3E18"},
+  {code:"060",name:"Pale Yellow",         line:"Standard Colors",sub:"Yellows", hex:"#EEE090"},
+  {code:"061",name:"Khaki",               line:"Standard Colors",sub:"Greens",  hex:"#B0A060"},
+  {code:"062",name:"Dark Golden Brown",   line:"Standard Colors",sub:"Browns",  hex:"#7A4A10"},
+  {code:"063",name:"Faded Plum",          line:"Standard Colors",sub:"Purples", hex:"#987080"},
+  {code:"065",name:"Yellow Green",        line:"Standard Colors",sub:"Greens",  hex:"#9ABE40"},
+  {code:"066",name:"Faded Green",         line:"Standard Colors",sub:"Greens",  hex:"#78A070"},
+  {code:"067",name:"Bright Jade",         line:"Standard Colors",sub:"Greens",  hex:"#28A880"},
+  {code:"068",name:"Dark Flesh",          line:"Standard Colors",sub:"Flesh",   hex:"#885040"},
+  {code:"069",name:"Burgundy",            line:"Standard Colors",sub:"Reds",    hex:"#701828"},
+  {code:"070",name:"Plum",                line:"Standard Colors",sub:"Purples", hex:"#602848"},
+  {code:"071",name:"Pink",                line:"Standard Colors",sub:"Pinks",   hex:"#E080A0"},
+  {code:"072",name:"Warm Yellow",         line:"Standard Colors",sub:"Yellows", hex:"#EEC840"},
+  {code:"073",name:"Warm Flesh",          line:"Standard Colors",sub:"Flesh",   hex:"#D09878"},
+  {code:"074",name:"Warm Grey",           line:"Standard Colors",sub:"Greys",   hex:"#A09890"},
+  {code:"075",name:"Neutral Grey",        line:"Standard Colors",sub:"Greys",   hex:"#888888"},
+  // METALLICS
+  {code:"025",name:"Silver",         line:"Metallics",sub:"Metallics",hex:"#C0C0C8"},
+  {code:"026",name:"Light Bronze",   line:"Metallics",sub:"Metallics",hex:"#C0906A"},
+  {code:"027",name:"Copper",         line:"Metallics",sub:"Metallics",hex:"#B07040"},
+  {code:"028",name:"Rich Gold",      line:"Metallics",sub:"Metallics",hex:"#C89820"},
+  {code:"029",name:"White Gold",     line:"Metallics",sub:"Metallics",hex:"#D8D090"},
+  {code:"030",name:"Dark Silver",    line:"Metallics",sub:"Metallics",hex:"#707078"},
+  {code:"031",name:"Bright Gold",    line:"Metallics",sub:"Metallics",hex:"#E0B030"},
+  {code:"032",name:"Bronze",         line:"Metallics",sub:"Metallics",hex:"#9A6028"},
+  {code:"033",name:"Metallic Medium",line:"Metallics",sub:"Metallics",hex:"#909090"},
+  // TRANSPARENTS
+  {code:"046",name:"Transparent Blue",  line:"Transparents",sub:"Transparents",hex:"#2848A0"},
+  {code:"047",name:"Transparent Red",   line:"Transparents",sub:"Transparents",hex:"#C01818"},
+  {code:"048",name:"Transparent Green", line:"Transparents",sub:"Transparents",hex:"#207830"},
+  {code:"049",name:"Transparent Yellow",line:"Transparents",sub:"Transparents",hex:"#D8C020"},
+  {code:"050",name:"Transparent Orange",line:"Transparents",sub:"Transparents",hex:"#D05810"},
+  {code:"051",name:"Transparent Purple",line:"Transparents",sub:"Transparents",hex:"#601888"},
+  {code:"052",name:"Transparent Brown", line:"Transparents",sub:"Transparents",hex:"#603018"},
+  {code:"053",name:"Transparent Black", line:"Transparents",sub:"Transparents",hex:"#101010"},
+  {code:"064",name:"Transparent White", line:"Transparents",sub:"Transparents",hex:"#E8E8F0"},
+  // SIGNATURE SERIES
+  {code:"S01",name:"Dark Jade",           line:"Signature Series",sub:"Set #1 — Vince Venturella",hex:"#1A5A48"},
+  {code:"S02",name:"Payne's Grey",        line:"Signature Series",sub:"Set #1 — Vince Venturella",hex:"#3A4858"},
+  {code:"S03",name:"Royal Purple",        line:"Signature Series",sub:"Set #1 — Vince Venturella",hex:"#501880"},
+  {code:"S04",name:"White Blue",          line:"Signature Series",sub:"Set #1 — Vince Venturella",hex:"#B8D0E8"},
+  {code:"S05",name:"Beige Red",           line:"Signature Series",sub:"Set #1 — Vince Venturella",hex:"#C09080"},
+  {code:"S06",name:"Dark Yellow Green",   line:"Signature Series",sub:"Set #1 — Vince Venturella",hex:"#485820"},
+  {code:"S07",name:"Dark Ivory",          line:"Signature Series",sub:"Set #2 — Ninjon",          hex:"#C8C0A0"},
+  {code:"S08",name:"Dark Warm Flesh",     line:"Signature Series",sub:"Set #2 — Ninjon",          hex:"#906050"},
+  {code:"S09",name:"Warm Brown",          line:"Signature Series",sub:"Set #2 — Ninjon",          hex:"#7A4830"},
+  {code:"S10",name:"Dark Magenta",        line:"Signature Series",sub:"Set #2 — Ninjon",          hex:"#880858"},
+  {code:"S11",name:"Dark Plum",           line:"Signature Series",sub:"Set #2 — Ninjon",          hex:"#380830"},
+  {code:"S12",name:"Red Grey",            line:"Signature Series",sub:"Set #2 — Ninjon",          hex:"#806860"},
+  {code:"S13",name:"Dark Sea Ben",        line:"Signature Series",sub:"Set #3 — Ben Komets",      hex:"#204858"},
+  {code:"S14",name:"Petroleum Brown",     line:"Signature Series",sub:"Set #3 — Ben Komets",      hex:"#403820"},
+  {code:"S15",name:"Dark Burgundy",       line:"Signature Series",sub:"Set #3 — Ben Komets",      hex:"#500818"},
+  {code:"S16",name:"Green Oxide",         line:"Signature Series",sub:"Set #3 — Ben Komets",      hex:"#486028"},
+  {code:"S17",name:"Advanced Flesh Tone", line:"Signature Series",sub:"Set #3 — Ben Komets",      hex:"#C08868"},
+  {code:"S18",name:"Heavy Warm White",    line:"Signature Series",sub:"Set #3 — Ben Komets",      hex:"#F0EAD8"},
+  {code:"S19",name:"Dark Crimson",        line:"Signature Series",sub:"Set #4 — Matt Cexwish",    hex:"#780818"},
+  {code:"S20",name:"Dark Emerald",        line:"Signature Series",sub:"Set #4 — Matt Cexwish",    hex:"#0A5030"},
+  {code:"S21",name:"Heavy Titanium White",line:"Signature Series",sub:"Set #4 — Matt Cexwish",    hex:"#F8F8F6"},
+  {code:"S22",name:"Brown Grey",          line:"Signature Series",sub:"Set #4 — Matt Cexwish",    hex:"#887870"},
+  {code:"S23",name:"Bone",                line:"Signature Series",sub:"Set #4 — Matt Cexwish",    hex:"#D8C898"},
+  {code:"S24",name:"Dark Bronze",         line:"Signature Series",sub:"Set #4 — Matt Cexwish",    hex:"#604020"},
+  {code:"S25",name:"Dark Green Brown",    line:"Signature Series",sub:"Set #5 — Flameon",         hex:"#383818"},
+  {code:"S26",name:"Dark Orange Brown",   line:"Signature Series",sub:"Set #5 — Flameon",         hex:"#703018"},
+  {code:"S27",name:"Orange Brown",        line:"Signature Series",sub:"Set #5 — Flameon",         hex:"#A05020"},
+  {code:"S28",name:"Caramel Brown",       line:"Signature Series",sub:"Set #5 — Flameon",         hex:"#B07830"},
+  {code:"S29",name:"Bright Yellow Ochre", line:"Signature Series",sub:"Set #5 — Flameon",         hex:"#D8A030"},
+  {code:"S30",name:"Bright Pale Yellow",  line:"Signature Series",sub:"Set #5 — Flameon",         hex:"#EEE098"},
+  {code:"S31",name:"Orange Red",          line:"Signature Series",sub:"Set #6 — Rogue Hobbies",   hex:"#D84010"},
+  {code:"S32",name:"Dark Hot Pink",       line:"Signature Series",sub:"Set #6 — Rogue Hobbies",   hex:"#A01060"},
+  {code:"S33",name:"Bright Green",        line:"Signature Series",sub:"Set #6 — Rogue Hobbies",   hex:"#30C040"},
+  {code:"S34",name:"Dark Turquoise",      line:"Signature Series",sub:"Set #6 — Rogue Hobbies",   hex:"#107868"},
+  {code:"S35",name:"Ultramarine",         line:"Signature Series",sub:"Set #6 — Rogue Hobbies",   hex:"#1828A0"},
+  {code:"S36",name:"Bismuth Yellow",      line:"Signature Series",sub:"Set #6 — Rogue Hobbies",   hex:"#E8E040"},
+  {code:"S37",name:"Red Oxide",           line:"Signature Series",sub:"AdeptiCon Spray-Team Set", hex:"#902010"},
+  {code:"S38",name:"Orange Oxide",        line:"Signature Series",sub:"AdeptiCon Spray-Team Set", hex:"#C05010"},
+  {code:"S39",name:"Satin Black",         line:"Signature Series",sub:"AdeptiCon Spray-Team Set", hex:"#141418"},
+  {code:"S40",name:"Drab Brown",          line:"Signature Series",sub:"AdeptiCon Spray-Team Set", hex:"#706040"},
+  {code:"S41",name:"Bright Shadow Flesh", line:"Signature Series",sub:"AdeptiCon Spray-Team Set", hex:"#D4A880"},
+  {code:"S42",name:"Magnesium",           line:"Signature Series",sub:"AdeptiCon Spray-Team Set", hex:"#B0B0B8"},
+  {code:"S49",name:"NOVA Orange",         line:"Signature Series",sub:"NOVA Open", hex:"#F06010"},
+  // AMP COLORS
+  {code:"AMP002",name:"Cool Grey",            line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#909098"},
+  {code:"AMP004",name:"Black Red",            line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#380808"},
+  {code:"AMP005",name:"Dark Navy Blue",       line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#101830"},
+  {code:"AMP006",name:"Beige Grey",           line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#A89E88"},
+  {code:"AMP007",name:"Orange Yellow",        line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#E09820"},
+  {code:"AMP008",name:"Peach Flesh",          line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#E0B090"},
+  {code:"AMP009",name:"Bright Green Blue",    line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#2898A8"},
+  {code:"AMP011",name:"Magenta Wash",         line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#901060"},
+  {code:"AMP012",name:"Petroleum Brown Wash", line:"AMP Colors",sub:"AMP Colors Set #1",hex:"#383020"},
+  {code:"AMP010",name:"Steel",                line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#808898"},
+  {code:"AMP013",name:"Slate Grey",           line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#585E68"},
+  {code:"AMP017",name:"Red Orange",           line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#D04818"},
+  {code:"AMP018",name:"Burnt Umber",          line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#603020"},
+  {code:"AMP020",name:"Green Brown",          line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#505028"},
+  {code:"AMP021",name:"Bright Brown Grey",    line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#A08870"},
+  {code:"AMP022",name:"Grey Green",           line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#708060"},
+  {code:"AMP023",name:"Brown Grey Wash",      line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#504840"},
+  {code:"AMP024",name:"Payne's Grey Wash",    line:"AMP Colors",sub:"AMP Colors Set #2",hex:"#2A3040"},
+  // FLUORESCENTS
+  {code:"F01",name:"Fluorescent Red",    line:"Fluorescents",sub:"Fluorescents",hex:"#FF2020"},
+  {code:"F02",name:"Fluorescent Orange", line:"Fluorescents",sub:"Fluorescents",hex:"#FF6000"},
+  {code:"F03",name:"Fluorescent Yellow", line:"Fluorescents",sub:"Fluorescents",hex:"#FFEE00"},
+  {code:"F04",name:"Fluorescent Green",  line:"Fluorescents",sub:"Fluorescents",hex:"#20EE20"},
+  {code:"F05",name:"Fluorescent Purple", line:"Fluorescents",sub:"Fluorescents",hex:"#B020E0"},
+  {code:"F06",name:"Fluorescent Pink",   line:"Fluorescents",sub:"Fluorescents",hex:"#FF30C0"},
+  // PRIMERS
+  {code:"P-002",name:"Black",             line:"Primers",sub:"Primers",hex:"#141414"},
+  {code:"P-003",name:"White",             line:"Primers",sub:"Primers",hex:"#F6F6F6"},
+  {code:"P-005",name:"Dark Neutral Grey", line:"Primers",sub:"Primers",hex:"#505050"},
+  {code:"P-007",name:"Dark Camo Green",   line:"Primers",sub:"Primers",hex:"#303820"},
+  {code:"P-011",name:"Black Brown",       line:"Primers",sub:"Primers",hex:"#201008"},
+  // WASHES
+  {code:"200",name:"Black Wash",line:"Washes",sub:"Washes",hex:"#181818"},
+  {code:"201",name:"Brown Wash",line:"Washes",sub:"Washes",hex:"#503020"},
+  {code:"202",name:"Flesh Wash",line:"Washes",sub:"Washes",hex:"#905848"},
+  // BASING TEXTURES
+  {code:"T01",name:"Grey Fine",          line:"Basing Textures",sub:"Basing Textures",hex:"#909090"},
+  {code:"T02",name:"Grey Coarse",        line:"Basing Textures",sub:"Basing Textures",hex:"#787878"},
+  {code:"T03",name:"Red Earth Fine",     line:"Basing Textures",sub:"Basing Textures",hex:"#904030"},
+  {code:"T04",name:"Golden Earth Fine",  line:"Basing Textures",sub:"Basing Textures",hex:"#B08040"},
+  {code:"T05",name:"Concrete Extra Fine",line:"Basing Textures",sub:"Basing Textures",hex:"#A0A098"},
+  {code:"T06",name:"Snow Ultra Fine",    line:"Basing Textures",sub:"Basing Textures",hex:"#E8EEF4"},
+  {code:"T07",name:"Brown Earth Fine",   line:"Basing Textures",sub:"Basing Textures",hex:"#7A5030"},
+  {code:"T08",name:"Brown Earth Coarse", line:"Basing Textures",sub:"Basing Textures",hex:"#604020"},
 
-  <!-- CONTACT -->
-  <section id="contact">
-    <div class="section-label reveal">Get in Touch</div>
-    <div class="contact-grid">
-      <div>
-        <h2 class="section-title reveal">Whether you're<br>building or<br><em style="font-style:italic;color:var(--jolt);">breaking ground.</em></h2>
-        <!-- EDIT: Update contact copy and email address -->
-        <div class="contact-intro reveal">
-          <p>We back founders from the earliest stages — if you're working on something at the frontier of science and technology, we want to hear from you.</p>
-          <p>Not raising yet? That's fine too. The best relationships start long before a round.</p>
-        </div>
-        <div class="contact-direct reveal">
-          <div class="contact-label">Email us directly</div>
-          <!-- EDIT: Replace with your actual contact email -->
-          <a href="mailto:hello@jolt.vc">hello@jolt.vc</a>
-        </div>
-      </div>
-      <div class="reveal">
-        <!-- This form uses mailto: for static hosting. For production, swap action for a form backend (e.g. Formspree, Basin, or your own endpoint) -->
-        <form id="contact-form" onsubmit="handleSubmit(event)">
-          <div class="form-row">
-            <div class="form-field">
-              <label for="fname">First Name</label>
-              <input type="text" id="fname" name="fname" required placeholder="Jane" />
-            </div>
-            <div class="form-field">
-              <label for="lname">Last Name</label>
-              <input type="text" id="lname" name="lname" required placeholder="Smith" />
-            </div>
-          </div>
-          <div class="form-field">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" required placeholder="jane@company.com" />
-          </div>
-          <div class="form-field">
-            <label for="company">Company / Organization</label>
-            <input type="text" id="company" name="company" placeholder="Acme Bio" />
-          </div>
-          <div class="form-field">
-            <label for="reason">I am a…</label>
-            <select id="reason" name="reason">
-              <option value="">Select one</option>
-              <option value="founder">Founder seeking investment</option>
-              <option value="lp">Potential LP</option>
-              <option value="partner">Strategic partner / CDMO</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label for="message">Message</label>
-            <textarea id="message" name="message" placeholder="Tell us about your company, the problem you're solving, and where you are in the journey…"></textarea>
-          </div>
-          <button type="submit" class="form-submit" id="submit-btn">Send Message →</button>
-          <p class="form-note" id="form-note">We read every submission and respond to qualified founders within 5 business days.</p>
-        </form>
-      </div>
-    </div>
-  </section>
+  // ─── VALLEJO METAL COLOR ─────────────────────────────────────────
+  {code:"VMC77.701",name:"Aluminium",line:"Metal Color",sub:"Airbrush",hex:"#a8adb2"},
+  {code:"VMC77.702",name:"Duraluminium",line:"Metal Color",sub:"Airbrush",hex:"#8e9196"},
+  {code:"VMC77.703",name:"Dark Aluminium",line:"Metal Color",sub:"Airbrush",hex:"#6a6c70"},
+  {code:"VMC77.704",name:"Pale Burnt Metal",line:"Metal Color",sub:"Airbrush",hex:"#b8925c"},
+  {code:"VMC77.706",name:"White Aluminium",line:"Metal Color",sub:"Airbrush",hex:"#c8cacc"},
+  {code:"VMC77.707",name:"Chrome",line:"Metal Color",sub:"Airbrush",hex:"#d0d4da"},
+  {code:"VMC77.710",name:"Copper",line:"Metal Color",sub:"Airbrush",hex:"#b87338"},
+  {code:"VMC77.711",name:"Magnesium",line:"Metal Color",sub:"Airbrush",hex:"#939598"},
+  {code:"VMC77.712",name:"Steel",line:"Metal Color",sub:"Airbrush",hex:"#888c90"},
+  {code:"VMC77.713",name:"Jet Exhaust",line:"Metal Color",sub:"Airbrush",hex:"#6a5f58"},
+  {code:"VMC77.716",name:"Semi Matt Aluminium",line:"Metal Color",sub:"Airbrush",hex:"#9fa2a7"},
+  {code:"VMC77.717",name:"Dull Aluminium",line:"Metal Color",sub:"Airbrush",hex:"#8a8c8e"},
+  {code:"VMC77.720",name:"Gunmetal Grey",line:"Metal Color",sub:"Airbrush",hex:"#575b60"},
+  {code:"VMC77.721",name:"Burnt Iron",line:"Metal Color",sub:"Airbrush",hex:"#3e3632"},
+  {code:"VMC77.723",name:"Exhaust Manifold",line:"Metal Color",sub:"Airbrush",hex:"#6b4f48"},
+  {code:"VMC77.724",name:"Silver",line:"Metal Color",sub:"Airbrush",hex:"#b8bcc6"},
+  {code:"VMC77.725",name:"Gold",line:"Metal Color",sub:"Airbrush",hex:"#c8a030"},
+  {code:"VMC77.657",name:"Gloss Metal Varnish",line:"Metal Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC77.660",name:"Gloss Black Primer",line:"Metal Color",sub:"Auxiliaries",hex:"#202020"},
+  // ─── VALLEJO MODEL COLOR ─────────────────────────────────────────
+  {code:"VMC70.951",name:"White",line:"Model Color",sub:"Whites",hex:"#f5f4f2"},
+  {code:"VMC70.919",name:"Cold White",line:"Model Color",sub:"Whites",hex:"#eceae4"},
+  {code:"VMC70.842",name:"Gloss White",line:"Model Color",sub:"Whites",hex:"#f0f0ee"},
+  {code:"VMC70.820",name:"Off-White",line:"Model Color",sub:"Whites",hex:"#e8e0cc"},
+  {code:"VMC70.918",name:"Ivory",line:"Model Color",sub:"Whites",hex:"#ece0b8"},
+  {code:"VMC70.837",name:"Pale Sand",line:"Model Color",sub:"Yellows",hex:"#e0d0a0"},
+  {code:"VMC70.917",name:"Beige",line:"Model Color",sub:"Yellows",hex:"#d0be88"},
+  {code:"VMC70.916",name:"Sand Yellow",line:"Model Color",sub:"Yellows",hex:"#d0b848"},
+  {code:"VMC70.949",name:"Light Yellow",line:"Model Color",sub:"Yellows",hex:"#f0e040"},
+  {code:"VMC70.952",name:"Lemon Yellow",line:"Model Color",sub:"Yellows",hex:"#f8f020"},
+  {code:"VMC70.806",name:"German Yellow",line:"Model Color",sub:"Yellows",hex:"#c8a018"},
+  {code:"VMC70.858",name:"Ice Yellow",line:"Model Color",sub:"Yellows",hex:"#f0e898"},
+  {code:"VMC70.915",name:"Deep Yellow",line:"Model Color",sub:"Yellows",hex:"#f0c000"},
+  {code:"VMC70.953",name:"Flat Yellow",line:"Model Color",sub:"Yellows",hex:"#e8b800"},
+  {code:"VMC70.948",name:"Golden Yellow",line:"Model Color",sub:"Yellows",hex:"#d09818"},
+  {code:"VMC70.928",name:"Light Flesh",line:"Model Color",sub:"Skin/Flesh",hex:"#f4c898"},
+  {code:"VMC70.815",name:"Basic Skin Tone",line:"Model Color",sub:"Skin/Flesh",hex:"#d09870"},
+  {code:"VMC70.955",name:"Flat Flesh",line:"Model Color",sub:"Skin/Flesh",hex:"#f0bc90"},
+  {code:"VMC70.927",name:"Dark Flesh",line:"Model Color",sub:"Skin/Flesh",hex:"#b07050"},
+  {code:"VMC70.845",name:"Sunny Skin Tone",line:"Model Color",sub:"Skin/Flesh",hex:"#d4a870"},
+  {code:"VMC70.860",name:"Medium Fleshtone",line:"Model Color",sub:"Skin/Flesh",hex:"#c88060"},
+  {code:"VMC70.914",name:"Green Ochre",line:"Model Color",sub:"Skin/Flesh",hex:"#a88840"},
+  {code:"VMC70.804",name:"Beige Red",line:"Model Color",sub:"Skin/Flesh",hex:"#c09090"},
+  {code:"VMC70.803",name:"Brown Rose",line:"Model Color",sub:"Skin/Flesh",hex:"#c07878"},
+  {code:"VMC70.911",name:"Light Orange",line:"Model Color",sub:"Oranges",hex:"#f0a030"},
+  {code:"VMC70.805",name:"German Orange",line:"Model Color",sub:"Oranges",hex:"#e07020"},
+  {code:"VMC70.851",name:"Bright Orange",line:"Model Color",sub:"Oranges",hex:"#f06820"},
+  {code:"VMC70.956",name:"Clear Orange",line:"Model Color",sub:"Oranges",hex:"#f07818"},
+  {code:"VMC70.981",name:"Orange Brown",line:"Model Color",sub:"Oranges",hex:"#c85818"},
+  {code:"VMC70.817",name:"Scarlet",line:"Model Color",sub:"Reds",hex:"#cc1010"},
+  {code:"VMC70.910",name:"Orange Red",line:"Model Color",sub:"Reds",hex:"#d82e10"},
+  {code:"VMC70.909",name:"Vermillion",line:"Model Color",sub:"Reds",hex:"#e02810"},
+  {code:"VMC70.947",name:"Dark Vermillion",line:"Model Color",sub:"Reds",hex:"#b82010"},
+  {code:"VMC70.908",name:"Carmine Red",line:"Model Color",sub:"Reds",hex:"#c02828"},
+  {code:"VMC70.957",name:"Flat Red",line:"Model Color",sub:"Reds",hex:"#b81e1e"},
+  {code:"VMC70.946",name:"Dark Red",line:"Model Color",sub:"Reds",hex:"#801818"},
+  {code:"VMC70.926",name:"Red",line:"Model Color",sub:"Reds",hex:"#c01818"},
+  {code:"VMC70.814",name:"Burnt Red",line:"Model Color",sub:"Reds",hex:"#902818"},
+  {code:"VMC70.859",name:"Black Red",line:"Model Color",sub:"Reds",hex:"#481010"},
+  {code:"VMC70.835",name:"Salmon Rose",line:"Model Color",sub:"Pinks",hex:"#e09090"},
+  {code:"VMC70.944",name:"Old Rose",line:"Model Color",sub:"Pinks",hex:"#b06060"},
+  {code:"VMC70.958",name:"Pink",line:"Model Color",sub:"Pinks",hex:"#e080a0"},
+  {code:"VMC70.802",name:"Sunset Red",line:"Model Color",sub:"Pinks",hex:"#d03040"},
+  {code:"VMC70.945",name:"Magenta",line:"Model Color",sub:"Pinks",hex:"#c02060"},
+  {code:"VMC70.812",name:"Violet Red",line:"Model Color",sub:"Pinks",hex:"#901070"},
+  {code:"VMC70.959",name:"Purple",line:"Model Color",sub:"Pinks",hex:"#701880"},
+  {code:"VMC70.960",name:"Violet",line:"Model Color",sub:"Pinks",hex:"#583880"},
+  {code:"VMC70.811",name:"Blue Violet",line:"Model Color",sub:"Pinks",hex:"#403080"},
+  {code:"VMC70.810",name:"Royal Purple",line:"Model Color",sub:"Pinks",hex:"#581868"},
+  {code:"VMC70.965",name:"Prussian Blue",line:"Model Color",sub:"Blues",hex:"#1a3060"},
+  {code:"VMC70.899",name:"Dark Prussian Blue",line:"Model Color",sub:"Blues",hex:"#102040"},
+  {code:"VMC70.807",name:"Oxford Blue",line:"Model Color",sub:"Blues",hex:"#102050"},
+  {code:"VMC70.930",name:"Dark Blue",line:"Model Color",sub:"Blues",hex:"#182048"},
+  {code:"VMC70.809",name:"Royal Blue",line:"Model Color",sub:"Blues",hex:"#1830a0"},
+  {code:"VMC70.839",name:"Ultramarine",line:"Model Color",sub:"Blues",hex:"#1c3890"},
+  {code:"VMC70.925",name:"Blue",line:"Model Color",sub:"Blues",hex:"#1c60c0"},
+  {code:"VMC70.963",name:"Medium Blue",line:"Model Color",sub:"Blues",hex:"#2050b8"},
+  {code:"VMC70.964",name:"Field Blue",line:"Model Color",sub:"Blues",hex:"#486890"},
+  {code:"VMC70.900",name:"French Mirage Blue",line:"Model Color",sub:"Blues",hex:"#405878"},
+  {code:"VMC70.903",name:"Intermediate Blue",line:"Model Color",sub:"Blues",hex:"#304888"},
+  {code:"VMC70.943",name:"Grey Blue",line:"Model Color",sub:"Blues",hex:"#607890"},
+  {code:"VMC70.905",name:"Blue Grey Pale",line:"Model Color",sub:"Blues",hex:"#8898b0"},
+  {code:"VMC70.902",name:"Azure",line:"Model Color",sub:"Blues",hex:"#3090d0"},
+  {code:"VMC70.901",name:"Pastel Blue",line:"Model Color",sub:"Blues",hex:"#8098c0"},
+  {code:"VMC70.906",name:"Pale Blue",line:"Model Color",sub:"Blues",hex:"#a0b8d0"},
+  {code:"VMC70.841",name:"Andrea Blue",line:"Model Color",sub:"Blues",hex:"#1c5888"},
+  {code:"VMC70.844",name:"Deep Sky Blue",line:"Model Color",sub:"Blues",hex:"#1878c8"},
+  {code:"VMC70.961",name:"Sky Blue",line:"Model Color",sub:"Blues",hex:"#60a8d8"},
+  {code:"VMC70.840",name:"Light Turquoise",line:"Model Color",sub:"Blues",hex:"#58c8c0"},
+  {code:"VMC70.966",name:"Turquoise",line:"Model Color",sub:"Blues",hex:"#20b0c0"},
+  {code:"VMC70.808",name:"Blue Green",line:"Model Color",sub:"Greens",hex:"#204870"},
+  {code:"VMC70.838",name:"Emerald",line:"Model Color",sub:"Greens",hex:"#208060"},
+  {code:"VMC70.891",name:"Intermediate Green",line:"Model Color",sub:"Greens",hex:"#486048"},
+  {code:"VMC70.942",name:"Light Green",line:"Model Color",sub:"Greens",hex:"#78b878"},
+  {code:"VMC70.885",name:"Pastel Green",line:"Model Color",sub:"Greens",hex:"#88c898"},
+  {code:"VMC70.827",name:"Lime Green",line:"Model Color",sub:"Greens",hex:"#78c820"},
+  {code:"VMC70.954",name:"Yellow Green",line:"Model Color",sub:"Greens",hex:"#90b840"},
+  {code:"VMC70.881",name:"Yellow Green",line:"Model Color",sub:"Greens",hex:"#a8c030"},
+  {code:"VMC70.857",name:"Golden Olive",line:"Model Color",sub:"Greens",hex:"#908820"},
+  {code:"VMC70.892",name:"Yellow Olive",line:"Model Color",sub:"Greens",hex:"#888040"},
+  {code:"VMC70.969",name:"Park Green Flat",line:"Model Color",sub:"Greens",hex:"#3e5828"},
+  {code:"VMC70.967",name:"Olive Green",line:"Model Color",sub:"Greens",hex:"#507040"},
+  {code:"VMC70.968",name:"Flat Green",line:"Model Color",sub:"Greens",hex:"#406830"},
+  {code:"VMC70.833",name:"German Cam. Bright Green",line:"Model Color",sub:"Greens",hex:"#487830"},
+  {code:"VMC70.971",name:"Green Grey",line:"Model Color",sub:"Greens",hex:"#708870"},
+  {code:"VMC70.886",name:"Green Grey (RLM)",line:"Model Color",sub:"Greens",hex:"#687870"},
+  {code:"VMC70.850",name:"Medium Olive",line:"Model Color",sub:"Greens",hex:"#707840"},
+  {code:"VMC70.972",name:"Light Green Blue",line:"Model Color",sub:"Greens",hex:"#708898"},
+  {code:"VMC70.920",name:"German Uniform WWII",line:"Model Color",sub:"Military",hex:"#5a6240"},
+  {code:"VMC70.923",name:"Japanese Uniform WWII",line:"Model Color",sub:"Military",hex:"#787840"},
+  {code:"VMC70.924",name:"Russian Uniform WWII",line:"Model Color",sub:"Military",hex:"#484820"},
+  {code:"VMC70.821",name:"English Uniform WWII",line:"Model Color",sub:"Military",hex:"#b09448"},
+  {code:"VMC70.830",name:"German Fieldgrey WWII",line:"Model Color",sub:"Military",hex:"#5a6050"},
+  {code:"VMC70.816",name:"Luftwaffe Uniform WWII",line:"Model Color",sub:"Military",hex:"#585e48"},
+  {code:"VMC70.823",name:"Luftwaffe Cam. Green",line:"Model Color",sub:"Military",hex:"#486040"},
+  {code:"VMC70.893",name:"US Dark Green",line:"Model Color",sub:"Military",hex:"#203818"},
+  {code:"VMC70.887",name:"US Olive Drab",line:"Model Color",sub:"Military",hex:"#484824"},
+  {code:"VMC70.895",name:"Gunship Green",line:"Model Color",sub:"Military",hex:"#405050"},
+  {code:"VMC70.884",name:"Cam. Olive Green",line:"Model Color",sub:"Military",hex:"#485038"},
+  {code:"VMC70.896",name:"Ger. Cam. Extra Dark Green",line:"Model Color",sub:"Military",hex:"#202c18"},
+  {code:"VMC70.975",name:"Military Green",line:"Model Color",sub:"Military",hex:"#303820"},
+  {code:"VMC70.890",name:"Refractive Green",line:"Model Color",sub:"Military",hex:"#506040"},
+  {code:"VMC70.897",name:"Bronze Green",line:"Model Color",sub:"Military",hex:"#304828"},
+  {code:"VMC70.826",name:"Ger. Cam. Med. Brown",line:"Model Color",sub:"Military",hex:"#806040"},
+  {code:"VMC70.824",name:"Ger. Cam. Orange Ochre",line:"Model Color",sub:"Military",hex:"#b08840"},
+  {code:"VMC70.825",name:"Ger. Cam. Pale Brown",line:"Model Color",sub:"Military",hex:"#c0a870"},
+  {code:"VMC70.822",name:"Ger. Cam. Black Brown",line:"Model Color",sub:"Military",hex:"#2c2018"},
+  {code:"VMC70.979",name:"German Grey",line:"Model Color",sub:"Military",hex:"#383c38"},
+  {code:"VMC70.913",name:"Yellow Ochre",line:"Model Color",sub:"Browns",hex:"#c09030"},
+  {code:"VMC70.877",name:"Gold Brown",line:"Model Color",sub:"Browns",hex:"#c09030"},
+  {code:"VMC70.856",name:"Ochre Brown",line:"Model Color",sub:"Browns",hex:"#b08028"},
+  {code:"VMC70.912",name:"Tan Yellow",line:"Model Color",sub:"Browns",hex:"#c8a860"},
+  {code:"VMC70.847",name:"Dark Sand",line:"Model Color",sub:"Browns",hex:"#9a8048"},
+  {code:"VMC70.819",name:"Iraqi Sand",line:"Model Color",sub:"Browns",hex:"#b8a870"},
+  {code:"VMC70.986",name:"Deck Tan",line:"Model Color",sub:"Browns",hex:"#c8b070"},
+  {code:"VMC70.976",name:"Buff",line:"Model Color",sub:"Browns",hex:"#c8a850"},
+  {code:"VMC70.977",name:"Desert Yellow",line:"Model Color",sub:"Browns",hex:"#c0a840"},
+  {code:"VMC70.978",name:"Dark Yellow",line:"Model Color",sub:"Browns",hex:"#907830"},
+  {code:"VMC70.843",name:"Cork Brown",line:"Model Color",sub:"Browns",hex:"#8a7040"},
+  {code:"VMC70.875",name:"Beige Brown",line:"Model Color",sub:"Browns",hex:"#9a7850"},
+  {code:"VMC70.876",name:"Brown Sand",line:"Model Color",sub:"Browns",hex:"#a88050"},
+  {code:"VMC70.879",name:"Green Brown",line:"Model Color",sub:"Browns",hex:"#687038"},
+  {code:"VMC70.880",name:"Khaki Grey",line:"Model Color",sub:"Browns",hex:"#808860"},
+  {code:"VMC70.988",name:"Khaki",line:"Model Color",sub:"Browns",hex:"#888050"},
+  {code:"VMC70.882",name:"Middlestone",line:"Model Color",sub:"Browns",hex:"#a89040"},
+  {code:"VMC70.874",name:"Tan Earth",line:"Model Color",sub:"Browns",hex:"#9a7040"},
+  {code:"VMC70.873",name:"US Field Drab",line:"Model Color",sub:"Browns",hex:"#8a7040"},
+  {code:"VMC70.983",name:"Flat Earth",line:"Model Color",sub:"Browns",hex:"#8a6838"},
+  {code:"VMC70.984",name:"Flat Brown",line:"Model Color",sub:"Browns",hex:"#7a5028"},
+  {code:"VMC70.846",name:"Mahogany Brown",line:"Model Color",sub:"Browns",hex:"#703020"},
+  {code:"VMC70.940",name:"Saddle Brown",line:"Model Color",sub:"Browns",hex:"#784028"},
+  {code:"VMC70.982",name:"Cavalry Brown",line:"Model Color",sub:"Browns",hex:"#782c1e"},
+  {code:"VMC70.929",name:"Light Brown",line:"Model Color",sub:"Browns",hex:"#9a6840"},
+  {code:"VMC70.828",name:"Wood Grain",line:"Model Color",sub:"Browns",hex:"#8a6028"},
+  {code:"VMC70.834",name:"Natural Woodgrain",line:"Model Color",sub:"Browns",hex:"#9a7840"},
+  {code:"VMC70.818",name:"Red Leather",line:"Model Color",sub:"Browns",hex:"#802818"},
+  {code:"VMC70.871",name:"Leather Brown",line:"Model Color",sub:"Browns",hex:"#7a5028"},
+  {code:"VMC70.872",name:"Chocolate Brown",line:"Model Color",sub:"Browns",hex:"#4a2818"},
+  {code:"VMC70.941",name:"Burnt Umber",line:"Model Color",sub:"Browns",hex:"#4a2818"},
+  {code:"VMC70.985",name:"Hull Red",line:"Model Color",sub:"Browns",hex:"#5a1c10"},
+  {code:"VMC70.939",name:"Smoke",line:"Model Color",sub:"Browns",hex:"#505050"},
+  {code:"VMC70.907",name:"Pale Grey Blue",line:"Model Color",sub:"Greys",hex:"#a8b0c0"},
+  {code:"VMC70.989",name:"Sky Grey",line:"Model Color",sub:"Greys",hex:"#b0b8c0"},
+  {code:"VMC70.990",name:"Light Grey",line:"Model Color",sub:"Greys",hex:"#a8b0b0"},
+  {code:"VMC70.993",name:"White Grey",line:"Model Color",sub:"Greys",hex:"#c8c8c8"},
+  {code:"VMC70.883",name:"Silvergrey",line:"Model Color",sub:"Greys",hex:"#909898"},
+  {code:"VMC70.987",name:"Medium Grey",line:"Model Color",sub:"Greys",hex:"#888888"},
+  {code:"VMC70.992",name:"Neutral Grey",line:"Model Color",sub:"Greys",hex:"#787878"},
+  {code:"VMC70.991",name:"Dark Sea Grey",line:"Model Color",sub:"Greys",hex:"#606868"},
+  {code:"VMC70.994",name:"Dark Grey",line:"Model Color",sub:"Greys",hex:"#505050"},
+  {code:"VMC70.995",name:"German Grey",line:"Model Color",sub:"Greys",hex:"#383838"},
+  {code:"VMC70.836",name:"London Grey",line:"Model Color",sub:"Greys",hex:"#909898"},
+  {code:"VMC70.870",name:"Medium Sea Grey",line:"Model Color",sub:"Greys",hex:"#808890"},
+  {code:"VMC70.904",name:"Dark Blue Grey",line:"Model Color",sub:"Greys",hex:"#485068"},
+  {code:"VMC70.869",name:"Basalt Grey",line:"Model Color",sub:"Greys",hex:"#545858"},
+  {code:"VMC70.867",name:"Dark Blue Grey",line:"Model Color",sub:"Greys",hex:"#404858"},
+  {code:"VMC70.868",name:"Dark Sea Green",line:"Model Color",sub:"Greys",hex:"#404840"},
+  {code:"VMC70.866",name:"Grey Green",line:"Model Color",sub:"Greys",hex:"#606858"},
+  {code:"VMC70.888",name:"Olive Grey",line:"Model Color",sub:"Greys",hex:"#606050"},
+  {code:"VMC70.889",name:"Olive Brown",line:"Model Color",sub:"Greys",hex:"#6a5830"},
+  {code:"VMC70.973",name:"Light Sea Grey",line:"Model Color",sub:"Greys",hex:"#909898"},
+  {code:"VMC70.980",name:"Black Green",line:"Model Color",sub:"Greys",hex:"#161c10"},
+  {code:"VMC70.950",name:"Black",line:"Model Color",sub:"Blacks",hex:"#0e0e0e"},
+  {code:"VMC70.861",name:"Glossy Black",line:"Model Color",sub:"Blacks",hex:"#101010"},
+  {code:"VMC70.862",name:"Black Grey",line:"Model Color",sub:"Blacks",hex:"#282830"},
+  {code:"VMC70.997",name:"Silver",line:"Model Color",sub:"Metallics",hex:"#b8bcc4"},
+  {code:"VMC70.996",name:"Gold",line:"Model Color",sub:"Metallics",hex:"#c8a030"},
+  {code:"VMC70.998",name:"Bronze",line:"Model Color",sub:"Metallics",hex:"#8a6028"},
+  {code:"VMC70.999",name:"Copper",line:"Model Color",sub:"Metallics",hex:"#b07038"},
+  {code:"VMC70.863",name:"Gunmetal Grey",line:"Model Color",sub:"Metallics",hex:"#505458"},
+  {code:"VMC70.864",name:"Natural Steel",line:"Model Color",sub:"Metallics",hex:"#909498"},
+  {code:"VMC70.865",name:"Oily Steel",line:"Model Color",sub:"Metallics",hex:"#585c60"},
+  {code:"VMC70.878",name:"Old Gold",line:"Model Color",sub:"Metallics",hex:"#b89030"},
+  {code:"VMC70.801",name:"Brass",line:"Model Color",sub:"Metallics",hex:"#a88028"},
+  {code:"VMC70.793",name:"Rich Gold (alcohol)",line:"Model Color",sub:"Metallics",hex:"#b08020"},
+  {code:"VMC70.792",name:"Old Gold (alcohol)",line:"Model Color",sub:"Metallics",hex:"#907820"},
+  {code:"VMC70.791",name:"Gold (alcohol)",line:"Model Color",sub:"Metallics",hex:"#c09020"},
+  {code:"VMC70.790",name:"Silver (alcohol)",line:"Model Color",sub:"Metallics",hex:"#b0b4bc"},
+  {code:"VMC70.795",name:"Green Gold",line:"Model Color",sub:"Metallics",hex:"#909040"},
+  {code:"VMC70.796",name:"White Gold",line:"Model Color",sub:"Metallics",hex:"#c8c4a0"},
+  {code:"VMC70.797",name:"Copper (alcohol)",line:"Model Color",sub:"Metallics",hex:"#b07038"},
+  {code:"VMC70.794",name:"Red Gold",line:"Model Color",sub:"Metallics",hex:"#b86030"},
+  {code:"VMC70.934",name:"Transparent Red",line:"Model Color",sub:"Transparents",hex:"#d03030"},
+  {code:"VMC70.935",name:"Transparent Orange",line:"Model Color",sub:"Transparents",hex:"#d07020"},
+  {code:"VMC70.936",name:"Transparent Yellow",line:"Model Color",sub:"Transparents",hex:"#d0c020"},
+  {code:"VMC70.937",name:"Transparent Green",line:"Model Color",sub:"Transparents",hex:"#308040"},
+  {code:"VMC70.938",name:"Transparent Blue",line:"Model Color",sub:"Transparents",hex:"#1050a0"},
+  {code:"VMC70.832",name:"Verdigris Glaze",line:"Model Color",sub:"Glazes",hex:"#488870"},
+  {code:"VMC70.831",name:"Tan Glaze",line:"Model Color",sub:"Glazes",hex:"#a08040"},
+  {code:"VMC70.853",name:"White Glaze",line:"Model Color",sub:"Glazes",hex:"#e0e0e0"},
+  {code:"VMC70.854",name:"Brown Glaze",line:"Model Color",sub:"Glazes",hex:"#603020"},
+  {code:"VMC70.855",name:"Black Glaze",line:"Model Color",sub:"Glazes",hex:"#1e1e1e"},
+  {code:"VMC70.730",name:"Fluorescent Yellow",line:"Model Color",sub:"Fluorescents",hex:"#f8f000"},
+  {code:"VMC70.733",name:"Fluorescent Orange",line:"Model Color",sub:"Fluorescents",hex:"#f86000"},
+  {code:"VMC70.735",name:"Fluorescent Magenta",line:"Model Color",sub:"Fluorescents",hex:"#f82090"},
+  {code:"VMC70.736",name:"Fluorescent Blue",line:"Model Color",sub:"Fluorescents",hex:"#2020f8"},
+  {code:"VMC70.737",name:"Fluorescent Green",line:"Model Color",sub:"Fluorescents",hex:"#10e020"},
+  {code:"VMC70.540",name:"Matt Medium",line:"Model Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC70.470",name:"Gloss Medium",line:"Model Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC70.521",name:"Metal Medium",line:"Model Color",sub:"Auxiliaries",hex:"#b8bcc4"},
+  {code:"VMC70.520",name:"Matt Varnish",line:"Model Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC70.510",name:"Gloss Varnish",line:"Model Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC70.522",name:"Satin Varnish",line:"Model Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC70.596",name:"Glaze Medium",line:"Model Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC70.597",name:"Retarder Medium",line:"Model Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC70.598",name:"Crackle Medium",line:"Model Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VMC70.523",name:"Liquid Mask",line:"Model Color",sub:"Auxiliaries",hex:"#e0e0e0"},
+  {code:"VMC70.400",name:"Plastic Putty",line:"Model Color",sub:"Auxiliaries",hex:"#e0e8e0"},
+  {code:"VMC70.524",name:"Thinner",line:"Model Color",sub:"Auxiliaries",hex:"#e8f0f8"},
+  // ─── VALLEJO GAME COLOR ──────────────────────────────────────────
+  {code:"VGC72.001",name:"Dead White",line:"Game Color",sub:"Standard",hex:"#f5f4f0"},
+  {code:"VGC72.101",name:"Off-White",line:"Game Color",sub:"Standard",hex:"#e8e0cc"},
+  {code:"VGC72.098",name:"Elfic Flesh",line:"Game Color",sub:"Standard",hex:"#f0d8b8"},
+  {code:"VGC72.034",name:"Bone White",line:"Game Color",sub:"Standard",hex:"#d8c898"},
+  {code:"VGC72.003",name:"Pale Flesh",line:"Game Color",sub:"Standard",hex:"#f4c898"},
+  {code:"VGC72.100",name:"Rosy Flesh",line:"Game Color",sub:"Standard",hex:"#e29080"},
+  {code:"VGC72.107",name:"Anthea Skin",line:"Game Color",sub:"Standard",hex:"#d4a07a"},
+  {code:"VGC72.108",name:"Succubus Skin",line:"Game Color",sub:"Standard",hex:"#c07070"},
+  {code:"VGC72.099",name:"Skin Tone",line:"Game Color",sub:"Standard",hex:"#d09470"},
+  {code:"VGC72.004",name:"Elf Skin Tone",line:"Game Color",sub:"Standard",hex:"#e8b088"},
+  {code:"VGC72.071",name:"Barbarian Skin",line:"Game Color",sub:"Standard",hex:"#cc8e68"},
+  {code:"VGC72.109",name:"Toxic Yellow",line:"Game Color",sub:"Standard",hex:"#c8e018"},
+  {code:"VGC72.005",name:"Moon Yellow",line:"Game Color",sub:"Standard",hex:"#f5e050"},
+  {code:"VGC72.006",name:"Sun Yellow",line:"Game Color",sub:"Standard",hex:"#f0c828"},
+  {code:"VGC72.007",name:"Gold Yellow",line:"Game Color",sub:"Standard",hex:"#d0a018"},
+  {code:"VGC72.038",name:"Scrofulous Brown",line:"Game Color",sub:"Standard",hex:"#a87838"},
+  {code:"VGC72.110",name:"Sunset Orange",line:"Game Color",sub:"Standard",hex:"#f08030"},
+  {code:"VGC72.008",name:"Orange Fire",line:"Game Color",sub:"Standard",hex:"#f07020"},
+  {code:"VGC72.009",name:"Hot Orange",line:"Game Color",sub:"Standard",hex:"#e05820"},
+  {code:"VGC72.106",name:"Scarlet Blood",line:"Game Color",sub:"Standard",hex:"#c01818"},
+  {code:"VGC72.010",name:"Bloody Red",line:"Game Color",sub:"Standard",hex:"#b82020"},
+  {code:"VGC72.012",name:"Scarlet Red",line:"Game Color",sub:"Standard",hex:"#d02828"},
+  {code:"VGC72.011",name:"Gory Red",line:"Game Color",sub:"Standard",hex:"#a01e1e"},
+  {code:"VGC72.111",name:"Nocturnal Red",line:"Game Color",sub:"Standard",hex:"#780018"},
+  {code:"VGC72.112",name:"Evil Red",line:"Game Color",sub:"Standard",hex:"#b01828"},
+  {code:"VGC72.013",name:"Squid Pink",line:"Game Color",sub:"Standard",hex:"#e06080"},
+  {code:"VGC72.014",name:"Warlord Purple",line:"Game Color",sub:"Standard",hex:"#7a2878"},
+  {code:"VGC72.113",name:"Deep Magenta",line:"Game Color",sub:"Standard",hex:"#a81858"},
+  {code:"VGC72.114",name:"Lustful Purple",line:"Game Color",sub:"Standard",hex:"#701890"},
+  {code:"VGC72.076",name:"Alien Purple",line:"Game Color",sub:"Standard",hex:"#6a2e90"},
+  {code:"VGC72.015",name:"Hexed Lichen",line:"Game Color",sub:"Standard",hex:"#504870"},
+  {code:"VGC72.016",name:"Royal Purple",line:"Game Color",sub:"Standard",hex:"#602e90"},
+  {code:"VGC72.116",name:"Midnight Purple",line:"Game Color",sub:"Standard",hex:"#301848"},
+  {code:"VGC72.117",name:"Elfic Blue",line:"Game Color",sub:"Standard",hex:"#4878c0"},
+  {code:"VGC72.022",name:"Ultramarine Blue",line:"Game Color",sub:"Standard",hex:"#2848a0"},
+  {code:"VGC72.019",name:"Night Blue",line:"Game Color",sub:"Standard",hex:"#1a1a3a"},
+  {code:"VGC72.118",name:"Sunrise Blue",line:"Game Color",sub:"Standard",hex:"#6090d0"},
+  {code:"VGC72.023",name:"Electric Blue",line:"Game Color",sub:"Standard",hex:"#3878d0"},
+  {code:"VGC72.021",name:"Magic Blue",line:"Game Color",sub:"Standard",hex:"#3060b8"},
+  {code:"VGC72.020",name:"Imperial Blue",line:"Game Color",sub:"Standard",hex:"#1e4080"},
+  {code:"VGC72.096",name:"Verdigris",line:"Game Color",sub:"Standard",hex:"#489060"},
+  {code:"VGC72.119",name:"Aquamarine",line:"Game Color",sub:"Standard",hex:"#30c0a0"},
+  {code:"VGC72.024",name:"Turquoise",line:"Game Color",sub:"Standard",hex:"#20a0b0"},
+  {code:"VGC72.120",name:"Abyssal Turquoise",line:"Game Color",sub:"Standard",hex:"#186880"},
+  {code:"VGC72.121",name:"Ghost Green",line:"Game Color",sub:"Standard",hex:"#90d090"},
+  {code:"VGC72.025",name:"Foul Green",line:"Game Color",sub:"Standard",hex:"#508050"},
+  {code:"VGC72.026",name:"Jade Green",line:"Game Color",sub:"Standard",hex:"#2e8060"},
+  {code:"VGC72.027",name:"Scurvy Green",line:"Game Color",sub:"Standard",hex:"#406030"},
+  {code:"VGC72.122",name:"Bile Green",line:"Game Color",sub:"Standard",hex:"#a0b840"},
+  {code:"VGC72.032",name:"Scorpy Green",line:"Game Color",sub:"Standard",hex:"#60b060"},
+  {code:"VGC72.030",name:"Goblin Green",line:"Game Color",sub:"Standard",hex:"#409040"},
+  {code:"VGC72.029",name:"Sick Green",line:"Game Color",sub:"Standard",hex:"#789050"},
+  {code:"VGC72.123",name:"Angel Green",line:"Game Color",sub:"Standard",hex:"#70c880"},
+  {code:"VGC72.028",name:"Dark Green",line:"Game Color",sub:"Standard",hex:"#184820"},
+  {code:"VGC72.035",name:"Dead Flesh",line:"Game Color",sub:"Standard",hex:"#c8b878"},
+  {code:"VGC72.031",name:"Camouflage Green",line:"Game Color",sub:"Standard",hex:"#608050"},
+  {code:"VGC72.145",name:"Dirty Grey",line:"Game Color",sub:"Standard",hex:"#888888"},
+  {code:"VGC72.067",name:"Cayman Green",line:"Game Color",sub:"Standard",hex:"#507040"},
+  {code:"VGC72.061",name:"Khaki",line:"Game Color",sub:"Standard",hex:"#9a8840"},
+  {code:"VGC72.063",name:"Desert Yellow",line:"Game Color",sub:"Standard",hex:"#c8b050"},
+  {code:"VGC72.062",name:"Earth",line:"Game Color",sub:"Standard",hex:"#8a6030"},
+  {code:"VGC72.036",name:"Bronze Brown",line:"Game Color",sub:"Standard",hex:"#7a5020"},
+  {code:"VGC72.039",name:"Plague Brown",line:"Game Color",sub:"Standard",hex:"#9a8050"},
+  {code:"VGC72.040",name:"Leather Brown",line:"Game Color",sub:"Standard",hex:"#9a6840"},
+  {code:"VGC72.043",name:"Beasty Brown",line:"Game Color",sub:"Standard",hex:"#8a5828"},
+  {code:"VGC72.042",name:"Parasite Brown",line:"Game Color",sub:"Standard",hex:"#6a4820"},
+  {code:"VGC72.115",name:"Marron Mugre",line:"Game Color",sub:"Standard",hex:"#7a5838"},
+  {code:"VGC72.124",name:"Gorgon Brown",line:"Game Color",sub:"Standard",hex:"#888060"},
+  {code:"VGC72.066",name:"Tan",line:"Game Color",sub:"Standard",hex:"#c8a870"},
+  {code:"VGC72.044",name:"Dark Fleshtone",line:"Game Color",sub:"Standard",hex:"#a06040"},
+  {code:"VGC72.045",name:"Charred Brown",line:"Game Color",sub:"Standard",hex:"#4a2818"},
+  {code:"VGC72.047",name:"Wolf Grey",line:"Game Color",sub:"Standard",hex:"#808888"},
+  {code:"VGC72.095",name:"Glacier Blue",line:"Game Color",sub:"Standard",hex:"#a8c8e0"},
+  {code:"VGC72.102",name:"Steel Grey",line:"Game Color",sub:"Standard",hex:"#707880"},
+  {code:"VGC72.048",name:"Sombre Grey",line:"Game Color",sub:"Standard",hex:"#686870"},
+  {code:"VGC72.148",name:"Warm Grey",line:"Game Color",sub:"Standard",hex:"#908880"},
+  {code:"VGC72.049",name:"Stonewall Grey",line:"Game Color",sub:"Standard",hex:"#a0a090"},
+  {code:"VGC72.050",name:"Neutral Grey",line:"Game Color",sub:"Standard",hex:"#808080"},
+  {code:"VGC72.155",name:"Charcoal",line:"Game Color",sub:"Standard",hex:"#484848"},
+  {code:"VGC72.051",name:"Black",line:"Game Color",sub:"Standard",hex:"#101010"},
+  {code:"VGC72.052",name:"Silver",line:"Game Color",sub:"Metallic",hex:"#b8bcc6"},
+  {code:"VGC72.053",name:"Chainmail Silver",line:"Game Color",sub:"Metallic",hex:"#909498"},
+  {code:"VGC72.054",name:"Dark Gunmetal",line:"Game Color",sub:"Metallic",hex:"#505458"},
+  {code:"VGC72.055",name:"Polished Gold",line:"Game Color",sub:"Metallic",hex:"#d0a830"},
+  {code:"VGC72.056",name:"Glorious Gold",line:"Game Color",sub:"Metallic",hex:"#b89020"},
+  {code:"VGC72.057",name:"Bright Bronze",line:"Game Color",sub:"Metallic",hex:"#a07830"},
+  {code:"VGC72.058",name:"Brassy Brass",line:"Game Color",sub:"Metallic",hex:"#b89040"},
+  {code:"VGC72.059",name:"Hammered Copper",line:"Game Color",sub:"Metallic",hex:"#b07038"},
+  {code:"VGC72.060",name:"Tinny Tin",line:"Game Color",sub:"Metallic",hex:"#707878"},
+  {code:"VGC72.082",name:"White Ink",line:"Game Color",sub:"Ink",hex:"#f0f0ec"},
+  {code:"VGC72.093",name:"Skin Ink",line:"Game Color",sub:"Ink",hex:"#e8a870"},
+  {code:"VGC72.085",name:"Yellow Ink",line:"Game Color",sub:"Ink",hex:"#e0c000"},
+  {code:"VGC72.086",name:"Red Ink",line:"Game Color",sub:"Ink",hex:"#c81818"},
+  {code:"VGC72.083",name:"Magenta Ink",line:"Game Color",sub:"Ink",hex:"#c82878"},
+  {code:"VGC72.087",name:"Violet Ink",line:"Game Color",sub:"Ink",hex:"#582888"},
+  {code:"VGC72.088",name:"Blue Ink",line:"Game Color",sub:"Ink",hex:"#1e50c0"},
+  {code:"VGC72.084",name:"Dark Turquoise Ink",line:"Game Color",sub:"Ink",hex:"#107080"},
+  {code:"VGC72.089",name:"Green Ink",line:"Game Color",sub:"Ink",hex:"#1e8040"},
+  {code:"VGC72.090",name:"Black Green Ink",line:"Game Color",sub:"Ink",hex:"#1a3018"},
+  {code:"VGC72.091",name:"Sepia Ink",line:"Game Color",sub:"Ink",hex:"#6a4818"},
+  {code:"VGC72.094",name:"Black Ink",line:"Game Color",sub:"Ink",hex:"#101010"},
+  {code:"VGC72.103",name:"Fluorescent Yellow",line:"Game Color",sub:"Fluorescent",hex:"#f0f010"},
+  {code:"VGC72.156",name:"Fluorescent Orange",line:"Game Color",sub:"Fluorescent",hex:"#f06000"},
+  {code:"VGC72.157",name:"Fluorescent Red",line:"Game Color",sub:"Fluorescent",hex:"#f01820"},
+  {code:"VGC72.158",name:"Fluorescent Magenta",line:"Game Color",sub:"Fluorescent",hex:"#f020a0"},
+  {code:"VGC72.159",name:"Fluorescent Violet",line:"Game Color",sub:"Fluorescent",hex:"#9010e0"},
+  {code:"VGC72.160",name:"Fluorescent Blue",line:"Game Color",sub:"Fluorescent",hex:"#1020f8"},
+  {code:"VGC72.104",name:"Fluorescent Green",line:"Game Color",sub:"Fluorescent",hex:"#10e020"},
+  {code:"VGC72.161",name:"Fluorescent Cold Green",line:"Game Color",sub:"Fluorescent",hex:"#10f0a0"},
+  {code:"VGC73.208",name:"Yellow Wash",line:"Game Color",sub:"Wash",hex:"#d0b818"},
+  {code:"VGC73.204",name:"Flesh Wash",line:"Game Color",sub:"Wash",hex:"#c89060"},
+  {code:"VGC73.206",name:"Red Wash",line:"Game Color",sub:"Wash",hex:"#b02020"},
+  {code:"VGC73.209",name:"Violet Wash",line:"Game Color",sub:"Wash",hex:"#6030a0"},
+  {code:"VGC73.207",name:"Blue Wash",line:"Game Color",sub:"Wash",hex:"#203090"},
+  {code:"VGC73.203",name:"Umber Wash",line:"Game Color",sub:"Wash",hex:"#5a3818"},
+  {code:"VGC73.200",name:"Sepia Wash",line:"Game Color",sub:"Wash",hex:"#7a5020"},
+  {code:"VGC73.201",name:"Black Wash",line:"Game Color",sub:"Wash",hex:"#101010"},
+  {code:"VGC72.600",name:"Vomit",line:"Game Color",sub:"Special FX",hex:"#b0a018"},
+  {code:"VGC72.601",name:"Fresh Blood",line:"Game Color",sub:"Special FX",hex:"#c01818"},
+  {code:"VGC72.602",name:"Thick Blood",line:"Game Color",sub:"Special FX",hex:"#8a1010"},
+  {code:"VGC72.603",name:"Demon Blood",line:"Game Color",sub:"Special FX",hex:"#580808"},
+  {code:"VGC72.604",name:"Frost",line:"Game Color",sub:"Special FX",hex:"#a0d0e8"},
+  {code:"VGC72.605",name:"Green Rust",line:"Game Color",sub:"Special FX",hex:"#608048"},
+  {code:"VGC72.606",name:"Bile",line:"Game Color",sub:"Special FX",hex:"#90a020"},
+  {code:"VGC72.607",name:"Acid",line:"Game Color",sub:"Special FX",hex:"#a0c818"},
+  {code:"VGC72.608",name:"Corrosion",line:"Game Color",sub:"Special FX",hex:"#786040"},
+  {code:"VGC72.609",name:"Rust",line:"Game Color",sub:"Special FX",hex:"#a05018"},
+  {code:"VGC72.610",name:"Galvanic Corrosion",line:"Game Color",sub:"Special FX",hex:"#588090"},
+  {code:"VGC72.611",name:"Moss and Lichen",line:"Game Color",sub:"Special FX",hex:"#607040"},
+  {code:"VGC72.401",name:"Templar White",line:"Game Color",sub:"Xpress",hex:"#e8e8e4"},
+  {code:"VGC72.402",name:"Dwarf Skin",line:"Game Color",sub:"Xpress",hex:"#c89068"},
+  {code:"VGC72.403",name:"Imperial Yellow",line:"Game Color",sub:"Xpress",hex:"#d0a010"},
+  {code:"VGC72.404",name:"Nuclear Yellow",line:"Game Color",sub:"Xpress",hex:"#f0e020"},
+  {code:"VGC72.405",name:"Martian Orange",line:"Game Color",sub:"Xpress",hex:"#e06818"},
+  {code:"VGC72.406",name:"Plasma Red",line:"Game Color",sub:"Xpress",hex:"#c01818"},
+  {code:"VGC72.407",name:"Velvet Red",line:"Game Color",sub:"Xpress",hex:"#901828"},
+  {code:"VGC72.408",name:"Cardinal Purple",line:"Game Color",sub:"Xpress",hex:"#8018a0"},
+  {code:"VGC72.409",name:"Deep Purple",line:"Game Color",sub:"Xpress",hex:"#380878"},
+  {code:"VGC72.410",name:"Gloomy Violet",line:"Game Color",sub:"Xpress",hex:"#582090"},
+  {code:"VGC72.411",name:"Mystic Blue",line:"Game Color",sub:"Xpress",hex:"#3060c0"},
+  {code:"VGC72.412",name:"Storm Blue",line:"Game Color",sub:"Xpress",hex:"#283880"},
+  {code:"VGC72.413",name:"Omega Blue",line:"Game Color",sub:"Xpress",hex:"#1848a8"},
+  {code:"VGC72.414",name:"Caribbean Turquoise",line:"Game Color",sub:"Xpress",hex:"#1890a8"},
+  {code:"VGC72.415",name:"Orc Skin",line:"Game Color",sub:"Xpress",hex:"#609050"},
+  {code:"VGC72.416",name:"Troll Green",line:"Game Color",sub:"Xpress",hex:"#308050"},
+  {code:"VGC72.417",name:"Snake Green",line:"Game Color",sub:"Xpress",hex:"#50a040"},
+  {code:"VGC72.418",name:"Lizard Green",line:"Game Color",sub:"Xpress",hex:"#80c050"},
+  {code:"VGC72.419",name:"Plague Green",line:"Game Color",sub:"Xpress",hex:"#506028"},
+  {code:"VGC72.420",name:"Wasteland Brown",line:"Game Color",sub:"Xpress",hex:"#9a7848"},
+  {code:"VGC72.421",name:"Copper Brown",line:"Game Color",sub:"Xpress",hex:"#9a6030"},
+  {code:"VGC72.422",name:"Space Grey",line:"Game Color",sub:"Xpress",hex:"#707888"},
+  {code:"VGC72.423",name:"Black Lotus",line:"Game Color",sub:"Xpress",hex:"#181818"},
+  {code:"VGC72.448",name:"Xpress Medium",line:"Game Color",sub:"Xpress",hex:"#e8e8e8"},
+  {code:"VGC72.650",name:"Gloss Poly. Varnish",line:"Game Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VGC72.651",name:"Matt Poly. Varnish",line:"Game Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VGC72.652",name:"Satin Poly. Varnish",line:"Game Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+  {code:"VGC72.653",name:"Ultra Matt Varnish",line:"Game Color",sub:"Auxiliaries",hex:"#e8e8e8"},
+];
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-logo">Jolt<span>.</span>VC</div>
-    <div>© 2025 Jolt VC. All rights reserved.</div>
-    <div>
-      <!-- EDIT: Add your real LinkedIn / social URLs -->
-      <a href="#">LinkedIn</a>
-    </div>
-  </footer>
+// Note: VMC = Vallejo Metal/Model Color, VGC = Vallejo Game Color
 
-  <script>
-    // Scroll-triggered reveals
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((e, i) => {
-        if (e.isIntersecting) {
-          setTimeout(() => e.target.classList.add('visible'), i * 60);
-          observer.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.12 });
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+const PAINT_MAP   = Object.fromEntries(PAINTS.map(p => [p.code, p]));
+const LINE_ORDER  = ["Standard Colors","Metallics","Transparents","Signature Series","AMP Colors","Fluorescents","Primers","Washes","Basing Textures","Metal Color","Model Color","Game Color"];
+const LINE_ICONS  = {"Standard Colors":"🎨","Metallics":"✨","Transparents":"💧","Signature Series":"⭐","AMP Colors":"🪖","Fluorescents":"💡","Primers":"🧱","Washes":"🌊","Basing Textures":"🌿","Metal Color":"🔩","Model Color":"🖌️","Game Color":"⚔️"};
+const ALWAYS_SUBS = new Set(["Signature Series","AMP Colors","Metal Color","Model Color","Game Color"]);
+const COLOUR_SUBS = new Set(["Standard Colors"]);
+const BRAND_ORDER = ["Monument Hobbies","Vallejo"];
+const BRAND_LINES = {
+  "Monument Hobbies": ["Standard Colors","Metallics","Transparents","Signature Series","AMP Colors","Fluorescents","Primers","Washes","Basing Textures"],
+  "Vallejo":          ["Metal Color","Model Color","Game Color"]
+};
+const BRAND_ICONS = {"Monument Hobbies":"🏔️","Vallejo":"🦅"};
 
-    // Navbar scroll state
-    window.addEventListener('scroll', () => {
-      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
-    });
+// ─── Tag derivation ───────────────────────────────────────────────────────
+const _SUB_FAM = {
+  'Whites':'White','Blacks':'Black','Reds':'Red','Blues':'Blue','Greens':'Green',
+  'Yellows':'Yellow','Oranges':'Orange','Browns':'Brown','Greys':'Grey',
+  'Skin/Flesh':'Skin/Flesh','Metallics':'Metallic','Metallic':'Metallic',
+  'Pinks':'Pink','Transparents':'Transparent','Fluorescents':'Fluorescent',
+  'Fluorescent':'Fluorescent','Glazes':'Glaze','Military':'Brown',
+  'Wash':'Wash','Ink':'Ink','Special FX':'Special FX','Xpress':'Xpress',
+  'Airbrush':'Metallic',
+};
+const _NAME_FAMS = [
+  [/\bwhit|ivory|bone\s*white|off.white|pale\s*sand/i,           'White'],
+  [/\bblack\b(?!\s*(green|red|brown|grey))/i,                    'Black'],
+  [/grey|gray(?!.*brown)|silver\s*grey|basalt|neutral grey|dark sea grey/i, 'Grey'],
+  [/\bred\b|blood|scarlet|gory|carmine|vermil|dark red|burnt red|flat red|rojo|hull red/i, 'Red'],
+  [/pink|rose|magenta|squid|sunset red|salmon/i,                    'Pink'],
+  [/purple|violet|warlord|hexed|lichen|lustful|midnight purple|alien purple/i, 'Purple'],
+  [/\borange\b|hot orange|orange fire|bright orange|clear orange|german orange/i, 'Orange'],
+  [/yellow|lemon|sun\b|moon\b|toxic yel|gold.*yel|sand yel|ice yel|deep yel|flat yel|golden yel/i, 'Yellow'],
+  [/green|jade|goblin|bile|scurvy|foul green|scorpy|angel green|ghost green|lime|emerald|verdigris|aquam/i, 'Green'],
+  [/\bblue\b|azure|ultramarine|prussian|royal blue|magic blue|electric blue|imperial blue|andrea blue|sky blue|deep sky|oxford|cobalt|turquoise|abyssal|elfic blue|sunrise blue|night blue/i, 'Blue'],
+  [/brown|earth|leather|wood|\btan\b|khaki|sand|ochre|beige|cork|saddle|mahogany|umber|cavalry|chocolate|scrofulous|marron|gorgon|parasite|plague brown|beasty|wasteland/i, 'Brown'],
+  [/skin|flesh|pale flesh|rosy flesh|anthea|succubus|barbarian|elfic flesh|elf skin|dark flesh|basic skin|medium flesh|sunny skin|dwarf skin|orc skin/i, 'Skin/Flesh'],
+  [/\bgold\b|\bsilver\b|\bcopper\b|\bbrass\b|\bbronze\b|gunmetal|\bsteel\b|\biron\b|tinny|duralum|alumin|chrome|magnesium|exhaust|burnt iron|chainmail|polished gold|glorious|brassy|hammered/i, 'Metallic'],
+  [/transparent|smoke\b|woodgrain|natural wood/i,                  'Transparent'],
+  [/fluorescent|fluo/i,                                             'Fluorescent'],
+  [/\bwash\b/i,                                                   'Wash'],
+  [/\bink\b/i,                                                    'Ink'],
+];
+function _deriveManufacturer(p){
+  return (p.code.startsWith('VMC')||p.code.startsWith('VGC'))?'Vallejo':'Monument Hobbies';
+}
+function _deriveColorFamily(p){
+  if(_SUB_FAM[p.sub]) return _SUB_FAM[p.sub];
+  const s=(p.name+' '+p.sub).toLowerCase();
+  for(const[re,fam]of _NAME_FAMS){if(re.test(s))return fam;}
+  return 'Other';
+}
+function _deriveType(p){
+  const l=p.line,s=p.sub;
+  if(s==='Auxiliaries'||s==='Auxiliary')return 'Auxiliary';
+  if(s==='Wash'||l==='Washes')          return 'Wash';
+  if(s==='Ink')                          return 'Ink';
+  if(s==='Special FX')                  return 'Special FX';
+  if(s==='Xpress')                       return 'Xpress';
+  if(s==='Glazes'||s==='Glaze')          return 'Glaze';
+  if(l==='Fluorescents'||s==='Fluorescent'||s==='Fluorescents') return 'Fluorescent';
+  if(l==='Primers')                      return 'Primer';
+  if(l==='Basing Textures')             return 'Texture';
+  if(l==='Transparents'||s==='Transparents'||s==='Transparent') return 'Transparent';
+  if(l==='Metallics'||s==='Metallics'||s==='Metallic'||l==='Metal Color'||s==='Airbrush') return 'Metallic';
+  return 'Standard';
+}
+const PAINT_TAGS={};
+PAINTS.forEach(p=>{
+  PAINT_TAGS[p.code]={
+    manufacturer:_deriveManufacturer(p),
+    colorFamily: _deriveColorFamily(p),
+    type:        _deriveType(p),
+  };
+});
+const TAG_GROUPS=[
+  {key:'manufacturer', label:'Brand',        values:['Monument Hobbies','Vallejo']},
+  {key:'colorFamily',  label:'Colour',       values:['White','Black','Grey','Red','Pink','Purple','Orange','Yellow','Green','Blue','Brown','Skin/Flesh','Metallic','Transparent','Fluorescent','Wash','Ink','Other']},
+  {key:'type',         label:'Type',         values:['Standard','Metallic','Transparent','Wash','Ink','Fluorescent','Glaze','Primer','Texture','Special FX','Xpress','Auxiliary']},
+];
 
-    // Form handler — swap for Formspree/Basin in production
-    function handleSubmit(e) {
-      e.preventDefault();
-      const btn = document.getElementById('submit-btn');
-      const note = document.getElementById('form-note');
-      btn.textContent = 'Sent ✓';
-      btn.disabled = true;
-      btn.style.background = '#3a7d44';
-      note.textContent = "Thanks — we'll be in touch soon.";
-      // EDIT: Replace mailto action below with Formspree endpoint, e.g.:
-      // fetch('https://formspree.io/f/YOUR_ID', { method:'POST', body: new FormData(e.target) })
+// ─── State ────────────────────────────────────
+let currentUser    = null;
+let currentProfile = null;
+let ownedPaints    = new Set();
+let wishedPaints   = new Set();
+let paintNotes     = {};        // code → note text
+let activeFilter   = 'all';
+let activeTagFilters = {manufacturer:new Set(), colorFamily:new Set(), type:new Set()};
+let pendingStyle   = null;
+let pendingXP      = '';
+let noteTargetCode = null;      // which paint the note modal is open for
+
+// ─── UI helpers ───────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function showModal(id) {
+  document.getElementById(id).classList.add('open');
+  if (id === 'profile-modal' && currentProfile) {
+    document.getElementById('modal-name').value   = currentProfile.display_name || '';
+    document.getElementById('modal-system').value = currentProfile.system || '';
+    document.querySelectorAll('#profile-modal [data-xp]').forEach(b =>
+      b.classList.toggle('active', b.dataset.xp === currentProfile.xp));
+  }
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+let toastTimer;
+function showToast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+function setLoading(id, on, label='') {
+  const b = document.getElementById(id);
+  if (!b) return;
+  b.disabled = on;
+  if (on) b.innerHTML = `<span class="spinner"></span>${label}`;
+}
+
+// ─── Session init ─────────────────────────────
+async function init() {
+  const { data:{ session } } = await sb.auth.getSession();
+  if (session) { currentUser = session.user; await loadUserData(); }
+  else showScreen('welcome-screen');
+}
+
+async function loadUserData() {
+  const uid = currentUser.id;
+  const [profRes, ownedRes, wishRes, notesRes] = await Promise.all([
+    sb.from('profiles').select('*').eq('id', uid).single(),
+    sb.from('owned_paints').select('paint_code').eq('user_id', uid),
+    sb.from('wishlist_paints').select('paint_code').eq('user_id', uid),
+    sb.from('paint_notes').select('paint_code,note').eq('user_id', uid),
+  ]);
+  if (!profRes.data) { showScreen('style-screen'); return; }
+  currentProfile = profRes.data;
+  ownedPaints  = new Set((ownedRes.data  || []).map(r => r.paint_code));
+  wishedPaints = new Set((wishRes.data   || []).map(r => r.paint_code));
+  paintNotes   = Object.fromEntries((notesRes.data || []).map(r => [r.paint_code, r.note]));
+  launchApp();
+}
+
+// ─── Auth ─────────────────────────────────────
+async function handleRegister() {
+  const username = document.getElementById('reg-username').value.trim();
+  const email    = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const confirm  = document.getElementById('reg-confirm').value;
+  document.getElementById('reg-user-error').textContent = '';
+  document.getElementById('reg-pass-error').textContent = '';
+  if (!username) { document.getElementById('reg-user-error').textContent = 'Please enter a username.'; return; }
+  if (!email)    { document.getElementById('reg-user-error').textContent = 'Please enter an email.'; return; }
+  if (password.length < 6) { document.getElementById('reg-pass-error').textContent = 'Password must be at least 6 characters.'; return; }
+  if (password !== confirm) { document.getElementById('reg-pass-error').textContent = 'Passwords do not match.'; return; }
+  const { data: existing } = await sb.from('profiles').select('id').eq('username', username).maybeSingle();
+  if (existing) { document.getElementById('reg-user-error').textContent = 'Username already taken.'; return; }
+  setLoading('reg-btn', true, 'Creating account…');
+  const { data, error } = await sb.auth.signUp({ email, password });
+  if (error) { setLoading('reg-btn', false); document.getElementById('reg-pass-error').textContent = error.message; return; }
+  currentUser = data.user;
+  sessionStorage.setItem('pending_username', username);
+  setLoading('reg-btn', false);
+  showScreen('style-screen');
+}
+
+async function handleLogin() {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  document.getElementById('login-error').textContent = '';
+  setLoading('login-btn', true, 'Signing in…');
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) { setLoading('login-btn', false); document.getElementById('login-error').textContent = 'Invalid email or password.'; return; }
+  currentUser = data.user;
+  setLoading('login-btn', false);
+  await loadUserData();
+}
+
+async function handleLogout() {
+  await sb.auth.signOut();
+  currentUser = null; currentProfile = null;
+  ownedPaints = new Set(); wishedPaints = new Set(); paintNotes = {};
+  showScreen('welcome-screen');
+}
+
+// ─── Onboarding ───────────────────────────────
+function selectStyle(el) {
+  document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected'); pendingStyle = el.dataset.style;
+}
+function handleStyleSelect() {
+  if (!pendingStyle) { showToast('Please select a painting style.', true); return; }
+  showScreen('profile-screen');
+}
+function selectXP(el) {
+  document.querySelectorAll('#profile-screen [data-xp]').forEach(b => b.classList.remove('active'));
+  el.classList.add('active'); pendingXP = el.dataset.xp;
+}
+async function handleProfileSave() {
+  const displayName = document.getElementById('profile-name').value.trim();
+  const system      = document.getElementById('profile-system').value.trim();
+  const username    = sessionStorage.getItem('pending_username') || 'painter';
+  const { data:{ session } } = await sb.auth.getSession();
+  if (!session) { showToast('Session expired — please sign in again.', true); showScreen('login-screen'); return; }
+  setLoading('profile-btn', true, 'Saving…');
+  const { data, error } = await sb.from('profiles')
+    .upsert({ id: currentUser.id, username, style: pendingStyle, display_name: displayName, xp: pendingXP, system })
+    .select().single();
+  if (error) { setLoading('profile-btn', false); console.error(error); showToast(error.message, true); return; }
+  currentProfile = data;
+  sessionStorage.removeItem('pending_username');
+  setLoading('profile-btn', false);
+  launchApp();
+}
+
+// ─── Launch ───────────────────────────────────
+function launchApp() {
+  const dn = currentProfile.display_name || currentProfile.username;
+  document.getElementById('topbar-username').textContent = currentProfile.username;
+  document.getElementById('profile-nudge').style.display =
+    (currentProfile.display_name && currentProfile.xp) ? 'none' : 'flex';
+  renderPaints();
+  showScreen('app-screen');
+}
+
+// ─── Owned toggle ─────────────────────────────
+async function toggleOwned(code, event) {
+  event.stopPropagation();
+  const wasOwned = ownedPaints.has(code);
+  wasOwned ? ownedPaints.delete(code) : ownedPaints.add(code);
+  // Marking as owned clears the wishlist — re-wishlist when running low
+  if (!wasOwned && wishedPaints.has(code)) {
+    wishedPaints.delete(code);
+    await sb.from('wishlist_paints').delete().eq('user_id', currentUser.id).eq('paint_code', code);
+  }
+  renderPaints();
+  if (wasOwned) {
+    const { error } = await sb.from('owned_paints').delete().eq('user_id', currentUser.id).eq('paint_code', code);
+    if (error) { ownedPaints.add(code); showToast('Could not save.', true); renderPaints(); }
+  } else {
+    const { error } = await sb.from('owned_paints').insert({ user_id: currentUser.id, paint_code: code });
+    if (error) { ownedPaints.delete(code); showToast('Could not save.', true); renderPaints(); }
+  }
+}
+
+// ─── Wishlist toggle ──────────────────────────
+async function toggleWish(code, event) {
+  event.stopPropagation();
+  const wasWished = wishedPaints.has(code);
+  wasWished ? wishedPaints.delete(code) : wishedPaints.add(code);
+  renderPaints();
+  if (wasWished) {
+    const { error } = await sb.from('wishlist_paints').delete().eq('user_id', currentUser.id).eq('paint_code', code);
+    if (error) { wishedPaints.add(code); showToast('Could not save.', true); renderPaints(); }
+  } else {
+    const { error } = await sb.from('wishlist_paints').upsert({ user_id: currentUser.id, paint_code: code });
+    if (error) { wishedPaints.delete(code); showToast('Could not save.', true); renderPaints(); }
+  }
+}
+
+// ─── Note modal ───────────────────────────────
+function openNoteModal(code, event) {
+  event.stopPropagation();
+  const paint = PAINT_MAP[code];
+  noteTargetCode = code;
+  document.getElementById('note-modal-swatch').style.background = paint.hex;
+  document.getElementById('note-modal-name').textContent = paint.name;
+  document.getElementById('note-modal-code').textContent = code;
+  document.getElementById('note-textarea').value = paintNotes[code] || '';
+  const delBtn = document.getElementById('note-delete-btn');
+  delBtn.style.display = paintNotes[code] ? 'inline' : 'none';
+  showModal('note-modal');
+}
+
+async function saveNote() {
+  const note = document.getElementById('note-textarea').value.trim();
+  const code = noteTargetCode;
+  if (!code) return;
+  setLoading('note-save-btn', true, 'Saving…');
+  if (note) {
+    const { error } = await sb.from('paint_notes')
+      .upsert({ user_id: currentUser.id, paint_code: code, note });
+    if (error) { showToast('Could not save note.', true); setLoading('note-save-btn', false); return; }
+    paintNotes[code] = note;
+  } else {
+    await sb.from('paint_notes').delete().eq('user_id', currentUser.id).eq('paint_code', code);
+    delete paintNotes[code];
+  }
+  setLoading('note-save-btn', false);
+  closeModal('note-modal');
+  renderPaints();
+  showToast(note ? 'Note saved.' : 'Note deleted.');
+}
+
+async function deleteNote() {
+  const code = noteTargetCode;
+  if (!code) return;
+  await sb.from('paint_notes').delete().eq('user_id', currentUser.id).eq('paint_code', code);
+  delete paintNotes[code];
+  closeModal('note-modal');
+  renderPaints();
+  showToast('Note deleted.');
+}
+
+// ─── Render ───────────────────────────────────
+function renderPaints() {
+  const query  = (document.getElementById('search-input').value || '').toLowerCase();
+  const filter = activeFilter;
+
+  const lines = {};
+  PAINTS.forEach(p => {
+    const _tags = PAINT_TAGS[p.code];
+    const _tagStr = _tags ? `${_tags.manufacturer} ${_tags.colorFamily} ${_tags.type}`.toLowerCase() : '';
+    if (!p.name.toLowerCase().includes(query) && !p.code.toLowerCase().includes(query) && !_tagStr.includes(query)) return;
+    const isOwned  = ownedPaints.has(p.code);
+    const isWished = wishedPaints.has(p.code);
+    if (filter === 'owned'   && !isOwned)  return;
+    if (filter === 'wished'  && !isWished) return;
+    if (filter === 'missing' && (isOwned || isWished)) return;
+    const _t = PAINT_TAGS[p.code];
+    if (activeTagFilters.manufacturer.size && !activeTagFilters.manufacturer.has(_t.manufacturer)) return;
+    if (activeTagFilters.colorFamily.size  && !activeTagFilters.colorFamily.has(_t.colorFamily))  return;
+    if (activeTagFilters.type.size         && !activeTagFilters.type.has(_t.type))                return;
+    if (!lines[p.line]) lines[p.line] = {};
+    if (!lines[p.line][p.sub]) lines[p.line][p.sub] = [];
+    lines[p.line][p.sub].push(p);
+  });
+
+  const container = document.getElementById('paint-list');
+  if (!Object.keys(lines).length) {
+    container.innerHTML = '<div class="empty-state">No paints match your search or filter.</div>';
+    updatePills(); return;
+  }
+
+  let html = '';
+  let lastBrand = null;
+  LINE_ORDER.forEach(lineName => {
+    if (!lines[lineName]) return;
+    const brand = Object.keys(BRAND_LINES).find(b => BRAND_LINES[b].includes(lineName)) || 'Other';
+    if (brand !== lastBrand) {
+      const brandLines = BRAND_LINES[brand] || [lineName];
+      const brandAll   = brandLines.flatMap(l => lines[l] ? Object.values(lines[l]).flat() : []);
+      const bOwned     = brandAll.filter(p => ownedPaints.has(p.code)).length;
+      const bTotal     = brandAll.length;
+      html += `<div class="brand-header" id="brand-${brand.replace(/\s+/g,'-').toLowerCase()}">${BRAND_ICONS[brand]||'🎨'} ${brand}<span class="brand-meta">${bOwned}/${bTotal} owned</span></div>`;
+      lastBrand = brand;
     }
-  </script>
+    const subs    = lines[lineName];
+    const all     = Object.values(subs).flat();
+    const ownedN  = all.filter(p => ownedPaints.has(p.code)).length;
+    const wishedN = all.filter(p => wishedPaints.has(p.code)).length;
+    const doSubs  = ALWAYS_SUBS.has(lineName) || (COLOUR_SUBS.has(lineName) && Object.keys(subs).length > 1);
+    const wishHtml = wishedN > 0 ? `<span class="lc-wish">★ ${wishedN} wishlisted</span>` : '';
 
-</body>
+    html += `<div class="line-section">
+      <div class="line-header">
+        ${LINE_ICONS[lineName]||'🎨'} ${lineName}
+        <div class="line-counts">
+          <span class="lc-owned">${ownedN}/${all.length} owned</span>${wishHtml}
+        </div>
+      </div>`;
+
+    Object.entries(subs).forEach(([subName, paints]) => {
+      if (doSubs) {
+        const os = paints.filter(p => ownedPaints.has(p.code)).length;
+        const ws = paints.filter(p => wishedPaints.has(p.code)).length;
+        const wt = ws > 0 ? ` · <span style="color:var(--wish)">★${ws}</span>` : '';
+        html += `<div class="group-header">${subName}<span class="g-count">${os}/${paints.length}${wt}</span></div>`;
+      }
+      html += '<div class="paint-grid">';
+      paints.forEach(p => {
+        const isOwned  = ownedPaints.has(p.code);
+        const isWished = wishedPaints.has(p.code);
+        const hasNote  = !!paintNotes[p.code];
+        const cls      = [isOwned?'owned':'', isWished?'wished':''].filter(Boolean).join(' ');
+        const noteCls  = hasNote ? 'has-note' : '';
+        const safeCode = p.code.replace(/'/g, "\\'");
+        html += `<div class="paint-item ${cls} ${noteCls}" data-code="${p.code}">
+          <div class="paint-swatch" style="background:${p.hex};"></div>
+          <span class="paint-name">${p.name}</span>
+          <span class="paint-code">${p.code}</span>
+          <div class="paint-cols">
+            <div class="paint-col" onclick="toggleOwned('${safeCode}',event)" title="Mark as owned">
+              <div class="col-check"><span class="check-mark">✓</span></div>
+              <span class="paint-col-label owned-lbl">Owned</span>
+            </div>
+            <div class="paint-col" onclick="toggleWish('${safeCode}',event)" title="${isWished?'Remove from wishlist':'Add to wishlist'}">
+              <div class="col-star">★</div>
+              <span class="paint-col-label wish-lbl">Wishlist</span>
+            </div>
+            <div class="paint-col" onclick="openNoteModal('${safeCode}',event)" title="${hasNote?'Edit note':'Add note'}">
+              <div class="col-note">📝</div>
+              <span class="paint-col-label note-lbl">Notes</span>
+            </div>
+            <a class="paint-col buy-col" href="${buyUrl(p.code)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${(p.code.startsWith('VMC')||p.code.startsWith('VGC'))?'Find on Vallejo website':'Buy on Monument Hobbies'}">
+              <div class="col-buy">🛒</div>
+              <span class="paint-col-label" style="color:var(--accent);opacity:.7;">Buy</span>
+            </a>
+          </div>
+        </div>`;
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+  updatePills();
+  renderNav();
+}
+
+function updatePills() {
+  document.getElementById('owned-pill').textContent = `${ownedPaints.size} / ${PAINTS.length} owned`;
+  document.getElementById('wish-pill').textContent  = `${wishedPaints.size} wishlisted`;
+}
+
+function setFilter(el, val) {
+  activeFilter = val;
+  document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderPaints();
+}
+
+// ─── Profile modal ────────────────────────────
+let modalXP = '';
+function selectXPModal(el) {
+  document.querySelectorAll('#profile-modal [data-xp]').forEach(b => b.classList.remove('active'));
+  el.classList.add('active'); modalXP = el.dataset.xp;
+}
+async function saveModalProfile() {
+  const displayName = document.getElementById('modal-name').value.trim();
+  const system      = document.getElementById('modal-system').value.trim();
+  const xp          = modalXP || currentProfile.xp;
+  setLoading('modal-save-btn', true, 'Saving…');
+  const { data, error } = await sb.from('profiles')
+    .update({ display_name: displayName, xp, system }).eq('id', currentUser.id).select().single();
+  setLoading('modal-save-btn', false);
+  if (error) { showToast('Could not save profile.', true); return; }
+  currentProfile = data;
+  document.getElementById('profile-nudge').style.display =
+    (data.display_name && data.xp) ? 'none' : 'flex';
+  closeModal('profile-modal');
+  showToast('Profile saved.');
+}
+
+// Close modals on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(o =>
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }));
+
+init();
+function renderNav() {
+  const nav = document.getElementById('quick-nav');
+  if (!nav) return;
+
+  // Build list of visible lines from rendered DOM
+  const visibleLines = new Set();
+  document.querySelectorAll('.line-header').forEach(h => {
+    LINE_ORDER.forEach(l => { if (h.textContent.includes(l)) visibleLines.add(l); });
+  });
+
+  if (!visibleLines.size) { nav.style.display='none'; return; }
+  nav.style.display='flex';
+
+  let opts = '<option value="">Jump to section…</option>';
+  BRAND_ORDER.forEach(brand => {
+    const lines = (BRAND_LINES[brand] || []).filter(l => visibleLines.has(l));
+    if (!lines.length) return;
+    opts += `<optgroup label="${BRAND_ICONS[brand]||''} ${brand}">`;
+    lines.forEach(l => { opts += `<option value="${l}">${l}</option>`; });
+    opts += '</optgroup>';
+  });
+
+  nav.innerHTML = `<span class="quick-nav-label">Jump to</span><select class="nav-select" onchange="navTo(this.value);this.value=''">${opts}</select>`;
+}
+
+function navTo(lineName) {
+  const headers = document.querySelectorAll('.line-header');
+  for (const h of headers) {
+    if (h.textContent.includes(lineName)) {
+      h.closest('.line-section').scrollIntoView({behavior:'smooth', block:'start'});
+      return;
+    }
+  }
+  // fallback: scroll to brand header
+  const brandHeader = document.querySelector('.brand-header');
+  if (brandHeader) brandHeader.scrollIntoView({behavior:'smooth'});
+}
+
+
+// ─── Tag filter UI ────────────────────────────────────────────────────────
+function openTagFilterModal(){
+  renderFilterModalBody();
+  showModal('tag-filter-modal');
+}
+function renderFilterModalBody(){
+  const el=document.getElementById('filter-modal-body');
+  if(!el)return;
+  let h='';
+  TAG_GROUPS.forEach(({key,label,values})=>{
+    h+=`<div class="filter-group"><div class="filter-group-label">${label}</div><div class="filter-pills">`;
+    values.forEach(v=>{
+      const on=activeTagFilters[key].has(v)?'on':'';
+      h+=`<button class="fpill ${on}" onclick="toggleTagFilter('${key}','${v}',this)">${v}</button>`;
+    });
+    h+='</div></div>';
+  });
+  el.innerHTML=h;
+}
+function toggleTagFilter(key,val,btn){
+  const s=activeTagFilters[key];
+  s.has(val)?s.delete(val):s.add(val);
+  btn.classList.toggle('on',s.has(val));
+  updateTagFilterUI();
+  renderPaints();
+}
+function clearTagFilters(){
+  TAG_GROUPS.forEach(({key})=>activeTagFilters[key].clear());
+  renderFilterModalBody();
+  updateTagFilterUI();
+  renderPaints();
+}
+function updateTagFilterUI(){
+  const total=TAG_GROUPS.reduce((n,{key})=>n+activeTagFilters[key].size,0);
+  const badge=document.getElementById('tag-filter-badge');
+  const btn=document.getElementById('tag-filter-btn');
+  if(badge){badge.style.display=total?'flex':'none';badge.textContent=total;}
+  if(btn){btn.classList.toggle('active',total>0);}
+  // Active chips strip
+  const chips=document.getElementById('active-chips');
+  if(!chips)return;
+  let h='';
+  TAG_GROUPS.forEach(({key,label})=>{
+    activeTagFilters[key].forEach(v=>{
+      h+=`<span class="chip" onclick="toggleTagFilter('${key}','${v}',document.querySelector('.fpill.on'))">${label}: ${v} <span class="chip-x">✕</span></span>`;
+    });
+  });
+  chips.innerHTML=h;
+  // re-attach click handlers to chips properly
+  chips.querySelectorAll('.chip').forEach(chip=>{
+    chip.onclick=()=>{
+      const [k,v]=chip.dataset.kv?.split('|')||[];
+    };
+  });
+  // Rebuild chips with data attributes for reliable removal
+  h='';
+  TAG_GROUPS.forEach(({key,label})=>{
+    activeTagFilters[key].forEach(v=>{
+      h+=`<span class="chip" data-kv="${key}|${v}">${label}: ${v} <span class="chip-x">✕</span></span>`;
+    });
+  });
+  chips.innerHTML=h;
+  chips.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click',()=>{
+      const[k,v]=chip.dataset.kv.split('|');
+      activeTagFilters[k].delete(v);
+      renderFilterModalBody();
+      updateTagFilterUI();
+      renderPaints();
+    });
+  });
+}
+function hideModal(id){document.getElementById(id)?.classList.remove('open');}
+window.addEventListener('scroll',()=>{
+  document.getElementById('back-to-top')?.classList.toggle('visible', window.scrollY > 400);
+});
+</script>
+<button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+
+
 </html>
