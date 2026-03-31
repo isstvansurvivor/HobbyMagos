@@ -1,5 +1,9 @@
-// Supabase keep-alive ping
-// Schedule this via Netlify CRON in netlify.toml — runs every 5 days at 9am UTC
+// Supabase keep-alive ping — runs every 5 days at 9am UTC
+// Netlify scheduled function
+
+exports.config = {
+  schedule: '0 9 */5 * *',
+};
 
 exports.handler = async function () {
   const url  = process.env.SUPABASE_URL;
