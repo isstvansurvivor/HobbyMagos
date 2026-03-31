@@ -1,27 +1,26 @@
-const { schedule } = require('@netlify/functions');
+// Supabase keep-alive ping
+// Schedule this via Netlify CRON in netlify.toml — runs every 5 days at 9am UTC
 
-// Runs every 5 days — well within Supabase's 7-day inactivity limit
-exports.handler = schedule('0 9 */5 * *', async () => {
+exports.handler = async function () {
   const url  = process.env.SUPABASE_URL;
   const key  = process.env.SUPABASE_KEY;
 
   if (!url || !key) {
     console.log('Keep-alive: missing env vars, skipping.');
-    return { statusCode: 200 };
+    return { statusCode: 200, body: 'skipped' };
   }
 
   try {
-    // A lightweight REST ping — just fetches one row from profiles
     const res = await fetch(`${url}/rest/v1/profiles?limit=1`, {
       headers: {
         apikey:        key,
         Authorization: `Bearer ${key}`,
       },
     });
-    console.log(`Keep-alive ping: ${res.status}`);
+    console.log(`Keep-alive ping status: ${res.status}`);
+    return { statusCode: 200, body: `ping ${res.status}` };
   } catch (err) {
     console.error('Keep-alive error:', err.message);
+    return { statusCode: 500, body: err.message };
   }
-
-  return { statusCode: 200 };
-});
+};
