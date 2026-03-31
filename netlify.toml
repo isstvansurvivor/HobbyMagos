@@ -1,0 +1,11 @@
+[functions]
+  directory = "netlify/functions"
+
+[[plugins]]
+
+[build]
+  publish = "."
+
+[[scheduled-functions]]
+  name = "keep-alive"
+  cron = "0 9 */5 * *"
