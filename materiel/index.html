@@ -1800,7 +1800,7 @@ If you cannot identify any paints, return an empty array [].`;
 
   let raw;
   try {
-    const res = await fetch('/.netlify/functions/scan', {
+    const res = await fetch('/api/scan', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
