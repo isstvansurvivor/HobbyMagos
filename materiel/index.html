@@ -1850,7 +1850,7 @@ If you cannot identify any paints, return an empty array [].`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1000,
         messages: [{
           role: 'user',
@@ -1862,6 +1862,12 @@ If you cannot identify any paints, return an empty array [].`;
       })
     });
     const data = await res.json();
+    // Surface any API errors
+    if (data.error || (data.type === 'error')) {
+      const msg = data.error?.message || data.message || JSON.stringify(data);
+      document.getElementById('scan-status').textContent = `❌ API error: ${msg}`;
+      return;
+    }
     raw = data.content?.find(b => b.type === 'text')?.text || '[]';
   } catch(err) {
     document.getElementById('scan-status').textContent = '❌ Network error — please try again.';
