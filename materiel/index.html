@@ -1278,7 +1278,7 @@ function showToast(msg, isError=false) {
   t.textContent = msg;
   t.className = 'toast show' + (isError ? ' error' : '');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 5000);
 }
 function setLoading(id, on, label='') {
   const b = document.getElementById(id);
@@ -1869,6 +1869,11 @@ If you cannot identify any paints, return an empty array [].`;
       return;
     }
     raw = data.content?.find(b => b.type === 'text')?.text || '[]';
+    // Show raw response briefly for debugging
+    if (!raw || raw === '[]') {
+      document.getElementById('scan-status').textContent = `⚠️ Empty response. Full: ${JSON.stringify(data).substring(0,200)}`;
+      return;
+    }
   } catch(err) {
     document.getElementById('scan-status').textContent = '❌ Network error — please try again.';
     return;
