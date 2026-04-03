@@ -412,7 +412,11 @@
          ondrop="handleScanDrop(event)">
       <div class="scan-drop-icon">📸</div>
       <div class="scan-drop-label">Tap to take a photo or upload an image</div>
-      <div class="scan-drop-sub">Works best with pots standing upright in good light</div>
+      <div class="scan-drop-sub" id="scan-remaining-msg"></div>
+      <div class="scan-drop-sub">• You can scan multiple pots at once</div>
+      <div class="scan-drop-sub">• Make sure labels are facing the camera</div>
+      <div class="scan-drop-sub">• Good lighting makes a big difference</div>
+      <div class="scan-drop-sub">• Pots upright works better than on their side</div>
     </div>
     <input type="file" id="scan-file-input" accept="image/*" capture="environment" style="display:none" onchange="handleScanFile(this.files[0])">
 
@@ -1735,18 +1739,28 @@ function hideModal(id){document.getElementById(id)?.classList.remove('open');}
 let scanMatches = [];   // [{paint, checked}]
 
 function openScanModal() {
-  // Check scan limit unless user is a patron
-  if (!currentProfile?.is_patron) {
-    const now       = new Date();
-    const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-    const count     = (currentProfile?.scan_month === thisMonth)
-                      ? (currentProfile?.scan_count || 0)
-                      : 0;
-    if (count >= 5) {
-      showModal('patreon-modal');
-      return;
-    }
+  // Check scan limit — 5 for free users, 100 for patrons
+  const now       = new Date();
+  const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const count     = (currentProfile?.scan_month === thisMonth)
+                    ? (currentProfile?.scan_count || 0)
+                    : 0;
+  const limit     = currentProfile?.is_patron ? 100 : 5;
+
+  if (count >= limit) {
+    showModal('patreon-modal');
+    return;
   }
+
+  // Show remaining scans message
+  const remaining = limit - count;
+  const isPatron  = currentProfile?.is_patron;
+  const msg       = isPatron
+    ? `${remaining} of 100 Artisan scans remaining this month`
+    : `${remaining} of 5 free scans remaining this month — <a href="https://www.patreon.com/c/HobbyMagos" target="_blank" style="color:var(--accent)">join Patreon</a> for 100/month`;
+  const el = document.getElementById('scan-remaining-msg');
+  if (el) el.innerHTML = msg;
+
   resetScanModal();
   showModal('scan-modal');
 }
@@ -1824,9 +1838,10 @@ async function runScan(dataUrl) {
     sb.from('profiles').update({ scan_count: newCount, scan_month: thisMonth })
       .eq('id', currentUser.id).then(() => {});
     // Show remaining scans
-    const remaining = 5 - newCount;
-    if (remaining > 0) {
-      showToast(`${remaining} free scan${remaining !== 1 ? 's' : ''} remaining this month`);
+    const limit2    = currentProfile?.is_patron ? 100 : 5;
+    const remaining = limit2 - newCount;
+    if (remaining > 0 && remaining <= 3) {
+      showToast(`${remaining} scan${remaining !== 1 ? 's' : ''} remaining this month`);
     }
   }
   document.getElementById('scan-confirm-btn').style.display = 'none';
@@ -1869,11 +1884,6 @@ If you cannot identify any paints, return an empty array [].`;
       return;
     }
     raw = data.content?.find(b => b.type === 'text')?.text || '[]';
-    // Show raw response briefly for debugging
-    if (!raw || raw === '[]') {
-      document.getElementById('scan-status').textContent = `⚠️ Empty response. Full: ${JSON.stringify(data).substring(0,200)}`;
-      return;
-    }
   } catch(err) {
     document.getElementById('scan-status').textContent = '❌ Network error — please try again.';
     return;
@@ -1900,7 +1910,7 @@ If you cannot identify any paints, return an empty array [].`;
   identified.forEach(item => {
     // Skip non-tracked manufacturers
     const mfr = (item.manufacturer||'').toLowerCase();
-    if (mfr && !mfr.includes('vallejo') && !mfr.includes('monument') && !mfr.includes('proacryl')) {
+    if (mfr && !mfr.includes('vallejo') && !mfr.includes('monument') && !mfr.includes('proacryl') && !mfr.includes('amp')) {
       unmatched.push(item.name);
       return;
     }
