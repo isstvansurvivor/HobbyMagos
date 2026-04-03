@@ -386,6 +386,20 @@
   </div>
 </div>
 
+<!-- PATREON PAYWALL MODAL -->
+<div class="modal-overlay" id="patreon-modal">
+  <div class="modal" style="max-width:420px;text-align:center;">
+    <div style="font-size:2rem;margin-bottom:.75rem;">🎨</div>
+    <h2 style="margin-bottom:.5rem;">Unlock Unlimited Scanning</h2>
+    <p class="modal-sub" style="margin-bottom:1.2rem;">You've used your 5 free scans this month. Unlimited paint scanning is an exclusive feature for <strong>HobbyMagos Artisan</strong> backers on Patreon.</p>
+    <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:1.5rem;">Join for $5/month and unlock unlimited scans, plus exclusive hobby guides and early access content.</p>
+    <div style="display:flex;flex-direction:column;gap:.75rem;">
+      <button class="btn btn-primary" onclick="connectPatreon()" style="font-size:1rem;">Connect Patreon Account</button>
+      <button class="btn btn-ghost btn-sm" onclick="hideModal('patreon-modal')">Maybe later</button>
+    </div>
+  </div>
+</div>
+
 <!-- SCAN MODAL -->
 <div class="modal-overlay" id="scan-modal">
   <div class="modal scan-modal">
@@ -1376,6 +1390,7 @@ function launchApp() {
     (currentProfile.display_name && currentProfile.xp) ? 'none' : 'flex';
   renderPaints();
   showScreen('app-screen');
+  checkPatreonCallback();
 }
 
 // ─── Owned toggle ─────────────────────────────
@@ -1720,6 +1735,18 @@ function hideModal(id){document.getElementById(id)?.classList.remove('open');}
 let scanMatches = [];   // [{paint, checked}]
 
 function openScanModal() {
+  // Check scan limit unless user is a patron
+  if (!currentProfile?.is_patron) {
+    const now       = new Date();
+    const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const count     = (currentProfile?.scan_month === thisMonth)
+                      ? (currentProfile?.scan_count || 0)
+                      : 0;
+    if (count >= 5) {
+      showModal('patreon-modal');
+      return;
+    }
+  }
   resetScanModal();
   showModal('scan-modal');
 }
@@ -1783,6 +1810,25 @@ function _fuzzyMatch(raw) {
 
 async function runScan(dataUrl) {
   document.getElementById('scan-status').textContent = '🔍 Analysing image…';
+
+  // Increment scan count for non-patrons
+  if (!currentProfile?.is_patron) {
+    const now       = new Date();
+    const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const newCount  = (currentProfile?.scan_month === thisMonth)
+                      ? (currentProfile?.scan_count || 0) + 1
+                      : 1;
+    currentProfile.scan_count = newCount;
+    currentProfile.scan_month = thisMonth;
+    // Update Supabase in background — don't await
+    sb.from('profiles').update({ scan_count: newCount, scan_month: thisMonth })
+      .eq('id', currentUser.id).then(() => {});
+    // Show remaining scans
+    const remaining = 5 - newCount;
+    if (remaining > 0) {
+      showToast(`${remaining} free scan${remaining !== 1 ? 's' : ''} remaining this month`);
+    }
+  }
   document.getElementById('scan-confirm-btn').style.display = 'none';
 
   const base64 = dataUrl.split(',')[1];
@@ -1939,6 +1985,29 @@ async function confirmScanResults() {
   hideModal('scan-modal');
   renderPaints();
   showToast(`${toAdd.length} paint${toAdd.length !== 1 ? 's' : ''} added to your collection! 🎨`);
+}
+
+// ─── Patreon integration ──────────────────────────────────────────────────
+function connectPatreon() {
+  if (!currentUser) { showToast('Please sign in first.', true); return; }
+  // Pass user ID as state so callback can update the right profile
+  const url = `/api/patreon-connect?state=${encodeURIComponent(currentUser.id)}`;
+  window.location.href = url;
+}
+
+function checkPatreonCallback() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('patreon') === 'verified') {
+    // Update local profile
+    if (currentProfile) currentProfile.is_patron = true;
+    hideModal('patreon-modal');
+    showToast('🎉 Patreon verified! Unlimited scanning unlocked.');
+    // Clean URL
+    window.history.replaceState({}, '', window.location.pathname);
+  } else if (params.get('error')) {
+    showToast('Patreon connection failed — please try again.', true);
+    window.history.replaceState({}, '', window.location.pathname);
+  }
 }
 window.addEventListener('scroll',()=>{
   document.getElementById('back-to-top')?.classList.toggle('visible', window.scrollY > 400);
