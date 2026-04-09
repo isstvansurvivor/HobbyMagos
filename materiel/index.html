@@ -592,11 +592,11 @@ const SLUG_MAP = {
 function buyUrl(code) {
   if (code.startsWith('VMC') || code.startsWith('VGC')) {
     const name = PAINT_MAP[code]?.name || code;
-    return `https://www.amazon.com/s?k=${encodeURIComponent(name+' vallejo paint')}&tag=${AMAZON_TAG}`;
+    return `https://www.amazon.com/s?k=${encodeURIComponent(name)}+vallejo+paint&tag=${AMAZON_TAG}`;
   }
   if (code.startsWith('CT')) {
     const name = PAINT_MAP[code]?.name || code;
-    return `https://www.amazon.com/s?k=${encodeURIComponent(name+' citadel paint')}&tag=${AMAZON_TAG}`;
+    return `https://www.amazon.com/s?k=${encodeURIComponent(name)}+citadel+paint&tag=${AMAZON_TAG}`;
   }
   const name = PAINT_MAP[code]?.name || code;
   const base = `https://monumenthobbies.com/search?q=${encodeURIComponent(name)}`;
